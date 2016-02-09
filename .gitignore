@@ -1,0 +1,28 @@
+# Build system files
+/NuGet.config
+/packages/
+/packages.*/
+
+# Compiling result files
+/RsDocGenerator/bin/
+/RsDocGenerator/bin.*/
+/RsDocGenerator/obj/
+/RsDocGenerator/obj.*/
+
+# Visual Studion and ReSharper files
+.vs/
+*.sdf
+*.suo
+*.user
+
+# Generated files
+*.Generated.*
+*Generated.cs
+*Generated.vb
+*Generated.fs
+
+# Temp files
+*.tmp
+*.tmp_proj
+*.orig
+
