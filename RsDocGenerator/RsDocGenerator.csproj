@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\GeneralHelpers.cs" />
+    <Compile Include="src\RsDocExportBase.cs" />
     <Compile Include="src\RsDocExportCodeInspections.cs" />
     <Compile Include="src\RsDocExportContextActions.cs" />
     <Compile Include="src\RsDocExportFeatures.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="src\RsDocExportShortcuts.cs" />
     <Compile Include="src\RsDocExportTemplates.cs" />
     <Compile Include="src\RsDocGeneratorActionGroup.cs" />
+    <Compile Include="src\RsDocOptionsPage.cs" />
     <Compile Include="src\XmlHelpers.cs" />
     <Compile Include="ZoneMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

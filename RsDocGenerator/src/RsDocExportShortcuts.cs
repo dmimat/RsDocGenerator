@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using System.Xml.Linq;
 using JetBrains.ActionManagement;
 using JetBrains.Application;
@@ -15,140 +13,126 @@ using JetBrains.UI.ActionsRevised;
 using JetBrains.UI.ActionsRevised.Loader;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.Sources;
-using FolderBrowserDialog = System.Windows.Forms.FolderBrowserDialog;
-using MessageBox = JetBrains.Util.MessageBox;
 
 namespace RsDocGenerator
 {
   [ShellComponent]
   [Action("RsDocExportShortcuts", "Export Actions and Shortcuts", Id = 8373)]
-  public class RsDocExportShortcuts : IExecutableAction
+  public class RsDocExportShortcuts : RsDocExportBase
   {
-    public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
+    protected override string GenerateContent(IDataContext context, string outputFolder)
     {
-      return true;
-    }
+      var shortcutsXmlDoc = new XDocument();
+      var actionMapElement = new XElement("Keymap");
+      shortcutsXmlDoc.Add(actionMapElement);
+      XmlHelpers.AddAutoGenComment(shortcutsXmlDoc.Root);
 
-    public void Execute(IDataContext context, DelegateExecute nextExecute)
-    {
-      using (var brwsr = new FolderBrowserDialog {Description = "Choose where to save XML topics."})
+      const string menuPathLibId = "Menupath_by_ID";
+      var menuPathLibrary = XmlHelpers.CreateHmTopic(menuPathLibId);
+      const string accessIntroLibId = "AccessIntro_by_ID";
+      var accessIntroLibrary = XmlHelpers.CreateHmTopic(accessIntroLibId);
+
+      var actionManager = context.GetComponent<IActionManager>();
+
+      var productcatalogs = context.GetComponent<IPartCatalogSet>();
+      var actionParts = PartSelector.LeafsAndHides.SelectParts(
+        productcatalogs.Catalogs.SelectMany(catalog => catalog.GetPartsWithAttribute<ActionAttribute>().ToEnumerable()))
+        .ToList();
+
+      foreach (PartCatalogType actionPart in actionParts)
       {
-        if (brwsr.ShowDialog() == DialogResult.Cancel) return;
-        string saveDirectoryPath = brwsr.SelectedPath;
-        var shortcutsXmlDoc = new XDocument();
-        var actionMapElement = new XElement("Keymap");
-        shortcutsXmlDoc.Add(actionMapElement);
-        XmlHelpers.AddAutoGenComment(shortcutsXmlDoc.Root);
+        var attributes = actionPart.GetPartAttributes<ActionAttribute>();
 
-        const string menuPathLibId = "Menupath_by_ID";
-        string menupathLibfileName = Path.Combine(saveDirectoryPath, menuPathLibId + ".xml");
-        var menuPathLibrary = XmlHelpers.CreateHmTopic(menuPathLibId);
-        const string accessIntroLibId = "AccessIntro_by_ID";
-        string accessIntroLibfileName = Path.Combine(saveDirectoryPath, accessIntroLibId + ".xml");
-        var accessIntroLibrary = XmlHelpers.CreateHmTopic(accessIntroLibId);
+        if (attributes.Count == 0)
+          Assertion.Fail("{0} has no ActionAttribute", actionPart);
 
-        var actionManager = context.GetComponent<IActionManager>();
+        if (attributes.Count > 1)
+          Assertion.Fail("{0} has {1} ActionAttribute annotations. Only one annotation is supported.",
+            actionPart, attributes.Count);
 
-        var productcatalogs = context.GetComponent<IPartCatalogSet>();
-        var actionParts = PartSelector.LeafsAndHides.SelectParts(
-          productcatalogs.Catalogs.SelectMany(catalog => catalog.GetPartsWithAttribute<ActionAttribute>().ToEnumerable()))
-          .ToList();
-
-        foreach (PartCatalogType actionPart in actionParts)
+        PartCatalogAttribute attribute = attributes.GetItemAt(0);
+        var actionId =
+          (attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_ActionId].GetStringValueIfDefined() ??
+           StringSource.Empty).ToRuntimeString();
+        if (actionId.IsEmpty())
+          actionId = ActionDefines.GetIdFromName(actionPart.LocalName);
+        var actionText =
+          (attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_Text].GetStringValueIfDefined() ??
+           StringSource.Empty).ToRuntimeString();
+        if (actionText.IsEmpty())
+          actionText = actionId;
+        actionText = actionText.Replace("&", String.Empty);
+        var vsShortcuts =
+          attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_VsShortcuts].GetArrayValueIfDefined();
+        var ideaShortcuts =
+          attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_IdeaShortcuts].GetArrayValueIfDefined();
+        if (actionId.Equals("CompleteCodeBasic")) vsShortcuts = new object[] { "Control+Space" };
+        if (actionId.Equals("CompleteStatement")) vsShortcuts = new object[] { "Control+Shift+Enter" };
+        if (actionId.Equals("CompleteCodeBasic")) ideaShortcuts = new object[] { "Control+Space" };
+        if (actionId.Equals("CompleteStatement")) ideaShortcuts = new object[] { "Control+Shift+Enter" };
+        string pathToTheRoot;
+        try
         {
-          var attributes = actionPart.GetPartAttributes<ActionAttribute>();
-
-          if (attributes.Count == 0)
-            Assertion.Fail("{0} has no ActionAttribute", actionPart);
-
-          if (attributes.Count > 1)
-            Assertion.Fail("{0} has {1} ActionAttribute annotations. Only one annotation is supported.",
-              actionPart, attributes.Count);
-
-          PartCatalogAttribute attribute = attributes.GetItemAt(0);
-          var actionId =
-            (attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_ActionId].GetStringValueIfDefined() ??
-             StringSource.Empty).ToRuntimeString();
-          if (actionId.IsEmpty())
-            actionId = ActionDefines.GetIdFromName(actionPart.LocalName);
-          var actionText =
-            (attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_Text].GetStringValueIfDefined() ??
-             StringSource.Empty).ToRuntimeString();
-          if (actionText.IsEmpty())
-            actionText = actionId;
-          actionText = actionText.Replace("&", String.Empty);
-          var vsShortcuts =
-            attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_VsShortcuts].GetArrayValueIfDefined();
-          var ideaShortcuts =
-            attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_IdeaShortcuts].GetArrayValueIfDefined();
-          if (actionId.Equals("CompleteCodeBasic")) vsShortcuts = new object[] {"Control+Space"};
-          if (actionId.Equals("CompleteStatement")) vsShortcuts = new object[] {"Control+Shift+Enter"};
-          if (actionId.Equals("CompleteCodeBasic")) ideaShortcuts = new object[] {"Control+Space"};
-          if (actionId.Equals("CompleteStatement")) ideaShortcuts = new object[] {"Control+Shift+Enter"};
-          string pathToTheRoot;
-          try
-          {
-            pathToTheRoot =
-              (context.GetComponent<ActionPresentationHelper>()
-                .GetPathPresentationToRoot(actionManager.Defs.GetActionDefById(actionId)));
-          }
-          catch (Exception e) {
-            pathToTheRoot = "";
-          }
-          if (!pathToTheRoot.IsEmpty() && !actionText.IsEmpty())
-            pathToTheRoot = pathToTheRoot.Replace('→', '|') + " | " + actionText;
-          var actionElement = new XElement("Action");
-          var pattern = new Regex("[_.]");
-
-          actionId = pattern.Replace(actionId, String.Empty);
-          
-          actionElement.Add(
-            new XAttribute("id", actionId),
-            new XAttribute("title", actionText),
-            new XAttribute("menupath", pathToTheRoot));
-          var accessIntroChunk = XmlHelpers.CreateChunk(actionId);
-          var accessIntroWrapper = new XElement("p");
-          if (!pathToTheRoot.IsNullOrEmpty())
-          {
-            var menupPathChunk = XmlHelpers.CreateChunk(actionId);
-            pathToTheRoot =
-              pathToTheRoot.Replace("ReSharper | Navigate ", "%navigateMenu%")
-                .Replace("ReSharper | Windows ", "%windowsMenu%");
-            menupPathChunk.Add(new XElement("menupath", pathToTheRoot));
-            accessIntroWrapper.Add(new XElement("menupath", pathToTheRoot));
-            accessIntroWrapper.Add(new XElement("br"));
-            menuPathLibrary.Root.Add(menupPathChunk);
-          }
-          if (ideaShortcuts != null || vsShortcuts != null)
-          {
-            accessIntroWrapper.Add(new XElement("shortcut", new XAttribute("key", actionId)));
-            accessIntroWrapper.Add(new XElement("br"));
-          }
-          accessIntroWrapper.Add(new XElement("code", String.Format("ReSharper_{0}", actionId),
-            new XAttribute("product", "rs")));
-          accessIntroChunk.Add(accessIntroWrapper);
-          accessIntroLibrary.Root.Add(accessIntroChunk);
-          
-          AddShortcuts(ideaShortcuts, actionElement, "rs");
-          AddShortcuts(vsShortcuts, actionElement, "vs");
-
-          if (actionId == "ParameterInfoShow")
-            actionElement.Add(new XElement("Shortcut", "Control+Shift+Space", new XAttribute("layout", "vs")));
-          if (actionId == "GotoDeclaration")
-            actionElement.Add(new XElement("Shortcut", "F12", new XAttribute("layout", "vs")));
-          if (actionId == "GotoImplementation")
-            actionElement.Add(new XElement("Shortcut", "Ctrl+F12", new XAttribute("layout", "vs")));
-          // TODO: check if this hack works 
-
-          actionMapElement.Add(actionElement);
+          pathToTheRoot =
+            (context.GetComponent<ActionPresentationHelper>()
+              .GetPathPresentationToRoot(actionManager.Defs.GetActionDefById(actionId)));
         }
+        catch (Exception e)
+        {
+          pathToTheRoot = "";
+        }
+        if (!pathToTheRoot.IsEmpty() && !actionText.IsEmpty())
+          pathToTheRoot = pathToTheRoot.Replace('→', '|') + " | " + actionText;
+        var actionElement = new XElement("Action");
+        var pattern = new Regex("[_.]");
 
-        shortcutsXmlDoc.Save(Path.Combine(saveDirectoryPath, "keymap.xml"));
-        menuPathLibrary.Save(menupathLibfileName);
-        accessIntroLibrary.Save(accessIntroLibfileName);
+        actionId = pattern.Replace(actionId, String.Empty);
 
-        MessageBox.ShowInfo("Shortcuts and Actions exported successfully");
+        actionElement.Add(
+          new XAttribute("id", actionId),
+          new XAttribute("title", actionText),
+          new XAttribute("menupath", pathToTheRoot));
+        var accessIntroChunk = XmlHelpers.CreateChunk(actionId);
+        var accessIntroWrapper = new XElement("p");
+        if (!pathToTheRoot.IsNullOrEmpty())
+        {
+          var menupPathChunk = XmlHelpers.CreateChunk(actionId);
+          pathToTheRoot =
+            pathToTheRoot.Replace("ReSharper | Navigate ", "%navigateMenu%")
+              .Replace("ReSharper | Windows ", "%windowsMenu%");
+          menupPathChunk.Add(new XElement("menupath", pathToTheRoot));
+          accessIntroWrapper.Add(new XElement("menupath", pathToTheRoot));
+          accessIntroWrapper.Add(new XElement("br"));
+          menuPathLibrary.Root.Add(menupPathChunk);
+        }
+        if (ideaShortcuts != null || vsShortcuts != null)
+        {
+          accessIntroWrapper.Add(new XElement("shortcut", new XAttribute("key", actionId)));
+          accessIntroWrapper.Add(new XElement("br"));
+        }
+        accessIntroWrapper.Add(new XElement("code", String.Format("ReSharper_{0}", actionId),
+          new XAttribute("product", "rs,dcv")));
+        accessIntroChunk.Add(accessIntroWrapper);
+        accessIntroLibrary.Root.Add(accessIntroChunk);
+
+        AddShortcuts(ideaShortcuts, actionElement, "rs");
+        AddShortcuts(vsShortcuts, actionElement, "vs");
+
+        if (actionId == "ParameterInfoShow")
+          actionElement.Add(new XElement("Shortcut", "Control+Shift+Space", new XAttribute("layout", "vs")));
+        if (actionId == "GotoDeclaration")
+          actionElement.Add(new XElement("Shortcut", "F12", new XAttribute("layout", "vs")));
+        if (actionId == "GotoImplementation")
+          actionElement.Add(new XElement("Shortcut", "Ctrl+F12", new XAttribute("layout", "vs")));
+        // TODO: check if this hack works 
+
+        actionMapElement.Add(actionElement);
       }
+
+      shortcutsXmlDoc.Save(Path.Combine(outputFolder, "keymap.xml"));
+      menuPathLibrary.Save(Path.Combine(outputFolder, menuPathLibId + ".xml"));
+      accessIntroLibrary.Save(Path.Combine(outputFolder, accessIntroLibId + ".xml"));
+      return "Shortcuts and actions";
     }
 
     private static void AddShortcuts(object[] currentShortcutsSet, XElement actionElement, string keymapName)

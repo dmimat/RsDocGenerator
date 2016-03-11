@@ -1,65 +1,50 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml.Linq;
-using JetBrains.ActionManagement;
 using JetBrains.Application.DataContext;
 using JetBrains.ReSharper.Feature.Services.PostfixTemplates;
 using JetBrains.UI.ActionsRevised;
-using MessageBox = JetBrains.Util.MessageBox;
 
 namespace RsDocGenerator
 {
-    [Action("RsDocExportPostfixTemplates", "Export Postfix Templates", Id = 7569)]
-    internal class RsDocExportPostfixTemplates : IExecutableAction
+  [Action("RsDocExportPostfixTemplates", "Export Postfix Templates", Id = 7569)]
+  internal class RsDocExportPostfixTemplates : RsDocExportBase
+  {
+    protected override string GenerateContent(IDataContext context, string outputFolder)
     {
-        public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
-        {
-            return true;
-        }
+      const string postfixTopicId = "Postfix_Templates_Generated";
+      var postfixLibrary = XmlHelpers.CreateHmTopic(postfixTopicId);
+      var postfixChunk = XmlHelpers.CreateChunk("postfix_table");
+      var macroTable = XmlHelpers.CreateTable(new[] {"Shortcut", "Description", "Example"}, null);
 
-        public void Execute(IDataContext context, DelegateExecute nextExecute)
-        {
-            using (var brwsr = new FolderBrowserDialog() {Description = "Choose where to save XML topics."})
-            {
-                const string postfixTopicId = "Postfix_Templates_Generated";
-                if (brwsr.ShowDialog() == DialogResult.Cancel) return;
-                string saveDirectoryPath = brwsr.SelectedPath;
-                string fileName = Path.Combine(saveDirectoryPath, postfixTopicId + ".xml");
+      var allSortedPostfix =
+        context.GetComponent<PostfixTemplatesManager>()
+          .AllRegisteredPostfixTemplates.OrderBy(template => template.Annotations.TemplateName);
+      postfixLibrary.Root.Add(
+        new XComment("Total postifix templates in ReSharper " +
+                     GeneralHelpers.GetCurrentVersion() + ": " + allSortedPostfix.Count()));
 
-              var postfixLibrary = XmlHelpers.CreateHmTopic(postfixTopicId);
-                var postfixChunk = XmlHelpers.CreateChunk("postfix_table");
-                var macroTable = XmlHelpers.CreateTable(new[] {"Shortcut", "Description", "Example"}, null);
+      foreach (var postTempalte in allSortedPostfix)
+      {
+        var postfixRow = new XElement("tr");
+        var shortcut = postTempalte.Annotations.TemplateName;
+        var description = postTempalte.Annotations.Description;
+        var example = postTempalte.Annotations.Example;
 
-                var allSortedPostfix =
-                    context.GetComponent<PostfixTemplatesManager>()
-                        .AllRegisteredPostfixTemplates.OrderBy(template => template.Annotations.TemplateName);
-                postfixLibrary.Root.Add(
-                    new XComment("Total postifix templates in ReSharper " + 
-                      GeneralHelpers.GetCurrentVersion() + ": " + allSortedPostfix.Count()));
+        var shortcutCell = XElement.Parse("<td><b>." + shortcut + "</b></td>");
+        shortcutCell.Add(new XAttribute("id", shortcut));
+        var descriptionCell = XElement.Parse("<td>" + description + "</td>");
+        var exampleCell = new XElement("td", new XElement("code", example));
 
-                foreach (var postTempalte in allSortedPostfix)
-                {
-                    var postfixRow = new XElement("tr");
-                    var shortcut = postTempalte.Annotations.TemplateName;
-                    var description = postTempalte.Annotations.Description;
-                    var example = postTempalte.Annotations.Example;
-                    
-                    var shortcutCell = XElement.Parse("<td><b>." + shortcut + "</b></td>");
-                    shortcutCell.Add(new XAttribute("id", shortcut));
-                    var descriptionCell = XElement.Parse("<td>" + description + "</td>");
-                    var exampleCell = new XElement("td", new XElement("code", example));
-  
-                    postfixRow.Add(shortcutCell, descriptionCell, exampleCell);
-                    macroTable.Add(postfixRow);
-                }
+        postfixRow.Add(shortcutCell, descriptionCell, exampleCell);
+        macroTable.Add(postfixRow);
+      }
 
-                postfixChunk.Add(macroTable);
-                
-                postfixLibrary.Root.Add(postfixChunk);
-                postfixLibrary.Save(fileName);
-                MessageBox.ShowInfo("Postfix templates saved successfully");
-            }
-        }
+      postfixChunk.Add(macroTable);
+
+      postfixLibrary.Root.Add(postfixChunk);
+      postfixLibrary.Save(Path.Combine(outputFolder, postfixTopicId + ".xml"));
+      return "Postfix templates";
     }
+  }
 }

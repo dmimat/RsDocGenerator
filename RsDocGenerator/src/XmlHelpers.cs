@@ -71,9 +71,9 @@ namespace RsDocGenerator
       return link;
     }
 
-    public static XElement CrqateCodeBlock([NotNull] string content, [CanBeNull] string lang)
+    public static XElement CreateCodeBlock([NotNull] string content, [CanBeNull] string lang)
     {
-      var codeElement = new XElement("code", content,
+      var codeElement = new XElement("code", content.CleanCodeSample(),
         new XAttribute("style", "block"));
 
       if (lang == null || lang == "Global")

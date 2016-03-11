@@ -21,7 +21,7 @@ namespace RsDocGenerator
 {
 
 
-  // This is an old implementation, doen't work, but may contain some hints as of where to get the data from.
+  // This is an old implementation, doesn't work now, but may contain some hints as of where to get the data from.
 
     [Action("RsDocExportFeatures", Id = 6969)]
     internal class RsDocExportFeatures : IExecutableAction
