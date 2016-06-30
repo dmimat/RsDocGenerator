@@ -252,8 +252,8 @@ namespace RsDocGenerator
         private string GetLangsForInspection(string id)
         {
             var lang = string.Empty;
-            var langs = HighlightingSettingsManager.Instance.GetConfigurableSeverityImplementations(id);
-            foreach (PsiLanguageType psiLanguageType in langs)
+            var langs = HighlightingSettingsManager.Instance.GetInspectionImplementations(id);
+      foreach (PsiLanguageType psiLanguageType in langs)
             {
                 string langName = this.NormalizeLanguage(psiLanguageType.Name);
                 if (!lang.Contains(langName))

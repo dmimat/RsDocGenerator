@@ -5,8 +5,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
-using JetBrains.ReSharper.Feature.Services.Bulk;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
+using JetBrains.ReSharper.Feature.Services.Intentions.Scoped;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.UI.ActionsRevised;
 
@@ -38,7 +38,7 @@ namespace RsDocGenerator
 
         foreach (var type in types)
         {
-          if (typeof (IBulkAction).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+          if (typeof (IScopedAction).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
           {
             var text = "";
             try
