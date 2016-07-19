@@ -55,7 +55,7 @@ namespace RsDocGenerator
       var topicRoot = topic.Root;
 
       topicRoot.Add(new XElement("p",
-        new XElement("menupath", "ReSharper | Templates Explorer | " + type + " Templates")));
+        new XElement("menupath", "ReSharper | Tools | Templates Explorer | " + type + " Templates")));
 
       topicRoot.Add(new XElement("p",
         "This section lists all predefined " + type + " templates in ReSharper " + version + "."));

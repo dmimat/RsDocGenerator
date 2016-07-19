@@ -43,7 +43,7 @@ namespace RsDocGenerator
           new XElement("td",
             ca.Description ?? "", exampleTable,
             XmlHelpers.CreateInclude("CA_Static_Chunks",
-              ca.MergeKey.NormalizeStringForAttribute()))));
+              ca.ActionKey.NormalizeStringForAttribute()))));
       }
 
       foreach (var table in tablesByLanguage)
@@ -71,7 +71,7 @@ namespace RsDocGenerator
     {
       // temporarily disabled
       return null;
-      var testFileName = contextAction.MergeKey.Split('.').Last().RemoveFromEnd("Action") + ".cs";
+      var testFileName = contextAction.ActionKey.Split('.').Last().RemoveFromEnd("Action") + ".cs";
       var goldFileName = testFileName + ".gold";
       var basePath = Path.Combine(caPath, lang.NormalizeStringForAttribute().ToLower());
       var testFile = Path.Combine(basePath, testFileName);

@@ -19,7 +19,7 @@ namespace RsDocGenerator
 
       var allSortedPostfix =
         context.GetComponent<PostfixTemplatesManager>()
-          .AllRegisteredPostfixTemplates.OrderBy(template => template.Annotations.TemplateName);
+          .AllRegisteredPostfixTemplates.OrderBy(template => template.Annotation.TemplateName);
       postfixLibrary.Root.Add(
         new XComment("Total postifix templates in ReSharper " +
                      GeneralHelpers.GetCurrentVersion() + ": " + allSortedPostfix.Count()));
@@ -27,9 +27,9 @@ namespace RsDocGenerator
       foreach (var postTempalte in allSortedPostfix)
       {
         var postfixRow = new XElement("tr");
-        var shortcut = postTempalte.Annotations.TemplateName;
-        var description = postTempalte.Annotations.Description;
-        var example = postTempalte.Annotations.Example;
+        var shortcut = postTempalte.Annotation.TemplateName;
+        var description = postTempalte.Annotation.Description;
+        var example = postTempalte.Annotation.Example;
 
         var shortcutCell = XElement.Parse("<td><b>." + shortcut + "</b></td>");
         shortcutCell.Add(new XAttribute("id", shortcut));
