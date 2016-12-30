@@ -8,7 +8,8 @@ namespace RsDocGenerator
     {
         public RsDocGeneratorActionGroup(RsDocExportMacros macros, RsDocExportContextActions ca,
             RsDocExportShortcuts shortcuts, RsDocExportTemplates templates, RsDocExportFixInScope scope,
-            RsDocExportCodeInspections inspections, RsDocExportPostfixTemplates postfix)
+            RsDocExportCodeInspections inspections, RsDocExportInspectionsIndex inspIndex,
+            RsDocExportPostfixTemplates postfix)
         {
         }
     }

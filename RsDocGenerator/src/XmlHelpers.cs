@@ -55,12 +55,18 @@ namespace RsDocGenerator
 
     public static XElement CreateChapter(string title)
     {
-      return new XElement("chapter",
-        new XAttribute("caps", "aswritten"),
-        new XAttribute("title", title));
+        return CreateChapter(title, title.NormalizeStringForAttribute());
     }
 
-    public static XElement CreateHyperlink([CanBeNull] string content, [CanBeNull] string href,
+      public static XElement CreateChapter(string title, string id)
+      {
+          return new XElement("chapter",
+              new XAttribute("id", id),
+              new XAttribute("caps", "aswritten"),
+              new XAttribute("title", title));
+      }
+
+      public static XElement CreateHyperlink([CanBeNull] string content, [CanBeNull] string href,
       [CanBeNull] string anchor)
     {
       var link = new XElement("a", content);

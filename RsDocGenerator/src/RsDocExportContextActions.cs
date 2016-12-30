@@ -38,7 +38,7 @@ namespace RsDocGenerator
 
         var exampleTable = ExtractExamples(ca, caPath, lang);
 
-        tablesByLanguage.GetValue(lang).Add(new XElement("tr",
+        tablesByLanguage[lang].Add(new XElement("tr",
           new XElement("td", new XElement("b", ca.Name)),
           new XElement("td",
             ca.Description ?? "", exampleTable,

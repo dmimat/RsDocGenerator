@@ -46,7 +46,7 @@ namespace RsDocGenerator
             continue;
 
           var inspectionId = inspection.Id;
-          var inspectionElement = new XElement("Inspection", inspection.HTMLDescriptionBody);
+          var inspectionElement = new XElement("Inspection", inspection.Description);
 
           inspectionElement.Add(new XAttribute("id", inspectionId));
           inspectionElement.Add(new XAttribute("lang", this.GetLangsForInspection(inspectionId)));

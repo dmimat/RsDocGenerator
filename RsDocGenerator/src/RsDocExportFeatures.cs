@@ -92,7 +92,7 @@ namespace RsDocGenerator
                 this.myTestAssemblies.Add(testAssembly);
             }
 
-            var cache = this.GetTestsForFeatures();
+           // var cache = this.GetTestsForFeatures();
 
             // Context actions
             int cAnumber = 0;
@@ -143,7 +143,7 @@ namespace RsDocGenerator
                         //                description = a.Description;
                         //              }
                         //            }
-                        this.AddFeature(xDocRoot, type.Name, type, "QuickFix", this.version, name, description, lang, cache, null);
+                       // this.AddFeature(xDocRoot, type.Name, type, "QuickFix", this.version, name, description, lang, cache, null);
                         qFnumber++;
                     }
 
@@ -177,7 +177,7 @@ namespace RsDocGenerator
                                 if (inpectionInstance != null)
                                 {
                                     name = inpectionInstance.FullTitle;
-                                    description = inpectionInstance.HTMLDescriptionBody;
+                                    description = inpectionInstance.Description;
                                     severity = inpectionInstance.DefaultSeverity.ToString();
                                     solutionWide = inpectionInstance.SolutionAnalysisRequired ? "yes" : "no";
                                     group = inpectionInstance.GroupId;
@@ -210,7 +210,7 @@ namespace RsDocGenerator
                                                  );
                             if (string.IsNullOrEmpty(name) && description == "Unknown") name = RsDocExportFeatures.SplitCamelCase(type.Name);
                             if (string.IsNullOrEmpty(name)) name = description;
-                            this.AddFeature(xDocRoot, id, type, "Inspection", this.version, name, description, lang, cache, details);
+                            //this.AddFeature(xDocRoot, id, type, "Inspection", this.version, name, description, lang, cache, details);
                             insTypeNumber++;
                         }
                     }
@@ -238,7 +238,7 @@ namespace RsDocGenerator
                                              new XAttribute("QuickFixes", "")
                                              );
                     this.AddFeature(xDocRoot, ins.Id, ins.GetType(), "Inspection", this.version,
-                      ins.FullTitle, ins.HTMLDescriptionBody, this.GetLangsForInspection(ins.Id), null, details);
+                      ins.FullTitle, ins.Description, this.GetLangsForInspection(ins.Id), null, details);
                 }
                 insTypeNumber++;
             }
@@ -337,7 +337,7 @@ namespace RsDocGenerator
         /// Builds a dictionary (feature type, test object)
         /// </summary>
         /// <returns></returns>
-        private List<KeyValuePair<Type, Object>> GetTestsForFeatures()
+/*        private List<KeyValuePair<Type, Object>> GetTestsForFeatures()
         {
             var cache = new List<KeyValuePair<Type, Object>>();
             foreach (var assembly in this.myTestAssemblies)
@@ -352,6 +352,8 @@ namespace RsDocGenerator
                         if (attribute.GetType().Name == "IgnoreAttribute") ignore = true;
 
                     if (ignore) continue;
+
+
 
                     foreach (Type genericTypeArgument in testType.BaseType.GetGenericArguments())
                     {
@@ -390,7 +392,7 @@ namespace RsDocGenerator
                 }
             }
             return cache;
-        }
+        }*/
 
         /// <summary>
         /// Finds all tests for a feature.
