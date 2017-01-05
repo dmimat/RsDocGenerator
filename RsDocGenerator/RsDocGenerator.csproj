@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RsDocGenerator</RootNamespace>
     <AssemblyName>RsDocGenerator</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -347,6 +348,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\CodeInspectionHelpers.cs" />
+    <Compile Include="src\FeatureKeeper.cs" />
     <Compile Include="src\GeneralHelpers.cs" />
     <Compile Include="src\RsDocExportBase.cs" />
     <Compile Include="src\RsDocExportCodeInspections.cs" />

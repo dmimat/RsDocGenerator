@@ -1,0 +1,237 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
+using JetBrains.Application.Catalogs;
+using JetBrains.ReSharper.Daemon.WebConfig.Highlightings;
+using JetBrains.ReSharper.Daemon.Xaml.Highlightings;
+using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Resources.Shell;
+
+namespace RsDocGenerator
+{
+    public static class CodeInspectionHelpers
+    {
+        public static  Dictionary<string, string> ExternalInspectionLinks { get; set; }
+        public static  Dictionary<string, string> PsiLanguagesByCategoryNames { get; set; }
+
+        static CodeInspectionHelpers()
+        {
+            ExternalInspectionLinks = new Dictionary<string, string>()
+            {
+                {"CSharpWarnings::CS0108", "https://msdn.microsoft.com/en-us/library/3s8070fc.aspx"},
+                {"CSharpWarnings::CS0109", "https://msdn.microsoft.com/en-us/library/css4y2c4.aspx"},
+                {"CSharpWarnings::CS0162", "https://msdn.microsoft.com/en-us/library/c0h4st1x.aspx"},
+                {"CSharpWarnings::CS0183", "https://msdn.microsoft.com/en-us/library/sb7782xb.aspx"},
+                {"CSharpWarnings::CS0184", "https://msdn.microsoft.com/en-us/library/230kb9yt.aspx"},
+                {"CSharpWarnings::CS0197", "https://msdn.microsoft.com/en-us/library/y545659k.aspx"},
+                {"CSharpWarnings::CS0252", "https://msdn.microsoft.com/en-us/library/f6dtw2ah.aspx"},
+                {"CSharpWarnings::CS0420", "https://msdn.microsoft.com/en-us/library/4bw5ewxy.aspx"},
+                {"CSharpWarnings::CS0465", "https://msdn.microsoft.com/en-us/library/02wtfwbt.aspx"},
+                {"CSharpWarnings::CS0469", "https://msdn.microsoft.com/en-us/library/ms228370.aspx"},
+                {"CSharpWarnings::CS0612", "https://msdn.microsoft.com/en-us/library/h0h063ka.aspx"},
+                {"CSharpWarnings::CS0618", "https://msdn.microsoft.com/en-us/library/x5ye6x1e.aspx"},
+                {"CSharpWarnings::CS0628", "https://msdn.microsoft.com/en-us/library/7x8ekes3.aspx"},
+                {"CSharpWarnings::CS0642", "https://msdn.microsoft.com/en-us/library/9x19t380.aspx"},
+                {"CSharpWarnings::CS0657", "https://msdn.microsoft.com/en-us/library/c6hdfbk4.aspx"},
+                {"CSharpWarnings::CS0658", "https://msdn.microsoft.com/en-us/library/4ky08ezz.aspx"},
+                {"CSharpWarnings::CS0659", "https://msdn.microsoft.com/en-us/library/xxhbfytk.aspx"},
+                {"CSharpWarnings::CS0660", "https://msdn.microsoft.com/en-us/library/4wtxwb6k.aspx"},
+                {"CSharpWarnings::CS0665", "https://msdn.microsoft.com/en-us/library/c1sde1ax.aspx"},
+                {"CSharpWarnings::CS0672", "https://msdn.microsoft.com/en-us/library/9dzeyth8.aspx"},
+                {"CSharpWarnings::CS0693", "https://msdn.microsoft.com/en-us/library/0ah54ze5.aspx"},
+                {"CSharpWarnings::CS1030", "https://msdn.microsoft.com/en-us/library/ckcykyd4.aspx"},
+                {"CSharpWarnings::CS1058", "https://msdn.microsoft.com/en-us/library/ms228623.aspx"},
+                {"CSharpWarnings::CS1522", "https://msdn.microsoft.com/en-us/library/x68b4s45.aspx"},
+                {"CSharpWarnings::CS1570", "https://msdn.microsoft.com/en-us/library/c20zzdxx.aspx"},
+                {"CSharpWarnings::CS1571", "https://msdn.microsoft.com/en-us/library/a5c6cbk0.aspx"},
+                {"CSharpWarnings::CS1573", "https://msdn.microsoft.com/en-us/library/01248w2b.aspx"},
+                {"CSharpWarnings::CS1574", "https://msdn.microsoft.com/en-us/library/26x4hk2a.aspx"},
+                {"CSharpWarnings::CS1580", "https://msdn.microsoft.com/en-us/library/03t96cfx.aspx"},
+                {"CSharpWarnings::CS1584", "https://msdn.microsoft.com/en-us/library/hz13h4se.aspx"},
+                {"CSharpWarnings::CS1587", "https://msdn.microsoft.com/en-us/library/d3x6ez1z.aspx"},
+                {"CSharpWarnings::CS1589", "https://msdn.microsoft.com/en-us/library/3y857kz5.aspx"},
+                {"CSharpWarnings::CS1590", "https://msdn.microsoft.com/en-us/library/549c3y6s.aspx"},
+                {"CSharpWarnings::CS1591", "https://msdn.microsoft.com/en-us/library/zk18c1w9.aspx"},
+                {"CSharpWarnings::CS1592", "https://msdn.microsoft.com/en-us/library/89c331t3.aspx"},
+                {"CSharpWarnings::CS1710", "https://msdn.microsoft.com/en-us/library/k5ya7w1x.aspx"},
+                {"CSharpWarnings::CS1712", "https://msdn.microsoft.com/en-us/library/t8zca749.aspx"},
+                {"CSharpWarnings::CS1717", "https://msdn.microsoft.com/en-us/library/a1kzfw0z.aspx"},
+                {"CSharpWarnings::CS1723", "https://msdn.microsoft.com/en-us/library/ms228603.aspx"},
+                {"CSharpWarnings::CS1911", "https://msdn.microsoft.com/en-us/library/ms228459.aspx"},
+                {"CSharpWarnings::CS1957", "https://msdn.microsoft.com/en-us/library/bb882562.aspx"},
+                {"CSharpWarnings::CS4014", "https://msdn.microsoft.com/en-us/library/hh873131.aspx"},
+                {"CSharpWarnings::CS0078", "https://msdn.microsoft.com/en-us/library/s74dtt7k.aspx"},
+                {"CSharpWarnings::CS1584,CS1711,CS1572,CS1581,CS1580", "CSharpWarnings_CS1584_CS1711_CS1572_CS1581_CS1580"},
+                {"CSharpWarnings::CS0108,CS0114", "CSharpWarnings_CS0108_CS0114"},
+                {"CSharpWarnings::CS0660,CS0661", "CSharpWarnings_CS0660_CS0661"},
+                {"CSharpWarnings::CS0252,CS0253", "CSharpWarnings_CS0252_CS0253"},
+                {"VBWarnings::BC400005", "https://msdn.microsoft.com/en-us/library/fs06ef5d.aspx"},
+                {"VBWarnings::BC42358", "https://msdn.microsoft.com/en-us/library/hh965065.aspx"},
+                {"VBWarnings::BC42025", "https://msdn.microsoft.com/en-us/library/y6t76186.aspx"},
+                {"VBWarnings::BC40056", "https://msdn.microsoft.com/en-us/library/ms234657.aspx"},
+                {"VBWarnings::BC42016", "https://msdn.microsoft.com/en-us/library/56k670kt.aspx"},
+                {"VBWarnings::BC40008", "https://msdn.microsoft.com/en-us/library/s5f0ewa6.aspx"},
+                {"VBWarnings::BC42104", "https://msdn.microsoft.com/en-us/library/3fdk625a.aspx"}
+            };
+
+            PsiLanguagesByCategoryNames = new Dictionary<string, string>()
+            {
+                {"CSharpErrors", "CSHARP"},
+                {WebConfigStaticHighlightingsGroups.WEB_CONFIG_ERRORS_GROUP, "Web.Config"},
+                {XamlStaticHighlightingsGroups.XAML_ERRORS_GROUP, "XAML"},
+                {"HtmlErrors", "HTML"},
+                {"AsxxErrors", "ASXX"},
+                {"AspErrors", "ASPX"}
+            };
+        }
+
+        public static string TryGetStaticHref(string inspectionId)
+        {
+            return ExternalInspectionLinks.ContainsKey(inspectionId) ?
+                ExternalInspectionLinks[inspectionId] : inspectionId;
+        }
+    }
+
+    public class InspectionByLanguageGroup
+    {
+        public Dictionary<RsSmallFeatureKind, Dictionary<string, CategoryGroup>> FeaturesByCategories { get; set; }
+
+        public Dictionary<string, CategoryGroup> ConfigurableCategories { get; set; }
+        public Dictionary<string, CategoryGroup> StaticCategories { get; set; }
+        public string Name { get; set; }
+        public int ErrorCount { get; set; }
+
+        public InspectionByLanguageGroup(string languagePresentableName)
+        {
+            Name = languagePresentableName;
+
+            ConfigurableCategories = new Dictionary<string, CategoryGroup>();
+            StaticCategories = new Dictionary<string, CategoryGroup>();
+            FeaturesByCategories = new Dictionary<RsSmallFeatureKind, Dictionary<string, CategoryGroup>>()
+            {
+                {RsSmallFeatureKind.ConfigInspection, ConfigurableCategories},
+                {RsSmallFeatureKind.StaticInspection, StaticCategories},
+            };
+        }
+
+        public int TotalConfigurableInspections()
+        {
+            return ConfigurableCategories.Values.Sum(category => category.Inspections.Count);
+        }
+
+        public void AddConfigurableInspection(ConfigurableSeverityItem inspection, PsiLanguageType lang, List<PsiLanguageType> langs,
+            HighlightingSettingsManager highlightingManager)
+        {
+            var groupId = inspection.GroupId;
+            var feature = new RsSmallFeature(inspection.Id, inspection.FullTitle, lang, langs,
+                RsSmallFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName);
+            AddInspection(groupId, feature, highlightingManager);
+
+
+         /*   CategoryGroup configurableCategoryGroup;
+            if (!ConfigurableCategories.TryGetValue(groupId, out configurableCategoryGroup))
+            {
+                foreach (var groupDescriptor in highlightingManager.ConfigurableGroups)
+                {
+                    if (groupDescriptor.Key != groupId) continue;
+                    ConfigurableCategories[groupId] = configurableCategoryGroup =
+                        new CategoryGroup(groupDescriptor.Title);
+                }
+            }
+            configurableCategoryGroup.Inspections.Add(
+                new RsSmallFeature(inspection.Id,inspection.FullTitle, lang, langs, RsSmallFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName));*/
+        }
+
+        public void AddStaticInspection(StaticSeverityHighlightingAttribute inspectionAttribute, string groupId, PsiLanguageType psiLang, List<PsiLanguageType> psiLangs, HighlightingSettingsManager highlightingManager, Type type)
+        {
+            var feature = new RsSmallFeature(type.Name, inspectionAttribute.ToolTipFormatString, psiLang, psiLangs,
+                RsSmallFeatureKind.StaticInspection, inspectionAttribute.Severity, null);
+            AddInspection(groupId, feature, highlightingManager);
+
+/*            CategoryGroup configurableCategoryGroup;
+            if (!StaticCategories.TryGetValue(groupId, out configurableCategoryGroup))
+            {
+                StaticCategories[groupId] = configurableCategoryGroup = new CategoryGroup(groupId);
+            }
+            configurableCategoryGroup.Inspections.Add(inspectionAttribute);*/
+        }
+
+        public void AddInspection(string groupId, RsSmallFeature inspection, HighlightingSettingsManager highlightingManager)
+        {
+            var groupName = groupId;
+            var staticGroup = highlightingManager.StaticGroups.FirstOrDefault(x => x.Key == groupId);
+            if (staticGroup != null)
+                groupName = staticGroup.Name;
+
+            var configurableGroup = highlightingManager.ConfigurableGroups.FirstOrDefault(x => x.Key == groupId);
+            if (configurableGroup != null)
+                groupName = configurableGroup.Title;
+
+            CategoryGroup categoryGroup;
+            if (!FeaturesByCategories[inspection.Kind].TryGetValue(groupId, out categoryGroup))
+            {
+                FeaturesByCategories[inspection.Kind][groupId] = categoryGroup = new CategoryGroup(groupName);
+            }
+            categoryGroup.Inspections.Add(inspection);
+        }
+
+        public void Sort()
+        {
+            foreach (var category in ConfigurableCategories.Values)
+                category.Inspections = category.Inspections.OrderBy(o => o.Name).ToList();
+            foreach (var category in StaticCategories.Values)
+                ErrorCount += category.Inspections.Count;
+
+        }
+
+        public class CategoryGroup
+        {
+            public CategoryGroup([NotNull] string name)
+            {
+                Name = name;
+                Inspections = new List<RsSmallFeature>();
+            }
+
+            public string Name { get; private set; }
+            public List<RsSmallFeature> Inspections { get; set; }
+        }
+
+    }
+
+    public class RsSmallFeature
+    {
+        public RsSmallFeature([NotNull]string id, string name,
+            [NotNull] PsiLanguageType lang, List<PsiLanguageType> multilang, RsSmallFeatureKind kind, Severity severity, string compoundName)
+        {
+            if (name == null)
+                name = id;
+            Id = id;
+            Name = name;
+            Lang = lang;
+            Multilang = multilang;
+            Kind = kind;
+            Severity = severity;
+            CompoundName = compoundName;
+        }
+
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public PsiLanguageType Lang { get; set; }
+        public List<PsiLanguageType> Multilang { get; set; }
+        public RsSmallFeatureKind Kind { get; set; }
+        public Severity Severity { get; set; }
+        public string CompoundName { get; set; }
+    }
+
+    public enum RsSmallFeatureKind
+    {
+        ConfigInspection,
+        StaticInspection,
+        ContextAction,
+        QuickFix
+    }
+
+
+}
