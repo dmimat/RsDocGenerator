@@ -349,6 +349,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\CodeInspectionHelpers.cs" />
+    <Compile Include="src\FeatureDigger.cs" />
     <Compile Include="src\FeatureKeeper.cs" />
     <Compile Include="src\GeneralHelpers.cs" />
     <Compile Include="src\RsDocExportBase.cs" />

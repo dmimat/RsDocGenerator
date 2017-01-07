@@ -36,88 +36,36 @@ namespace RsDocGenerator
         protected override string GenerateContent(IDataContext context, string outputFolder)
         {
             var featureKeeper = new FeatureKeeper(context);
+            var configurableInspetions = FeatureDigger.GetConfigurableInspections(context, RsFeatureKind.ConfigInspection);
+            var staticInspetions = FeatureDigger.GetStaticInspections(context, RsFeatureKind.StaticInspection);
 
-            var highlightingManager = Shell.Instance.GetComponent<HighlightingSettingsManager>();
-            var groupsByLanguage = new Dictionary<PsiLanguageType, InspectionByLanguageGroup>();
-
-            foreach (var configurableSeverityItem in highlightingManager.SeverityConfigurations)
-            {
-                if (configurableSeverityItem.Internal && !Shell.Instance.IsInInternalMode) continue;
-
-                List<PsiLanguageType> langs =  highlightingManager.GetInspectionImplementations(configurableSeverityItem.Id).ToList();
-                foreach (var language in langs)
-                    GetLanguageGroup(groupsByLanguage, language).AddConfigurableInspection(configurableSeverityItem, language, langs, highlightingManager);
-
-            }
-
-            var catalogs = Shell.Instance.GetComponent<ShellPartCatalogSet>();
-            foreach (var catalog in catalogs.Catalogs)
-            {
-                foreach (var part in catalog.ApplyFilter(CatalogAttributeFilter<StaticSeverityHighlightingAttribute>.Instance).AllPartTypes)
-                {
-                    foreach (var attribute in part.GetPartAttributes<StaticSeverityHighlightingAttribute>())
-                    {
-                        var type = Type.GetType(part.AssemblyQualifiedName.ToRuntimeString());
-                        if(type == null) continue;
-                        var staticSeverityAttribute = highlightingManager.GetHighlightingAttribute(type) as StaticSeverityHighlightingAttribute;
-                        if(staticSeverityAttribute == null) continue;
-                        var languages = staticSeverityAttribute.Languages;
-                        var groupId = staticSeverityAttribute.GroupId;
-
-                        if (languages == null && CodeInspectionHelpers.PsiLanguagesByCategoryNames.ContainsKey(groupId))
-                            languages = CodeInspectionHelpers.PsiLanguagesByCategoryNames[groupId];
-                        if (languages == null) continue;
-                        List<PsiLanguageType> psiLangs = new List<PsiLanguageType>();
-                        foreach (var sLang in languages.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            var lang = Shell.Instance.GetComponent<ILanguages>().GetLanguageByName(sLang);
-                            if (lang == null)
-                                continue;
-                            psiLangs.Add(lang);
-                        }
-                        foreach (var psiLang in psiLangs)
-                        {
-                            GetLanguageGroup(groupsByLanguage, psiLang).AddStaticInspection(staticSeverityAttribute, groupId, psiLang, psiLangs, highlightingManager, type);
-                        }
-                    }
-                }
-            }
-
-
-            foreach (var languageGroup in groupsByLanguage)
+            foreach (var languageGroup in configurableInspetions)
             {
                 languageGroup.Value.Sort();
-                CreateIndpectionIndexTopic(languageGroup.Key.Name, languageGroup.Value, outputFolder);
-                featureKeeper.AddFeatures(languageGroup.Value, RsSmallFeatureKind.ConfigInspection);
-                featureKeeper.AddFeatures(languageGroup.Value, RsSmallFeatureKind.StaticInspection);
+                var errorCount = 0;
+                FeaturesByLanguageGroup categoryGroup;
+                if (staticInspetions.TryGetValue(languageGroup.Key, out categoryGroup))
+                    errorCount = categoryGroup.TotalFeatures();
+
+                CreateIndpectionIndexTopic(languageGroup.Key.Name, languageGroup.Value, outputFolder, errorCount);
+
             }
+            featureKeeper.AddFeatures(configurableInspetions);
+            featureKeeper.AddFeatures(staticInspetions);
 
             featureKeeper.CloseSession();
             return "Code inspections index";
         }
 
-        private static InspectionByLanguageGroup GetLanguageGroup(Dictionary<PsiLanguageType, InspectionByLanguageGroup> groupsByLanguage,
-            PsiLanguageType language)
-        {
-            InspectionByLanguageGroup languageGroup;
-            if (!groupsByLanguage.TryGetValue(language, out languageGroup))
-            {
-                groupsByLanguage[language] = languageGroup =
-                    new InspectionByLanguageGroup(GeneralHelpers.GetPsiLanguagePresentation(language));
-            }
-            return languageGroup;
-        }
-
-        private void CreateIndpectionIndexTopic(String language, InspectionByLanguageGroup languageGroup,
-            string outputFolder)
+        private void CreateIndpectionIndexTopic(String language, FeaturesByLanguageGroup languageGroup,
+            string outputFolder, int errorCount)
         {
             var topicId = string.Format("Reference__Code_Inspections_{0}", language);
             var fileName = Path.Combine(outputFolder, topicId + ".xml");
             var topic = XmlHelpers.CreateHmTopic(topicId);
             var topicRoot = topic.Root;
             var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
-            var errorCount = languageGroup.ErrorCount;
-            if (languageGroup.ErrorCount < 2)
+            if (errorCount < 2)
                 intro.Add(new XAttribute("filter", "empty"));
             intro.Add(
                 new XElement("var",
@@ -125,7 +73,7 @@ namespace RsDocGenerator
                     new XAttribute("value", languageGroup.Name)),
                 new XElement("var",
                     new XAttribute("name", "count"),
-                    new XAttribute("value", languageGroup.TotalConfigurableInspections())),
+                    new XAttribute("value", languageGroup.TotalFeatures())),
                 new XElement("var",
                     new XAttribute("name", "errCount"),
                     new XAttribute("value", errorCount)));
@@ -136,7 +84,7 @@ namespace RsDocGenerator
                 topicRoot.Add(XmlHelpers.CreateInclude("Code_Analysis_in_CPP", "cpp_support_note"));
             }
 
-            var sortedCategories = languageGroup.ConfigurableCategories.OrderBy(o => o.Value.Name).ToList();
+            var sortedCategories = languageGroup.Categories.OrderBy(o => o.Value.Name).ToList();
 
             foreach (var category in sortedCategories)
             {

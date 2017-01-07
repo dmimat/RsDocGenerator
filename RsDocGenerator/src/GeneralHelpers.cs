@@ -63,7 +63,6 @@ namespace RsDocGenerator
       [NotNull, Pure]
       public static string GetPsiLanguagePresentation([NotNull] PsiLanguageType type)
       {
-          // avoiding referencing all assemblies
           switch (type.Name)
           {
               case "VBASIC":

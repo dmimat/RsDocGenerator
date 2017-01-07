@@ -16,27 +16,28 @@ namespace RsDocGenerator
         private readonly string _catalogFile;
         private readonly XDocument _catalogDocument;
         private const string FileName = "RsFeatureCatalog.xml";
-        private const string ConfigurableInspectionsRootNodeName = "ConfigurableInspections";
-        private const string StaticInspectionsRootNodeName = "StaticInspections";
-        private const string ConfigurableInspectionNodeName = "CI";
-        private const string StaticInspectionNodeName = "SI";
         private const string RootNodeName = "RsFeatureCatalog";
         private const string VersionElementName = "version";
         private const string Externalwikilinks = "ExternalWikiLinks";
         private readonly XElement _currentVersionElement;
 
-        private Dictionary<RsSmallFeatureKind, List<string>> _existingFeatures =
-            new Dictionary<RsSmallFeatureKind, List<string>>();
-
-        private Dictionary<RsSmallFeatureKind, int> _totalFeatures = new Dictionary<RsSmallFeatureKind, int>();
-        private Dictionary<RsSmallFeatureKind, int> _totalNewFeatures = new Dictionary<RsSmallFeatureKind, int>();
 
         public FeatureKeeper(IDataContext context)
         {
             _catalogFile = Path.Combine(GeneralHelpers.GetFeatureCatalogFolder(context) ?? Path.GetTempPath(),
                 FileName);
             if (File.Exists(_catalogFile))
-                _catalogDocument = XDocument.Load(_catalogFile);
+            {
+                try
+                {
+                    _catalogDocument = XDocument.Load(_catalogFile);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
             else
             {
                 _catalogDocument = new XDocument();
@@ -51,47 +52,20 @@ namespace RsDocGenerator
                 _currentVersionElement = new XElement(VersionElementName, new XAttribute("v", currentVersionString));
                 _catalogDocument.Root.AddFirst(_currentVersionElement);
             }
-
-            _existingFeatures.Add(RsSmallFeatureKind.ConfigInspection,
-                _catalogDocument.Root.Descendants(ConfigurableInspectionNodeName)
-                    .Select(e => e.Attribute("id").Value)
-                    .ToList());
-            _existingFeatures.Add(RsSmallFeatureKind.StaticInspection,
-                _catalogDocument.Root.Descendants(StaticInspectionNodeName)
-                    .Select(e => e.Attribute("id").Value)
-                    .ToList());
         }
 
         public void CloseSession()
         {
-          foreach (var newFeatures in _totalNewFeatures)
-          {
-            if (newFeatures.Value > 0)
-            {
-              var statNode = _currentVersionElement.Element("statistics");
-              if (statNode == null)
-              {
-                statNode = new XElement("statistics");
-                _currentVersionElement.AddFirst(statNode);
-              }
-              statNode.Add(new XElement(newFeatures.Key.ToString(),
-                  new XAttribute("total", _totalFeatures[newFeatures.Key]),
-                  new XAttribute("new", _totalNewFeatures[newFeatures.Key])
-              ));
-            }
-            
-          }
-
-            
-
-            if (_currentVersionElement.Element(Externalwikilinks) == null)
-                AddExternalWikiLinks();
+            AddExternalWikiLinks();
             _catalogDocument.Save(_catalogFile);
         }
 
         private void AddExternalWikiLinks()
         {
-            var wiki = new XElement(Externalwikilinks);
+            var wiki = _catalogDocument.Root.Element(Externalwikilinks);
+            if (wiki != null) wiki.Remove();
+
+            wiki = new XElement(Externalwikilinks);
             foreach (var item in CodeInspectionHelpers.ExternalInspectionLinks)
             {
                 var link = item.Value;
@@ -101,89 +75,74 @@ namespace RsDocGenerator
                     new XAttribute("Id", item.Key),
                     new XAttribute("Url", link)));
             }
-            _currentVersionElement.Add(wiki);
+            _catalogDocument.Root.Add(wiki);
         }
 
-        public void AddFeatures(InspectionByLanguageGroup langGroup, RsSmallFeatureKind featureKind)
+        public void AddFeatures(Dictionary<PsiLanguageType, FeaturesByLanguageGroup> groupsByLanguage)
         {
-            var featureRootNodeName = "Unknown";
-            var featureNodeName = "Unknown";
-            switch (featureKind)
+            var totalFeatures = 0;
+            var totalFeaturesInVersion = 0;
+            var featureKind = groupsByLanguage.First().Value.FeatureKind;
+
+            foreach (var langGroup in groupsByLanguage.Values)
             {
-                case RsSmallFeatureKind.ConfigInspection:
-                    featureRootNodeName = ConfigurableInspectionsRootNodeName;
-                    featureNodeName = ConfigurableInspectionNodeName;
-                    break;
-                case RsSmallFeatureKind.StaticInspection:
-                    featureRootNodeName = StaticInspectionsRootNodeName;
-                    featureNodeName = StaticInspectionNodeName;
-                    break;
-                case RsSmallFeatureKind.ContextAction:
-                    break;
-                case RsSmallFeatureKind.QuickFix:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException("featureKind", featureKind, null);
-            }
+                totalFeatures += langGroup.TotalFeatures();
+                var featureRootNodeName = featureKind + "Node";
+                var totalLangFeaturesInVersion = 0;
 
-            var totalLangFeatures = 0;
-            var totalLangFeaturesInVersion = 0;
-
-            var langElement = (from el in _currentVersionElement.Elements("lang")
-                                  where (string) el.Attribute("name") == langGroup.Name
-                                  select el).FirstOrDefault() ??
-                              new XElement("lang", new XAttribute("name", langGroup.Name));
-
-            if (langElement.Element(featureRootNodeName) != null)
-                return;
-            var featuresRootElemnt = new XElement(featureRootNodeName);
-
-            var sortedCategories = langGroup.FeaturesByCategories[featureKind].OrderBy(o => o.Value.Name).ToList();
-            foreach (var category in sortedCategories)
-            {
-                var catElement = (from el in langElement.Elements("category")
-                                     where (string) el.Attribute("name") == category.Value.Name
-                                     select el).FirstOrDefault() ??
-                                 new XElement("category",
-                                     new XAttribute("name", category.Value.Name));
-
-                //var count = category.Value.ConfigurableInspections.Count;
-
-                foreach (var feature in category.Value.Inspections)
-                {
-                    totalLangFeatures += 1;
-
-                    if (!_totalFeatures.ContainsKey(featureKind)) _totalFeatures.Add(featureKind, 0);
-
-                    _totalFeatures[featureKind] += 1;
-
-                    if (_existingFeatures[featureKind].Contains(feature.Id)) continue;
-
-                    catElement.Add(new XElement(featureNodeName,
-                        new XAttribute("id", feature.Id),
-                        new XAttribute("name", feature.Name)));
-                    totalLangFeaturesInVersion += 1;
-
-                    if (!_totalNewFeatures.ContainsKey(featureKind)) _totalNewFeatures.Add(featureKind, 0);
-
-                    _totalNewFeatures[featureKind] += 1;
-                }
-                if (catElement.HasElements)
-                    featuresRootElemnt.Add(catElement);
-            }
-            if (featuresRootElemnt.HasElements)
-            {
-                featuresRootElemnt.Add(new XAttribute("total", totalLangFeatures));
-                featuresRootElemnt.Add(new XAttribute("new", totalLangFeaturesInVersion));
-                langElement.Add(featuresRootElemnt);
-            }
-
-            if (!langElement.HasElements) return;
-
-            if ((from el in _currentVersionElement.Elements("lang")
+                var existingLangFeatures = (from el in _catalogDocument.Root.Descendants("lang")
                     where (string) el.Attribute("name") == langGroup.Name
-                    select el).FirstOrDefault() == null)
-                _currentVersionElement.Add(langElement);
+                    select el).Descendants(featureKind.ToString())
+                    .Select(e => e.Attribute("id").Value)
+                    .ToList();
+
+                var langElement = (from el in _currentVersionElement.Elements("lang")
+                                      where (string) el.Attribute("name") == langGroup.Name
+                                      select el).FirstOrDefault() ??
+                                  new XElement("lang", new XAttribute("name", langGroup.Name));
+
+                if (langElement.Element(featureRootNodeName) != null)
+                    continue;
+                var featuresRootElemnt = new XElement(featureRootNodeName);
+
+                foreach (var category in langGroup.Categories)
+                {
+                    foreach (var feature in category.Value.Inspections)
+                    {
+                        if (existingLangFeatures.Contains(feature.Id)) continue;
+
+                        featuresRootElemnt.Add(new XElement(featureKind.ToString(),
+                            new XAttribute("id", feature.Id),
+                            new XAttribute("name", feature.Name)));
+                        totalLangFeaturesInVersion += 1;
+                        totalFeaturesInVersion += 1;
+                    }
+                }
+                if (featuresRootElemnt.HasElements)
+                {
+                    featuresRootElemnt.Add(new XAttribute("total", existingLangFeatures.Count + totalLangFeaturesInVersion));
+                    featuresRootElemnt.Add(new XAttribute("new", totalLangFeaturesInVersion));
+                    langElement.Add(featuresRootElemnt);
+                }
+
+                if (!langElement.HasElements) continue;
+
+                if ((from el in _currentVersionElement.Elements("lang")
+                        where (string) el.Attribute("name") == langGroup.Name
+                        select el).FirstOrDefault() == null)
+                    _currentVersionElement.Add(langElement);
+            }
+            var statNode = _currentVersionElement.Element("statistics");
+            if (statNode == null)
+            {
+                statNode = new XElement("statistics");
+                _currentVersionElement.AddFirst(statNode);
+            }
+            if(statNode.Element(featureKind.ToString()) != null) return;
+            statNode.Add(new XElement(featureKind.ToString(),
+                new XAttribute("total", totalFeatures),
+                new XAttribute("new", totalFeaturesInVersion)
+            ));
         }
     }
 }

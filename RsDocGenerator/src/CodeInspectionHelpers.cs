@@ -94,96 +94,37 @@ namespace RsDocGenerator
         }
     }
 
-    public class InspectionByLanguageGroup
+    public class FeaturesByLanguageGroup
     {
-        public Dictionary<RsSmallFeatureKind, Dictionary<string, CategoryGroup>> FeaturesByCategories { get; set; }
-
-        public Dictionary<string, CategoryGroup> ConfigurableCategories { get; set; }
-        public Dictionary<string, CategoryGroup> StaticCategories { get; set; }
+        public Dictionary<string, CategoryGroup> Categories { get; set; }
         public string Name { get; set; }
-        public int ErrorCount { get; set; }
+        public RsFeatureKind FeatureKind { get; set; }
 
-        public InspectionByLanguageGroup(string languagePresentableName)
+        public FeaturesByLanguageGroup(string languagePresentableName, RsFeatureKind featureKind)
         {
             Name = languagePresentableName;
-
-            ConfigurableCategories = new Dictionary<string, CategoryGroup>();
-            StaticCategories = new Dictionary<string, CategoryGroup>();
-            FeaturesByCategories = new Dictionary<RsSmallFeatureKind, Dictionary<string, CategoryGroup>>()
-            {
-                {RsSmallFeatureKind.ConfigInspection, ConfigurableCategories},
-                {RsSmallFeatureKind.StaticInspection, StaticCategories},
-            };
+            FeatureKind = featureKind;
+            Categories = new Dictionary<string, CategoryGroup>();
         }
 
-        public int TotalConfigurableInspections()
+        public int TotalFeatures()
         {
-            return ConfigurableCategories.Values.Sum(category => category.Inspections.Count);
+            return Categories.Values.Sum(category => category.Inspections.Count);
         }
 
-        public void AddConfigurableInspection(ConfigurableSeverityItem inspection, PsiLanguageType lang, List<PsiLanguageType> langs,
-            HighlightingSettingsManager highlightingManager)
+        public void AddInspection(string groupId, string groupName, RsFeature inspection)
         {
-            var groupId = inspection.GroupId;
-            var feature = new RsSmallFeature(inspection.Id, inspection.FullTitle, lang, langs,
-                RsSmallFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName);
-            AddInspection(groupId, feature, highlightingManager);
-
-
-         /*   CategoryGroup configurableCategoryGroup;
-            if (!ConfigurableCategories.TryGetValue(groupId, out configurableCategoryGroup))
-            {
-                foreach (var groupDescriptor in highlightingManager.ConfigurableGroups)
-                {
-                    if (groupDescriptor.Key != groupId) continue;
-                    ConfigurableCategories[groupId] = configurableCategoryGroup =
-                        new CategoryGroup(groupDescriptor.Title);
-                }
-            }
-            configurableCategoryGroup.Inspections.Add(
-                new RsSmallFeature(inspection.Id,inspection.FullTitle, lang, langs, RsSmallFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName));*/
-        }
-
-        public void AddStaticInspection(StaticSeverityHighlightingAttribute inspectionAttribute, string groupId, PsiLanguageType psiLang, List<PsiLanguageType> psiLangs, HighlightingSettingsManager highlightingManager, Type type)
-        {
-            var feature = new RsSmallFeature(type.Name, inspectionAttribute.ToolTipFormatString, psiLang, psiLangs,
-                RsSmallFeatureKind.StaticInspection, inspectionAttribute.Severity, null);
-            AddInspection(groupId, feature, highlightingManager);
-
-/*            CategoryGroup configurableCategoryGroup;
-            if (!StaticCategories.TryGetValue(groupId, out configurableCategoryGroup))
-            {
-                StaticCategories[groupId] = configurableCategoryGroup = new CategoryGroup(groupId);
-            }
-            configurableCategoryGroup.Inspections.Add(inspectionAttribute);*/
-        }
-
-        public void AddInspection(string groupId, RsSmallFeature inspection, HighlightingSettingsManager highlightingManager)
-        {
-            var groupName = groupId;
-            var staticGroup = highlightingManager.StaticGroups.FirstOrDefault(x => x.Key == groupId);
-            if (staticGroup != null)
-                groupName = staticGroup.Name;
-
-            var configurableGroup = highlightingManager.ConfigurableGroups.FirstOrDefault(x => x.Key == groupId);
-            if (configurableGroup != null)
-                groupName = configurableGroup.Title;
-
             CategoryGroup categoryGroup;
-            if (!FeaturesByCategories[inspection.Kind].TryGetValue(groupId, out categoryGroup))
-            {
-                FeaturesByCategories[inspection.Kind][groupId] = categoryGroup = new CategoryGroup(groupName);
-            }
+            if (!Categories.TryGetValue(groupId, out categoryGroup))
+                Categories[groupId] = categoryGroup = new CategoryGroup(groupName);
+
             categoryGroup.Inspections.Add(inspection);
         }
 
         public void Sort()
         {
-            foreach (var category in ConfigurableCategories.Values)
+            foreach (var category in Categories.Values)
                 category.Inspections = category.Inspections.OrderBy(o => o.Name).ToList();
-            foreach (var category in StaticCategories.Values)
-                ErrorCount += category.Inspections.Count;
-
         }
 
         public class CategoryGroup
@@ -191,19 +132,19 @@ namespace RsDocGenerator
             public CategoryGroup([NotNull] string name)
             {
                 Name = name;
-                Inspections = new List<RsSmallFeature>();
+                Inspections = new List<RsFeature>();
             }
 
             public string Name { get; private set; }
-            public List<RsSmallFeature> Inspections { get; set; }
+            public List<RsFeature> Inspections { get; set; }
         }
 
     }
 
-    public class RsSmallFeature
+    public class RsFeature
     {
-        public RsSmallFeature([NotNull]string id, string name,
-            [NotNull] PsiLanguageType lang, List<PsiLanguageType> multilang, RsSmallFeatureKind kind, Severity severity, string compoundName)
+        public RsFeature([NotNull]string id, string name,
+            [NotNull] PsiLanguageType lang, List<PsiLanguageType> multilang, RsFeatureKind kind, Severity severity, string compoundName)
         {
             if (name == null)
                 name = id;
@@ -220,12 +161,12 @@ namespace RsDocGenerator
         public string Name { get; set; }
         public PsiLanguageType Lang { get; set; }
         public List<PsiLanguageType> Multilang { get; set; }
-        public RsSmallFeatureKind Kind { get; set; }
+        public RsFeatureKind Kind { get; set; }
         public Severity Severity { get; set; }
         public string CompoundName { get; set; }
     }
 
-    public enum RsSmallFeatureKind
+    public enum RsFeatureKind
     {
         ConfigInspection,
         StaticInspection,
