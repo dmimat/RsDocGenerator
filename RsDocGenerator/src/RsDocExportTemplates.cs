@@ -240,7 +240,7 @@ namespace RsDocGenerator
       if (paramElement.HasElements)
         paramHeader.Add(new XElement("b", "Parameters "));
 
-      tables.GetValue(lang).Add(new XElement("tr",
+      tables[lang].Add(new XElement("tr",
         new XElement("td",
           new XElement("code", templateId), imported,
           new XAttribute("id", templateIdFull)),

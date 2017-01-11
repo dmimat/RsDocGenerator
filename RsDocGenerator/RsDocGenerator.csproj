@@ -266,18 +266,26 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\CodeInspectionHelpers.cs" />
+    <Compile Include="src\FeatureCatalog.cs" />
+    <Compile Include="src\FeatureDigger.cs" />
+    <Compile Include="src\FeatureKeeper.cs" />
     <Compile Include="src\GeneralHelpers.cs" />
     <Compile Include="src\RsDocExportBase.cs" />
     <Compile Include="src\RsDocExportCodeInspections.cs" />
     <Compile Include="src\RsDocExportContextActions.cs" />
     <Compile Include="src\RsDocExportFeatures.cs" />
     <Compile Include="src\RsDocExportFixInScope.cs" />
+    <Compile Include="src\RsDocExportInspectionsIndex.cs" />
     <Compile Include="src\RsDocExportMacros.cs" />
     <Compile Include="src\RsDocExportPostfixTemplates.cs" />
     <Compile Include="src\RsDocExportShortcuts.cs" />
     <Compile Include="src\RsDocExportTemplates.cs" />
     <Compile Include="src\RsDocGeneratorActionGroup.cs" />
     <Compile Include="src\RsDocOptionsPage.cs" />
+    <Compile Include="src\RsDocUpdateCatalog.cs" />
+    <Compile Include="src\RsFeature.cs" />
+    <Compile Include="src\RsFeatureKind.cs" />
     <Compile Include="src\XmlHelpers.cs" />
     <Compile Include="ZoneMarker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
