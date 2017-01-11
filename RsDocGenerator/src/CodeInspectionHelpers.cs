@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using JetBrains.Application.Catalogs;
 using JetBrains.ReSharper.Daemon.WebConfig.Highlightings;
 using JetBrains.ReSharper.Daemon.Xaml.Highlightings;
-using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 
 namespace RsDocGenerator
@@ -93,86 +90,4 @@ namespace RsDocGenerator
                 ExternalInspectionLinks[inspectionId] : inspectionId;
         }
     }
-
-    public class FeaturesByLanguageGroup
-    {
-        public Dictionary<string, CategoryGroup> Categories { get; set; }
-        public string Name { get; set; }
-        public RsFeatureKind FeatureKind { get; set; }
-
-        public FeaturesByLanguageGroup(string languagePresentableName, RsFeatureKind featureKind)
-        {
-            Name = languagePresentableName;
-            FeatureKind = featureKind;
-            Categories = new Dictionary<string, CategoryGroup>();
-        }
-
-        public int TotalFeatures()
-        {
-            return Categories.Values.Sum(category => category.Inspections.Count);
-        }
-
-        public void AddInspection(string groupId, string groupName, RsFeature inspection)
-        {
-            CategoryGroup categoryGroup;
-            if (!Categories.TryGetValue(groupId, out categoryGroup))
-                Categories[groupId] = categoryGroup = new CategoryGroup(groupName);
-
-            categoryGroup.Inspections.Add(inspection);
-        }
-
-        public void Sort()
-        {
-            foreach (var category in Categories.Values)
-                category.Inspections = category.Inspections.OrderBy(o => o.Name).ToList();
-        }
-
-        public class CategoryGroup
-        {
-            public CategoryGroup([NotNull] string name)
-            {
-                Name = name;
-                Inspections = new List<RsFeature>();
-            }
-
-            public string Name { get; private set; }
-            public List<RsFeature> Inspections { get; set; }
-        }
-
-    }
-
-    public class RsFeature
-    {
-        public RsFeature([NotNull]string id, string name,
-            [NotNull] PsiLanguageType lang, List<PsiLanguageType> multilang, RsFeatureKind kind, Severity severity, string compoundName)
-        {
-            if (name == null)
-                name = id;
-            Id = id;
-            Name = name;
-            Lang = lang;
-            Multilang = multilang;
-            Kind = kind;
-            Severity = severity;
-            CompoundName = compoundName;
-        }
-
-        public string Id { get; set; }
-        public string Name { get; set; }
-        public PsiLanguageType Lang { get; set; }
-        public List<PsiLanguageType> Multilang { get; set; }
-        public RsFeatureKind Kind { get; set; }
-        public Severity Severity { get; set; }
-        public string CompoundName { get; set; }
-    }
-
-    public enum RsFeatureKind
-    {
-        ConfigInspection,
-        StaticInspection,
-        ContextAction,
-        QuickFix
-    }
-
-
 }

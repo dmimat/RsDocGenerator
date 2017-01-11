@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
-using JetBrains.Build.Serialization;
-using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi;
-using JetBrains.Util;
 
 namespace RsDocGenerator
 {
@@ -20,7 +15,6 @@ namespace RsDocGenerator
         private const string VersionElementName = "version";
         private const string Externalwikilinks = "ExternalWikiLinks";
         private readonly XElement _currentVersionElement;
-
 
         public FeatureKeeper(IDataContext context)
         {
@@ -56,7 +50,7 @@ namespace RsDocGenerator
 
         public void CloseSession()
         {
-            AddExternalWikiLinks();
+       //     AddExternalWikiLinks();
             _catalogDocument.Save(_catalogFile);
         }
 
@@ -78,49 +72,50 @@ namespace RsDocGenerator
             _catalogDocument.Root.Add(wiki);
         }
 
-        public void AddFeatures(Dictionary<PsiLanguageType, FeaturesByLanguageGroup> groupsByLanguage)
+        public void AddFeatures(FeatureCatalog featureCatalog)
         {
             var totalFeatures = 0;
             var totalFeaturesInVersion = 0;
-            var featureKind = groupsByLanguage.First().Value.FeatureKind;
 
-            foreach (var langGroup in groupsByLanguage.Values)
+            foreach (var lang in featureCatalog.Languages)
             {
-                totalFeatures += langGroup.TotalFeatures();
-                var featureRootNodeName = featureKind + "Node";
+                var langPresentation = GeneralHelpers.GetPsiLanguagePresentation(lang);
+                var langImplementations = featureCatalog.GetLangImplementations(lang);
+                totalFeatures += langImplementations.Count;
+                var featureRootNodeName = featureCatalog.FeatureKind + "Node";
                 var totalLangFeaturesInVersion = 0;
 
                 var existingLangFeatures = (from el in _catalogDocument.Root.Descendants("lang")
-                    where (string) el.Attribute("name") == langGroup.Name
-                    select el).Descendants(featureKind.ToString())
+                        where (string) el.Attribute("name") == langPresentation
+                        select el).Descendants(featureCatalog.FeatureKind.ToString())
                     .Select(e => e.Attribute("id").Value)
                     .ToList();
 
                 var langElement = (from el in _currentVersionElement.Elements("lang")
-                                      where (string) el.Attribute("name") == langGroup.Name
+                                      where (string) el.Attribute("name") == langPresentation
                                       select el).FirstOrDefault() ??
-                                  new XElement("lang", new XAttribute("name", langGroup.Name));
+                                  new XElement("lang", new XAttribute("name", langPresentation));
 
                 if (langElement.Element(featureRootNodeName) != null)
                     continue;
                 var featuresRootElemnt = new XElement(featureRootNodeName);
 
-                foreach (var category in langGroup.Categories)
-                {
-                    foreach (var feature in category.Value.Inspections)
-                    {
-                        if (existingLangFeatures.Contains(feature.Id)) continue;
 
-                        featuresRootElemnt.Add(new XElement(featureKind.ToString(),
-                            new XAttribute("id", feature.Id),
-                            new XAttribute("name", feature.Name)));
-                        totalLangFeaturesInVersion += 1;
-                        totalFeaturesInVersion += 1;
-                    }
+                foreach (var feature in langImplementations)
+                {
+                    if (existingLangFeatures.Contains(feature.Id)) continue;
+
+                    featuresRootElemnt.Add(new XElement(featureCatalog.FeatureKind.ToString(),
+                        new XAttribute("id", feature.Id),
+                        new XAttribute("text", feature.Text)));
+                    totalLangFeaturesInVersion += 1;
+                    totalFeaturesInVersion += 1;
                 }
+
                 if (featuresRootElemnt.HasElements)
                 {
-                    featuresRootElemnt.Add(new XAttribute("total", existingLangFeatures.Count + totalLangFeaturesInVersion));
+                    featuresRootElemnt.Add(new XAttribute("total",
+                        existingLangFeatures.Count + totalLangFeaturesInVersion));
                     featuresRootElemnt.Add(new XAttribute("new", totalLangFeaturesInVersion));
                     langElement.Add(featuresRootElemnt);
                 }
@@ -128,7 +123,7 @@ namespace RsDocGenerator
                 if (!langElement.HasElements) continue;
 
                 if ((from el in _currentVersionElement.Elements("lang")
-                        where (string) el.Attribute("name") == langGroup.Name
+                        where (string) el.Attribute("name") == langPresentation
                         select el).FirstOrDefault() == null)
                     _currentVersionElement.Add(langElement);
             }
@@ -138,8 +133,8 @@ namespace RsDocGenerator
                 statNode = new XElement("statistics");
                 _currentVersionElement.AddFirst(statNode);
             }
-            if(statNode.Element(featureKind.ToString()) != null) return;
-            statNode.Add(new XElement(featureKind.ToString(),
+            if (statNode.Element(featureCatalog.FeatureKind.ToString()) != null) return;
+            statNode.Add(new XElement(featureCatalog.FeatureKind.ToString(),
                 new XAttribute("total", totalFeatures),
                 new XAttribute("new", totalFeaturesInVersion)
             ));

@@ -9,7 +9,7 @@ namespace RsDocGenerator
         public RsDocGeneratorActionGroup(RsDocExportMacros macros, RsDocExportContextActions ca,
             RsDocExportShortcuts shortcuts, RsDocExportTemplates templates, RsDocExportFixInScope scope,
             RsDocExportCodeInspections inspections, RsDocExportInspectionsIndex inspIndex,
-            RsDocExportPostfixTemplates postfix)
+            RsDocExportPostfixTemplates postfix, RsDocUpdateCatalog catalog)
         {
         }
     }

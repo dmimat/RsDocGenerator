@@ -71,7 +71,7 @@ namespace RsDocGenerator
     {
       // temporarily disabled
       return null;
-      var testFileName = contextAction.ActionKey.Split('.').Last().RemoveFromEnd("Action") + ".cs";
+/*      var testFileName = contextAction.ActionKey.Split('.').Last().RemoveFromEnd("Action") + ".cs";
       var goldFileName = testFileName + ".gold";
       var basePath = Path.Combine(caPath, lang.NormalizeStringForAttribute().ToLower());
       var testFile = Path.Combine(basePath, testFileName);
@@ -84,7 +84,7 @@ namespace RsDocGenerator
         new XElement("td", XmlHelpers.CreateCodeBlock(File.ReadAllText(testFile), lang)),
         new XElement("td", XmlHelpers.CreateCodeBlock(File.ReadAllText(goldFile), lang))));
 
-      return table;
+      return table;*/
     }
   }
 }

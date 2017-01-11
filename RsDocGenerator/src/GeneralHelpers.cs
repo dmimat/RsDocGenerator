@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -9,6 +11,8 @@ using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Util;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace RsDocGenerator
 {
@@ -59,12 +63,52 @@ namespace RsDocGenerator
       return "Common";
     }
 
+      public static string TryGetPsiLang(string fullName)
+      {
+          if (fullName.Contains("Asp"))
+              return "ASPX";
+          if (fullName.Contains("CSharp"))
+              return "CSHARP";
+          if (fullName.Contains("VB"))
+              return "VBASIC";
+          if (fullName.Contains("TypeScript"))
+              return "TYPE_SCRIPT";
+          if (fullName.Contains("JavaScript"))
+              return "JAVA_SCRIPT";
+          if (fullName.Contains("Html"))
+              return "HTML";
+          if (fullName.Contains("BuildScripts"))
+              return "Build scripts";
+          if (fullName.Contains("Xaml"))
+              return "XAML";
+          if (fullName.Contains("Razor"))
+              return "Razor";
+          if (fullName.Contains("Css"))
+              return "CSS";
+          if (fullName.Contains("WebConfig"))
+              return "Web.Config";
+          if (fullName.Contains("Xml"))
+              return "XML";
+          if (fullName.Contains("Resx"))
+              return "RESX";
+          if (fullName.Contains("RegExp"))
+              return "REGULAR_EXPRESSION";
+          if (fullName.Contains("Cpp"))
+              return "CPP";
+          return "Common";
+      }
+
 
       [NotNull, Pure]
-      public static string GetPsiLanguagePresentation([NotNull] PsiLanguageType type)
+      public static string GetPsiLanguagePresentation(string type)
       {
-          switch (type.Name)
+          switch (type)
           {
+              case "CSHARP":
+                  return "C#";
+              case "CPP":
+              case "Cpp":
+                  return "C++";
               case "VBASIC":
                   return "VB.NET";
               case "ASPX":
@@ -94,7 +138,7 @@ namespace RsDocGenerator
               case "REGULAR_EXPRESSION":
                   return "Regular expressions";
               default:
-                  return type.PresentableName;
+                  return type;
           }
       }
 
@@ -143,13 +187,23 @@ namespace RsDocGenerator
       if (result == DialogResult.Yes) { Process.Start(where); }
     }
 
-    public static string RemoveFromEnd(this string s, string suffix)
-    {
-      if (s.EndsWith(suffix))
+      public static string TextFromTypeName(this string input)
       {
-        return s.Substring(0, s.Length - suffix.Length);
+          input = input.TrimFromEnd("Error");
+          input = input.TrimFromEnd("QuickFix");
+          input = input.TrimFromEnd("Fix");
+
+          var substringsToReplace = new List<string>() {"Cpp", "Asp", "Xaml", "Razor", "Html", "Css", "CSharp"};
+          input = substringsToReplace.Aggregate(input, (current, substr) => current.TrimFromStart(substr));
+
+          if (input.IsNullOrEmpty())
+              return string.Empty;
+
+          var splitString = Regex.Replace(input, "([A-Z])", " $1",
+              RegexOptions.Compiled).Trim();
+          var name = splitString.Substring(0, 1) + splitString.Substring(1).ToLower();
+          return char.ToUpper(name[0]) + name.Substring(1);
       }
-      return s;
-    }
+
   }
 }
