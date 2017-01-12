@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using JetBrains.Application.Catalogs;
-using JetBrains.Application.Catalogs.Filtering;
 using JetBrains.Application.DataContext;
-using JetBrains.Application.Environment;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Intentions.Scoped;
@@ -24,6 +21,7 @@ namespace RsDocGenerator
         private readonly FeatureCatalog _fixInScopeCatalog;
         private readonly FeatureCatalog _contexActionsCatalog;
         private readonly FeatureCatalog _contexActionInScopeCatalog;
+        private readonly FeatureCatalog _staticInspectionCatalog;
 
         public FeatureDigger(IDataContext context)
         {
@@ -32,8 +30,9 @@ namespace RsDocGenerator
             _contexActionsCatalog = DigContextActions();
             _quickFixCatalog = new FeatureCatalog(RsFeatureKind.QuickFix);
             _fixInScopeCatalog = new FeatureCatalog(RsFeatureKind.FixInScope);
+            _staticInspectionCatalog = new FeatureCatalog(RsFeatureKind.StaticInspection);
             _contexActionInScopeCatalog = new FeatureCatalog(RsFeatureKind.ContextActionInScope);
-            DigQuickFixes();
+            DigFeaturesByTypes();
         }
 
         public FeatureCatalog GetConfigurableInspections()
@@ -52,6 +51,9 @@ namespace RsDocGenerator
                     var feature = new RsFeature(inspection.Id, inspection.FullTitle, language, langs,
                         RsFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName,
                         inspection.GroupId);
+                    if (configInspectionsCatalog.Features.FirstOrDefault(f => f.Id == inspection.Id && f.Lang == language) != null)
+                        continue;
+
                     configInspectionsCatalog.AddFeature(feature, language);
                 }
             }
@@ -77,50 +79,10 @@ namespace RsDocGenerator
 
         public FeatureCatalog GetStaticInspections()
         {
-            var staticInspectionsCatalog = new FeatureCatalog(RsFeatureKind.StaticInspection);
-            var catalogs = _myContext.GetComponent<ShellPartCatalogSet>();
-            foreach (var catalog in catalogs.Catalogs)
-            {
-                foreach (var part in catalog
-                    .ApplyFilter(CatalogAttributeFilter<StaticSeverityHighlightingAttribute>.Instance)
-                    .AllPartTypes)
-                {
-                    foreach (var attribute in part.GetPartAttributes<StaticSeverityHighlightingAttribute>())
-                    {
-                        var type = Type.GetType(part.AssemblyQualifiedName.ToRuntimeString());
-                        if (type == null) continue;
-
-                        // getting rid of generated TypeScript errors
-                        if (type.Name.StartsWith("TS") && type.Name.EndsWith("Error") &&
-                            !_inspectionTypesWithQuickFixes.Contains(type))
-                            continue;
-
-                        var staticSeverityAttribute = _highlightingSettingsManager.GetHighlightingAttribute(type)
-                                as StaticSeverityHighlightingAttribute;
-                        if (staticSeverityAttribute == null) continue;
-                        if (staticSeverityAttribute.Severity == Severity.INFO) continue;
-                        var languages = staticSeverityAttribute.Languages;
-                        var groupId = staticSeverityAttribute.GroupId;
-                        var langs = GetLangsFromHighlightingAttribute(languages, groupId);
-                        var text = staticSeverityAttribute.ToolTipFormatString;
-                        if (text.IsNullOrEmpty() || text.IsWhitespace() || text == "{0}")
-                        {
-                            text = type.Name.TextFromTypeName();
-                        }
-                        foreach (var lang in langs)
-                        {
-                            var feature = new RsFeature(type.Name, text, lang,
-                                langs,
-                                RsFeatureKind.StaticInspection, staticSeverityAttribute.Severity, null, groupId);
-                            staticInspectionsCatalog.AddFeature(feature, lang);
-                        }
-                    }
-                }
-            }
-            return staticInspectionsCatalog;
+            return _staticInspectionCatalog;
         }
 
-        private void DigQuickFixes()
+        private void DigFeaturesByTypes()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -136,22 +98,28 @@ namespace RsDocGenerator
 
                 foreach (var type in types)
                 {
-                    if (type.IsInterface || type.IsAbstract) continue;
+                    if (type.IsInterface || type.IsAbstract || type.Name.EndsWith("Base")) continue;
+
+                    // Quick-fixes
                     if (typeof(IQuickFix).IsAssignableFrom(type))
                     {
+                        // Making sure that the quick-fix is registered for at least one inspection
                         var inspectionTypes = _myContext.GetComponent<QuickFixTable>()
                             .GetHighlightingTypesForQuickFix(type);
                         if (!inspectionTypes.IsEmpty())
                         {
+                            // The list of inspections that have quick-fixes is used to drop some auto-generated inspections
                             foreach (var inspectionType in inspectionTypes)
                                 if (!_inspectionTypesWithQuickFixes.Contains(inspectionType))
                                     _inspectionTypesWithQuickFixes.Add(inspectionType);
 
                             AddQuickFixImplementations(type);
                         }
+                        continue;
                     }
-                    if (typeof(IContextAction).IsAssignableFrom(type) && typeof(IScopedAction).IsAssignableFrom(type) &&
-                        !type.Name.EndsWith("Base"))
+
+                    // Context actions in scope
+                    if (typeof(IContextAction).IsAssignableFrom(type) && typeof(IScopedAction).IsAssignableFrom(type))
                     {
                         var action = _contexActionsCatalog.Features.FirstOrDefault(f => f.Id == type.FullName);
                         if (action != null)
@@ -160,7 +128,37 @@ namespace RsDocGenerator
                                 null);
                             _contexActionInScopeCatalog.AddFeature(feature, action.Lang);
                         }
+                        continue;
+                    }
 
+                    // Static inspections
+                    StaticSeverityHighlightingAttribute staticSeverityAttribute = null;
+                    if (typeof(IHighlighting).IsAssignableFrom(type))
+                    {
+                        staticSeverityAttribute = Attribute.GetCustomAttribute(type,
+                            typeof(StaticSeverityHighlightingAttribute)) as StaticSeverityHighlightingAttribute;
+                    }
+
+                    if (staticSeverityAttribute != null && staticSeverityAttribute.Severity != Severity.INFO)
+                    {
+                        // getting rid of generated TypeScript errors
+                        if (type.Name.StartsWith("TS") && type.Name.EndsWith("Error") &&
+                            !_inspectionTypesWithQuickFixes.Contains(type))
+                            continue;
+
+                        var groupId = staticSeverityAttribute.GroupId;
+                        var langs = GetLangsFromHighlightingAttribute(staticSeverityAttribute.Languages, groupId);
+                        var text = staticSeverityAttribute.ToolTipFormatString;
+                        if (text.IsNullOrEmpty() || text.IsWhitespace() || text == "{0}")
+                        {
+                            text = type.Name.TextFromTypeName();
+                        }
+                        foreach (var lang in langs)
+                        {
+                            var feature = new RsFeature(type.FullName, text, lang, langs,
+                                RsFeatureKind.StaticInspection, staticSeverityAttribute.Severity, null, groupId);
+                            _staticInspectionCatalog.AddFeature(feature, lang);
+                        }
                     }
                 }
             }
