@@ -15,7 +15,6 @@ namespace RsDocGenerator
     public class FeatureDigger
     {
         private readonly IDataContext _myContext;
-        private readonly List<Type> _inspectionTypesWithQuickFixes = new List<Type>();
         private readonly HighlightingSettingsManager _highlightingSettingsManager;
         private readonly FeatureCatalog _quickFixCatalog;
         private readonly FeatureCatalog _fixInScopeCatalog;
@@ -85,6 +84,9 @@ namespace RsDocGenerator
 
         private void DigFeaturesByTypes()
         {
+            var inspectionTypesWithQuickFixes = new List<Type>();
+            var staticInspections = new Dictionary<Type, StaticSeverityHighlightingAttribute>();
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 Type[] types;
@@ -111,8 +113,8 @@ namespace RsDocGenerator
                         {
                             // The list of inspections that have quick-fixes is used to drop some auto-generated inspections
                             foreach (var inspectionType in inspectionTypes)
-                                if (!_inspectionTypesWithQuickFixes.Contains(inspectionType))
-                                    _inspectionTypesWithQuickFixes.Add(inspectionType);
+                                if (!inspectionTypesWithQuickFixes.Contains(inspectionType))
+                                    inspectionTypesWithQuickFixes.Add(inspectionType);
 
                             AddQuickFixImplementations(type);
                         }
@@ -133,34 +135,38 @@ namespace RsDocGenerator
                     }
 
                     // Static inspections
-                    StaticSeverityHighlightingAttribute staticSeverityAttribute = null;
                     if (typeof(IHighlighting).IsAssignableFrom(type))
                     {
-                        staticSeverityAttribute = Attribute.GetCustomAttribute(type,
+                        var staticSeverityAttribute = Attribute.GetCustomAttribute(type,
                             typeof(StaticSeverityHighlightingAttribute)) as StaticSeverityHighlightingAttribute;
+                        if (staticSeverityAttribute != null && staticSeverityAttribute.Severity != Severity.INFO)
+                            staticInspections.Add(type, staticSeverityAttribute);
                     }
+                }
+            }
 
-                    if (staticSeverityAttribute != null && staticSeverityAttribute.Severity != Severity.INFO)
-                    {
-                        // getting rid of generated TypeScript errors
-                        if (type.Name.StartsWith("TS") && type.Name.EndsWith("Error") &&
-                            !_inspectionTypesWithQuickFixes.Contains(type))
-                            continue;
+            foreach (var staticInspection in staticInspections)
+            {
+                var type = staticInspection.Key;
+                var staticSeverityAttribute = staticInspection.Value;
 
-                        var groupId = staticSeverityAttribute.GroupId;
-                        var langs = GetLangsFromHighlightingAttribute(staticSeverityAttribute.Languages, groupId);
-                        var text = staticSeverityAttribute.ToolTipFormatString;
-                        if (text.IsNullOrEmpty() || text.IsWhitespace() || text == "{0}")
-                        {
-                            text = type.Name.TextFromTypeName();
-                        }
-                        foreach (var lang in langs)
-                        {
-                            var feature = new RsFeature(type.FullName, text, lang, langs,
-                                RsFeatureKind.StaticInspection, staticSeverityAttribute.Severity, null, groupId);
-                            _staticInspectionCatalog.AddFeature(feature, lang);
-                        }
-                    }
+                // getting rid of generated TypeScript errors
+                if (type.Name.StartsWith("TS") && type.Name.EndsWith("Error") &&
+                    !inspectionTypesWithQuickFixes.Contains(type))
+                    continue;
+
+                var groupId = staticSeverityAttribute.GroupId;
+                var langs = GetLangsFromHighlightingAttribute(staticSeverityAttribute.Languages, groupId);
+                var text = staticSeverityAttribute.ToolTipFormatString;
+                if (text.IsNullOrEmpty() || text.IsWhitespace() || text == "{0}")
+                {
+                    text = type.Name.TextFromTypeName();
+                }
+                foreach (var lang in langs)
+                {
+                    var feature = new RsFeature(type.FullName, text, lang, langs,
+                        RsFeatureKind.StaticInspection, staticSeverityAttribute.Severity, null, groupId);
+                    _staticInspectionCatalog.AddFeature(feature, lang);
                 }
             }
         }
