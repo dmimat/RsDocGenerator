@@ -65,13 +65,14 @@ namespace RsDocGenerator
             var actionsCatalog = new FeatureCatalog(RsFeatureKind.ContextAction);
             foreach (var ca in _myContext.GetComponent<IContextActionTable>().AllActions)
             {
-                var lang = ca.Group ?? "Unknown";
+                var lang = GeneralHelpers.TryGetPsiLang(ca.Group);
                 var feature = new RsFeature(ca.ActionKey, ca.Name, lang, null,
                     RsFeatureKind.ContextAction, Severity.INFO, null, null);
                 actionsCatalog.AddFeature(feature, lang);
             }
             return actionsCatalog;
         }
+
         public FeatureCatalog GetContextActions()
         {
             return _contexActionsCatalog;
