@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using MessageBox = System.Windows.Forms.MessageBox;
@@ -103,13 +102,14 @@ namespace RsDocGenerator
       [NotNull, Pure]
       public static string GetPsiLanguagePresentation(string type)
       {
-          string presentableLang;
-          return PsiLangugages.TryGetValue(type, out presentableLang) ? presentableLang : type;
+          return PsiLangugages.ContainsKey(type) ? PsiLangugages[type] : type;
       }
 
       public static string GetPsiLangByPresentation(string lang)
       {
+          if (lang == null || lang == "General") return "Common";
           if (lang == "Cpp") return "CPP";
+          if (lang == "VB") return "VBASIC";
           foreach (var psiLangugage in PsiLangugages)
               if (lang == psiLangugage.Value)
                   return psiLangugage.Key;
