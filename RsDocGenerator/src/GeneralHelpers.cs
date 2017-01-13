@@ -63,7 +63,7 @@ namespace RsDocGenerator
       return "Common";
     }
 
-      public static string TryGetPsiLang(string fullName)
+      public static string TryGetPsiLangFromTypeName(string fullName)
       {
           if (fullName.Contains("Asp"))
               return "ASPX";
@@ -102,45 +102,39 @@ namespace RsDocGenerator
       [NotNull, Pure]
       public static string GetPsiLanguagePresentation(string type)
       {
-          switch (type)
-          {
-              case "CSHARP":
-                  return "C#";
-              case "CPP":
-              case "Cpp":
-                  return "C++";
-              case "VBASIC":
-                  return "VB.NET";
-              case "ASPX":
-                  return "ASP.NET";
-              case "JAVA_SCRIPT":
-                  return "JavaScript";
-              case "XAML":
-                  return "XAML";
-              case "RESX":
-                  return "Resource files";
-              case "HTML":
-                  return "HTML";
-              case "CSS":
-                  return "CSS";
-              case "Web.Config":
-                  return "Web.config";
-              case "MSBUILD_BUILD_SCRIPT":
-                  return "MSBuild";
-              case "NANT_BUILD_SCRIPT":
-                  return "NAnt";
-              case "ASXX":
-                  return "HttpHandler or WebService";
-              case "Razor":
-                  return "Razor";
-              case "TYPE_SCRIPT":
-                  return "TypeScript";
-              case "REGULAR_EXPRESSION":
-                  return "Regular expressions";
-              default:
-                  return type;
-          }
+          string presentableLang;
+          return PsiLangugages.TryGetValue(type, out presentableLang) ? presentableLang : type;
       }
+
+      public static string GetPsiLangByPresentation(string lang)
+      {
+          if (lang == "Cpp") return "CPP";
+          foreach (var psiLangugage in PsiLangugages)
+              if (lang == psiLangugage.Value)
+                  return psiLangugage.Key;
+          return lang;
+      }
+
+      private static readonly Dictionary<string, string> PsiLangugages = new Dictionary<string, string>()
+      {
+          {"CSHARP", "C#"},
+          {"CPP", "C++"},
+          {"VBASIC", "VB.NET"},
+          {"ASPX", "ASP.NET"},
+          {"JAVA_SCRIPT", "JavaScript"},
+          {"XAML", "XAML"},
+          {"RESX", "Resource files"},
+          {"HTML", "HTML"},
+          {"CSS", "CSS"},
+          {"Web.Config", "Web.config"},
+          {"MSBUILD_BUILD_SCRIPT", "MSBuild"},
+          {"NANT_BUILD_SCRIPT", "NAnt"},
+          {"BUILD_SCRIPT", "Build Scripts"},
+          {"ASXX", "HttpHandler or WebService"},
+          {"Razor", "Razor"},
+          {"TYPE_SCRIPT", "TypeScript"},
+          {"REGULAR_EXPRESSION", "Regular expressions"}
+      };
 
       [CanBeNull]
     public static string GetOutputFolder(IDataContext context)

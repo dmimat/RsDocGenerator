@@ -64,7 +64,7 @@ namespace RsDocGenerator
             var actionsCatalog = new FeatureCatalog(RsFeatureKind.ContextAction);
             foreach (var ca in _myContext.GetComponent<IContextActionTable>().AllActions)
             {
-                var lang = GeneralHelpers.TryGetPsiLang(ca.Group);
+                var lang = GeneralHelpers.GetPsiLangByPresentation(ca.Group);
                 var feature = new RsFeature(ca.ActionKey, ca.Name, lang, null,
                     RsFeatureKind.ContextAction, Severity.INFO, null, null);
                 actionsCatalog.AddFeature(feature, lang);
@@ -236,7 +236,7 @@ namespace RsDocGenerator
 
             if (allLanguages.IsEmpty())
             {
-                allLanguages.Add(GeneralHelpers.TryGetPsiLang(type.FullName));
+                allLanguages.Add(GeneralHelpers.TryGetPsiLangFromTypeName(type.FullName));
             }
 
             foreach (var lang in allLanguages.Distinct().ToList())
