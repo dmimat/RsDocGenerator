@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
 
@@ -28,11 +29,15 @@ namespace RsDocGenerator
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
-                    throw;
+                    var result = MessageBox.Show(
+                        String.Format("ReSharper feature catalog (RsFeatureCatalog.xml) is corrupted and can be neither read nor updated. \n" +
+                                                               "Do you want to overwrite this file?"),
+                        "RsFeatureCatalog.xml is corrupted", MessageBoxButtons.YesNo);
+                    if (result == DialogResult.No)
+                        throw;
                 }
             }
-            else
+            if(_catalogDocument == null)
             {
                 _catalogDocument = new XDocument();
                 _catalogDocument.Add(new XElement(RootNodeName));

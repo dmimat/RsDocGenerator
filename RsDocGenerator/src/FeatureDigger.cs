@@ -139,10 +139,12 @@ namespace RsDocGenerator
                     {
                         var staticSeverityAttribute = Attribute.GetCustomAttribute(type,
                             typeof(StaticSeverityHighlightingAttribute)) as StaticSeverityHighlightingAttribute;
+
                         // This is to get rid of configurable inspections that get StaticSeverityHighlightingAttribute
                         // from their base types
                         var configurableSeverityAttribute = Attribute.GetCustomAttribute(type,
-                            typeof(StaticSeverityHighlightingAttribute)) as ConfigurableSeverityHighlightingAttribute;
+                            typeof(ConfigurableSeverityHighlightingAttribute)) as ConfigurableSeverityHighlightingAttribute;
+
                         if (staticSeverityAttribute != null &&
                             configurableSeverityAttribute == null &&
                             staticSeverityAttribute.Severity != Severity.INFO)
