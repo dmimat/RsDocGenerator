@@ -24,7 +24,7 @@ namespace RsDocGenerator
                 var langPresentable = GeneralHelpers.GetPsiLanguagePresentation(language);
                 var topicId = string.Format("Reference__Code_Inspections_{0}", language);
                 var fileName = Path.Combine(outputFolder, topicId + ".xml");
-                var topic = XmlHelpers.CreateHmTopic(topicId);
+                var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
                 var topicRoot = topic.Root;
                 var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
                 var errorCount = staticInspetions.GetLangImplementations(language).Count;

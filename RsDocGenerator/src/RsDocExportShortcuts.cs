@@ -28,9 +28,9 @@ namespace RsDocGenerator
       XmlHelpers.AddAutoGenComment(shortcutsXmlDoc.Root);
 
       const string menuPathLibId = "Menupath_by_ID";
-      var menuPathLibrary = XmlHelpers.CreateHmTopic(menuPathLibId);
+      var menuPathLibrary = XmlHelpers.CreateHmTopic(menuPathLibId, "Menupath_by_ID Chunks");
       const string accessIntroLibId = "AccessIntro_by_ID";
-      var accessIntroLibrary = XmlHelpers.CreateHmTopic(accessIntroLibId);
+      var accessIntroLibrary = XmlHelpers.CreateHmTopic(accessIntroLibId, "AccessIntro_by_ID Chunks");
 
       var actionManager = context.GetComponent<IActionManager>();
 

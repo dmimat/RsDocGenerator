@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -50,8 +51,9 @@ namespace RsDocGenerator
       }
 
       var topicId = "Reference__Templates_Explorer__" + type + "_Templates";
-      var fileName = Path.Combine(saveDirectoryPath, topicId + ".xml");
-      var topic = XmlHelpers.CreateHmTopic(topicId);
+        var topicTitle = "Predefined " + type + " Templates";
+        var fileName = Path.Combine(saveDirectoryPath, topicId + ".xml");
+      var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
 
       topicRoot.Add(new XElement("p",
@@ -181,9 +183,10 @@ namespace RsDocGenerator
 
     private void CreateTopicForLang(string lang, string type, XElement table, string saveDirectoryPath, string version)
     {
-      string topicId = CreateTopicIdForTypeAndLang(lang, type);
-      string fileName = Path.Combine(saveDirectoryPath, topicId + ".xml");
-      var topic = XmlHelpers.CreateHmTopic(topicId);
+      var topicId = CreateTopicIdForTypeAndLang(lang, type);
+      var topicTitle = CreateTopicTitleForTypeAndLang(lang, type);
+      var fileName = Path.Combine(saveDirectoryPath, topicId + ".xml");
+      var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
 
       topicRoot.Add(new XElement("p",
@@ -218,6 +221,11 @@ namespace RsDocGenerator
     private static string CreateTopicIdForTypeAndLang(string lang, string type)
     {
       return String.Format("Reference__Templates_Explorer__{0}_Templates_{1}", type, lang.NormalizeStringForAttribute());
+    }
+
+    private static string CreateTopicTitleForTypeAndLang(string lang, string type)
+    {
+      return  String.Format("Predefined {0} Templates for {1}", type, lang);
     }
 
     private static void AddTemplateRow(Dictionary<string, XElement> tables,

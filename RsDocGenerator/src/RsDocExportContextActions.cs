@@ -18,7 +18,7 @@ namespace RsDocGenerator
     protected override string GenerateContent(IDataContext context, string outputFolder)
     {
       const string caTopicId = "CA_Chunks";
-      var caLibrary = XmlHelpers.CreateHmTopic(caTopicId);
+      var caLibrary = XmlHelpers.CreateHmTopic(caTopicId, "Context Actions chunks");
       var tablesByLanguage = new Dictionary<string, XElement>();
       var sortedActions = context.GetComponent<IContextActionTable>().AllActions.OrderBy(ca => ca.Name);
       var caPath = GeneralHelpers.GetCaPath(context);

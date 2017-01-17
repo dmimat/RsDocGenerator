@@ -182,7 +182,6 @@ namespace RsDocGenerator
         private void AddQuickFixImplementations(Type type)
         {
             string text;
-            Type fixInScopeType = null;
             try
             {
                 text =
@@ -193,20 +192,6 @@ namespace RsDocGenerator
             catch (Exception)
             {
                 text = type.Name.TextFromTypeName();
-            }
-            if (typeof(IScopedAction).IsAssignableFrom(type))
-            {
-                fixInScopeType = type;
-                try
-                {
-                    text =
-                        type.GetProperty("ScopedText")
-                            .GetValue(FormatterServices.GetUninitializedObject(type), null)
-                            .ToString();
-                }
-                catch (Exception)
-                {
-                }
             }
             var inspectionTypes = _myContext.GetComponent<QuickFixTable>().GetHighlightingTypesForQuickFix(type);
             var allLanguages = new List<string>();
@@ -244,7 +229,7 @@ namespace RsDocGenerator
                 var feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.QuickFix, Severity.INFO,
                     null, null);
                 _quickFixCatalog.AddFeature(feature, lang);
-                if (fixInScopeType == null) continue;
+                if (!typeof(IScopedAction).IsAssignableFrom(type)) continue;
                 feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.FixInScope, Severity.INFO, null,
                     null);
                 _fixInScopeCatalog.AddFeature(feature, lang);

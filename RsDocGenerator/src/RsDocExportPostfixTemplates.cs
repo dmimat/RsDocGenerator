@@ -13,7 +13,7 @@ namespace RsDocGenerator
     protected override string GenerateContent(IDataContext context, string outputFolder)
     {
       const string postfixTopicId = "Postfix_Templates_Generated";
-      var postfixLibrary = XmlHelpers.CreateHmTopic(postfixTopicId);
+      var postfixLibrary = XmlHelpers.CreateHmTopic(postfixTopicId, "Postfix templates chunks");
       var postfixChunk = XmlHelpers.CreateChunk("postfix_table");
       var macroTable = XmlHelpers.CreateTable(new[] {"Shortcut", "Description", "Example"}, null);
 

@@ -5,7 +5,7 @@ namespace RsDocGenerator
 {
   internal static class XmlHelpers
   {
-    public static XDocument CreateHmTopic(string topicId)
+    public static XDocument CreateHmTopic(string topicId, string title)
     {
       var topicDocument = new XDocument();
       topicDocument.Add(new XElement("topic"));
@@ -15,7 +15,8 @@ namespace RsDocGenerator
         new XAttribute(xsiNs + "noNamespaceSchemaLocation",
           "http://helpserver.labs.intellij.net/help/topic.v2.xsd"),
         new XAttribute(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-        new XAttribute("id", topicId));
+        new XAttribute("id", topicId),
+        new XAttribute("title", title));
 
       AddAutoGenComment(topicDocument.Root);
       return topicDocument;
@@ -49,7 +50,8 @@ namespace RsDocGenerator
     public static XElement CreateInclude(string src, string id)
     {
       return new XElement("include",
-        new XAttribute("src", src),
+        new XAttribute("nullable", "true"),
+        new XAttribute("src", src + ".xml"),
         new XAttribute("include-id", id.NormalizeStringForAttribute()));
     }
 
@@ -70,8 +72,10 @@ namespace RsDocGenerator
       [CanBeNull] string anchor)
     {
       var link = new XElement("a", content);
-      if (href != null)
-        link.Add(new XAttribute("href", href));
+        if (href != null)
+        {
+            link.Add(new XAttribute("href", href.Contains("http") ? href : href + ".xml"));
+        }
       if (anchor != null)
         link.Add(new XAttribute("anchor", anchor.NormalizeStringForAttribute()));
       return link;

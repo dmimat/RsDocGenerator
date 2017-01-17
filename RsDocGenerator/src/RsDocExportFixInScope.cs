@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Linq;
+using System.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.UI.ActionsRevised;
 
@@ -16,7 +17,7 @@ namespace RsDocGenerator
             var actionsInScope = featureDigger.GetContextActionsInScope();
 
             const string caTopicId = "Fix_in_Scope_Chunks";
-            var inScopeLibrary = XmlHelpers.CreateHmTopic(caTopicId);
+            var inScopeLibrary = XmlHelpers.CreateHmTopic(caTopicId, "Fix in scope chunks");
 
             var qfChunk = CreateScopeChunk(fixesInScope, "qf_list");
             var caChunk = CreateScopeChunk(actionsInScope, "ca_list");
@@ -31,15 +32,15 @@ namespace RsDocGenerator
             return "Fix in scope actions";
         }
 
-
         private static XElement CreateScopeChunk(FeatureCatalog fixesInScope, string chunkName)
         {
             var chunk = XmlHelpers.CreateChunk(chunkName);
             foreach (var lang in fixesInScope.Languages)
             {
-                var langChapter = XmlHelpers.CreateChapter(lang);
+                var langChapter = XmlHelpers.CreateChapter(GeneralHelpers.GetPsiLanguagePresentation(lang), lang);
                 var langList = new XElement("list");
-                foreach (var fixInScope in fixesInScope.GetLangImplementations(lang))
+                foreach (var fixInScope in
+                    fixesInScope.GetLangImplementations(lang).GroupBy(x => x.Text).Select(x => x.First()))
                 {
                     langList.Add(new XElement("li", fixInScope.Text + Environment.NewLine,
                         new XComment(fixInScope.Id),

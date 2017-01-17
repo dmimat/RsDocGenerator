@@ -99,9 +99,9 @@ namespace RsDocGenerator
 
 
       [NotNull, Pure]
-      public static string GetPsiLanguagePresentation(string type)
+      public static string GetPsiLanguagePresentation(string psiLangId)
       {
-          return PsiLangugages.ContainsKey(type) ? PsiLangugages[type] : type;
+          return PsiLangugages.ContainsKey(psiLangId) ? PsiLangugages[psiLangId] : psiLangId;
       }
 
       public static string GetPsiLangByPresentation(string lang)
