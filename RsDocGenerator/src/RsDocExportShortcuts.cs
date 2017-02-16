@@ -139,7 +139,7 @@ namespace RsDocGenerator
     {
       if (currentShortcutsSet != null)
       {
-        string previousKeystroke = "UNDEFINED";
+        var previousKeystroke = "UNDEFINED";
         foreach (var keystroke in currentShortcutsSet)
         {
           string curretnKeystroke = keystroke.ToString();
