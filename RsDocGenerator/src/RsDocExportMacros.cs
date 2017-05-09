@@ -14,6 +14,11 @@ namespace RsDocGenerator
   {
     protected override string GenerateContent(IDataContext context, string outputFolder)
     {
+      return StartContentGeneration(context, outputFolder);
+    }
+
+    public static string StartContentGeneration(IDataContext context, string outputFolder)
+    {
       const string macroTopicId = "Template_Macros";
 
       var macroLibrary = XmlHelpers.CreateHmTopic(macroTopicId, "List of Template Macros");
@@ -66,19 +71,19 @@ namespace RsDocGenerator
             longDescription,
             paramHeader,
             paramNode,
-            XmlHelpers.CreateInclude("TR", "macros_" + macroId)));
+            XmlHelpers.CreateInclude("TR", "macros_" + macroId, true)));
         macroTable.Add(macroRow);
       }
 
       macroChunk.Add(macroTable);
-      macroLibrary.Root.Add(XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Macros", "intro"));
+      macroLibrary.Root.Add(XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Macros", "intro", false));
       macroLibrary.Root.Add(new XElement("p", "Here is the full list of template macros provided by ReSharper:"));
       macroLibrary.Root.Add(macroChunk);
-      macroLibrary.Save(Path.Combine(outputFolder, macroTopicId + ".xml"));
+      macroLibrary.Save(Path.Combine(outputFolder + "\\CodeTemplates", macroTopicId + ".xml"));
       return "Template macros";
     }
 
-    private string GetParameterAsString(ParameterType param)
+    private static string GetParameterAsString(ParameterType param)
     {
       switch (param)
       {

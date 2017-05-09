@@ -19,35 +19,19 @@ namespace RsDocGenerator
         {
             // output path
             IProperty<FileSystemPath> outputPath =
-                new Property<FileSystemPath>(lifetime, "RsDocOptionsPage::OutputPath");
+                new Property<FileSystemPath>(lifetime, "RsDocOptionsPage::DotnetRootFolder");
             outputPath.SetValue(FileSystemPath.TryParse(
                 optionsSettingsSmartContext.StoreOptionsTransactionContext.GetValue(
-                    (RsDocSettingsKey key) => key.RsDocOutputFolder)));
+                    (RsDocSettingsKey key) => key.RsDocDotnetRootFolder)));
             outputPath.Change.Advise(lifetime, a =>
             {
                 if (!a.HasNew || a.New == null) return;
                 optionsSettingsSmartContext.StoreOptionsTransactionContext.SetValue(
-                    (RsDocSettingsKey key) => key.RsDocOutputFolder, a.New.FullPath);
+                    (RsDocSettingsKey key) => key.RsDocDotnetRootFolder, a.New.FullPath);
             });
-            AddText("Output folder for generated content:");
+            AddText("Dotnet docs root folder:");
             var outputPathOption = AddFolderChooserOption(outputPath, null, null);
             outputPathOption.IsEnabledProperty.SetValue(true);
-
-            // ReSharper feature catalog path
-            IProperty<FileSystemPath> featureCatalogPath =
-                new Property<FileSystemPath>(lifetime, "RsDocOptionsPage::OutputPath");
-            featureCatalogPath.SetValue(FileSystemPath.TryParse(
-                optionsSettingsSmartContext.StoreOptionsTransactionContext.GetValue(
-                    (RsDocSettingsKey key) => key.RsDocFeatureCatalog)));
-            featureCatalogPath.Change.Advise(lifetime, a =>
-            {
-                if (!a.HasNew || a.New == null) return;
-                optionsSettingsSmartContext.StoreOptionsTransactionContext.SetValue(
-                    (RsDocSettingsKey key) => key.RsDocFeatureCatalog, a.New.FullPath);
-            });
-            AddText("Folder with ReSharper feature catalog (RsFeatureCatalog.xml):");
-            var featureCataologOption = AddFolderChooserOption(featureCatalogPath, null, null);
-            featureCataologOption.IsEnabledProperty.SetValue(true);
 
             // folder with samples for context actions
             IProperty<FileSystemPath> caFolder = new Property<FileSystemPath>(lifetime, "RsDocOptionsPage::CaFolder");
@@ -69,8 +53,7 @@ namespace RsDocGenerator
     [SettingsKey(typeof(EnvironmentSettings), "Documentation generator settings")]
     public class RsDocSettingsKey
     {
-        [SettingsEntry("", "Output folder")] public string RsDocOutputFolder;
+        [SettingsEntry("", "Dotnet docs root folder")] public string RsDocDotnetRootFolder;
         [SettingsEntry("", "Folder with context actions samples")] public string RsDocCaFolder;
-        [SettingsEntry("", "ReSharper feature catalog")] public string RsDocFeatureCatalog;
     }
 }

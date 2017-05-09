@@ -22,16 +22,25 @@ namespace RsDocGenerator
   [Action("RsDocExportTemplates", "Export Templates", Id = 6759)]
   internal class RsDocExportTemplates : RsDocExportBase
   {
-    protected override string GenerateContent(IDataContext context, string outputFolder)
+    private static string _templatesOutputFolder;
+
+    public static string StartContentGeneration(IDataContext context, string outputFolder)
     {
+      _templatesOutputFolder = outputFolder + "\\CodeTemplates";
       var bound = context.GetComponent<ISettingsStore>().BindToContextTransient(ContextRange.ApplicationWide);
       foreach (TemplateApplicability applicability in Enum.GetValues(typeof(TemplateApplicability)))
-        CreateXml(applicability, bound, outputFolder, GeneralHelpers.GetCurrentVersion(), context);
+        CreateXml(applicability, bound, GeneralHelpers.GetCurrentVersion(), context);
       return "Code templates";
     }
 
-    private void CreateXml(TemplateApplicability applicability, IContextBoundSettingsStore bound, 
-      string saveDirectoryPath, string version, IDataContext context)
+    protected override string GenerateContent(IDataContext context, string outputFolder)
+    {
+      return StartContentGeneration(context, outputFolder);
+    }
+
+    private static void CreateXml(TemplateApplicability applicability,
+      IContextBoundSettingsStore bound,
+      string version, IDataContext context)
     {
       string type;
       ScopeFilter scopeFilter = ScopeFilter.Language;
@@ -52,7 +61,7 @@ namespace RsDocGenerator
 
       var topicId = "Reference__Templates_Explorer__" + type + "_Templates";
         var topicTitle = "Predefined " + type + " Templates";
-        var fileName = Path.Combine(saveDirectoryPath, topicId + ".xml");
+        var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
       var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
 
@@ -60,9 +69,9 @@ namespace RsDocGenerator
         new XElement("menupath", "ReSharper | Tools | Templates Explorer | " + type + " Templates")));
 
       topicRoot.Add(new XElement("p",
-        "This section lists all predefined " + type + " templates in ReSharper " + version + "."));
+        "This section lists all predefined " + type + " templates in %product% %currentVersion%."));
 
-      topicRoot.Add(new XElement("p", XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Types", type)));
+      topicRoot.Add(new XElement("p", XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Types", type, false)));
       var summaryTable = XmlHelpers.CreateTable(new[] {"Template", "Description"}, new[] {"20%", "80%"});
       var summaryItems = new List<Tuple<string, XElement>>();
       var tables = new Dictionary<string, XElement>();
@@ -126,7 +135,7 @@ namespace RsDocGenerator
           {
             var macro = MacroDescriptionFormatter.GetMacroAttribute(expr.Definition);
             paramItemElement.Add(" - " + macro.LongDescription + " (",
-              XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name),
+              XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
               ")");
           }
           else
@@ -171,7 +180,7 @@ namespace RsDocGenerator
         var langForHeading = table.Key;
         if (langForHeading == "Global")
           langForHeading = "Global Usage";
-        CreateTopicForLang(langForHeading, type, table.Value, saveDirectoryPath, version);
+        CreateTopicForLang(langForHeading, type, table.Value, version);
       }
 
       var indexChapter = XmlHelpers.CreateChapter(String.Format("Index of {0} Templates", type));
@@ -181,11 +190,11 @@ namespace RsDocGenerator
       topic.Save(fileName);
     }
 
-    private void CreateTopicForLang(string lang, string type, XElement table, string saveDirectoryPath, string version)
+    private static void CreateTopicForLang(string lang, string type, XElement table, string version)
     {
       var topicId = CreateTopicIdForTypeAndLang(lang, type);
       var topicTitle = CreateTopicTitleForTypeAndLang(lang, type);
-      var fileName = Path.Combine(saveDirectoryPath, topicId + ".xml");
+      var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
       var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
 
@@ -213,7 +222,7 @@ namespace RsDocGenerator
         String.Format(
           "This topic lists all predefined {0} templates for {1} in ReSharper {2}. For more information about {0} templates, see ",
           type.ToLower(), lang, version),
-        XmlHelpers.CreateHyperlink(null, learnMoreTopic, null)));
+        XmlHelpers.CreateHyperlink(null, learnMoreTopic, null, false)));
       topicRoot.Add(table);
       topic.Save(fileName);
     }
@@ -240,7 +249,7 @@ namespace RsDocGenerator
 
       var noDescriptionFallback = (template.Description.IsNullOrEmpty() || type == "File" || type == "Surround") &&
                                   !template.Description.Contains(' ')
-        ? XmlHelpers.CreateInclude("TR", templateIdFull + "_desc")
+        ? XmlHelpers.CreateInclude("TR", templateIdFull + "_desc", true)
         : template.Description as object;
 
       var paramHeader = new XElement("p");
@@ -259,12 +268,12 @@ namespace RsDocGenerator
           XmlHelpers.CreateCodeBlock(template.Text, lang),
           paramHeader,
           paramElement,
-          XmlHelpers.CreateInclude("TR", templateIdFull))));
+          XmlHelpers.CreateInclude("TR", templateIdFull, true))));
 
       summaryItems.Add(
         new Tuple<string, XElement>(lang, new XElement("tr",
           new XElement("td",
-            XmlHelpers.CreateHyperlink(templateId, CreateTopicIdForTypeAndLang(lang, type), templateIdFull), imported),
+            XmlHelpers.CreateHyperlink(templateId, CreateTopicIdForTypeAndLang(lang, type), templateIdFull, false), imported),
           new XElement("td", noDescriptionFallback))));
     }
   }

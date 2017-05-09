@@ -12,6 +12,11 @@ namespace RsDocGenerator
     {
         protected override string GenerateContent(IDataContext context, string outputFolder)
         {
+            return StartContentGeneration(context, outputFolder);
+        }
+
+        public static string StartContentGeneration(IDataContext context, string outputFolder)
+        {
             var featureDigger = new FeatureDigger(context);
             var fixesInScope = featureDigger.GetFixesInScope();
             var actionsInScope = featureDigger.GetContextActionsInScope();
@@ -45,7 +50,7 @@ namespace RsDocGenerator
                     langList.Add(new XElement("li", fixInScope.Text + Environment.NewLine,
                         new XComment(fixInScope.Id),
                         XmlHelpers.CreateInclude("Fix_in_Scope_Static_Chunks",
-                            fixInScope.Id.NormalizeStringForAttribute())));
+                            fixInScope.Id.NormalizeStringForAttribute(), true)));
                 }
                 langChapter.Add(langList);
                 chunk.Add(langChapter);

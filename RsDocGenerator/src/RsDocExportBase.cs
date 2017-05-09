@@ -13,8 +13,8 @@ namespace RsDocGenerator
 
     public void Execute(IDataContext context, DelegateExecute nextExecute)
     {
-      var outputFolder = GeneralHelpers.GetOutputFolder(context);
-      if (outputFolder == null) return;
+      var outputFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
+      if (string.IsNullOrEmpty(outputFolder)) return;
       var what = GenerateContent(context, outputFolder);
       GeneralHelpers.ShowSuccessMessage(what, outputFolder);
     }

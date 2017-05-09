@@ -12,6 +12,11 @@ namespace RsDocGenerator
     {
         protected override string GenerateContent(IDataContext context, string outputFolder)
         {
+            return StartContentGeneration(context, outputFolder);
+        }
+
+        public static string StartContentGeneration(IDataContext context, string outputFolder)
+        {
             var featureDigger = new FeatureDigger(context);
             var configurableInspetions = featureDigger.GetConfigurableInspections();
             var staticInspetions = featureDigger.GetStaticInspections();
@@ -23,10 +28,10 @@ namespace RsDocGenerator
                     continue;
                 var langPresentable = GeneralHelpers.GetPsiLanguagePresentation(language);
                 var topicId = string.Format("Reference__Code_Inspections_{0}", language);
-                var fileName = Path.Combine(outputFolder, topicId + ".xml");
+                var fileName = Path.Combine(outputFolder + "\\CodeInspectionIndex", topicId + ".xml");
                 var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
                 var topicRoot = topic.Root;
-                var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
+                var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro", false);
                 var errorCount = staticInspetions.GetLangImplementations(language).Count;
                 if (staticInspetions.GetLangImplementations(language).Count < 2)
                     intro.Add(new XAttribute("filter", "empty"));
@@ -44,7 +49,7 @@ namespace RsDocGenerator
                 topicRoot.Add(intro);
 
                 if (langPresentable.Equals("C++"))
-                    topicRoot.Add(XmlHelpers.CreateInclude("Code_Analysis_in_CPP", "cpp_support_note"));
+                    topicRoot.Add(XmlHelpers.CreateInclude("Code_Analysis_in_CPP", "cpp_support_note", false));
 
                 foreach (var category in configCategories)
                 {
@@ -54,7 +59,7 @@ namespace RsDocGenerator
                             string.Format("{0} ({1} {2})", FeatureCatalog.GetGroupTitle(category.Key), count,
                                 NounUtil.ToPluralOrSingular("inspection", count)),
                             category.Key);
-                    chapter.Add(XmlHelpers.CreateInclude("Code_Analysis__Code_Inspections", category.Key));
+                    chapter.Add(XmlHelpers.CreateInclude("Code_Analysis__Code_Inspections", category.Key, false));
                     var summaryTable = XmlHelpers.CreateTable(new[] {"Inspection", "Default Severity"},
                         new[] {"80%", "20%"});
                     foreach (var inspection in category.Value)
@@ -64,7 +69,7 @@ namespace RsDocGenerator
                             new XElement("tr",
                                 new XElement("td",
                                     XmlHelpers.CreateHyperlink(inspection.Text,
-                                        CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null),
+                                        CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null, true),
                                     new XComment(compoundName)),
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
                     }
@@ -82,15 +87,15 @@ namespace RsDocGenerator
             switch (inspectionDefaultSeverity)
             {
                 case Severity.DO_NOT_SHOW:
-                    return XmlHelpers.CreateHyperlink("Disabled", "Code_Analysis__Configuring_Warnings", "disable");
+                    return XmlHelpers.CreateHyperlink("Disabled", "Code_Analysis__Configuring_Warnings", "disable", false);
                 case Severity.ERROR:
-                    return XmlHelpers.CreateHyperlink("Error", "Code_Analysis__Code_Inspections", "errors");
+                    return XmlHelpers.CreateHyperlink("Error", "Code_Analysis__Code_Inspections", "errors", false);
                 case Severity.WARNING:
-                    return XmlHelpers.CreateHyperlink("Warning", "Code_Analysis__Code_Inspections", "warnings");
+                    return XmlHelpers.CreateHyperlink("Warning", "Code_Analysis__Code_Inspections", "warnings", false);
                 case Severity.SUGGESTION:
-                    return XmlHelpers.CreateHyperlink("Suggestion", "Code_Analysis__Code_Inspections", "suggestions");
+                    return XmlHelpers.CreateHyperlink("Suggestion", "Code_Analysis__Code_Inspections", "suggestions", false);
                 case Severity.HINT:
-                    return XmlHelpers.CreateHyperlink("Hint", "Code_Analysis__Code_Inspections", "hints");
+                    return XmlHelpers.CreateHyperlink("Hint", "Code_Analysis__Code_Inspections", "hints", false);
                 default:
                     return null;
             }

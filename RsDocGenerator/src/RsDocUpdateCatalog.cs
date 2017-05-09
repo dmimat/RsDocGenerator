@@ -19,6 +19,11 @@ namespace RsDocGenerator
 
         public void Execute(IDataContext context, DelegateExecute nextExecute)
         {
+            UpdateCatalog(context);
+        }
+
+        public static void UpdateCatalog(IDataContext context)
+        {
             var featureKeeper = new FeatureKeeper(context);
             var featureDigger = new FeatureDigger(context);
             var configurableInspetions = featureDigger.GetConfigurableInspections();
@@ -37,11 +42,9 @@ namespace RsDocGenerator
 
             featureKeeper.CloseSession();
 
-            var result = MessageBox.Show(String.Format("ReSharper Feature Catalog (RsFeatureCatalog.xml) is updated successfully according to version {0}. \n" +
-                                          "Do you want to open its location?", GeneralHelpers.GetCurrentVersion()),
-                "Export completed", MessageBoxButtons.YesNo);
-            if (result == DialogResult.Yes) { Process.Start(GeneralHelpers.GetFeatureCatalogFolder(context) ?? Path.GetTempPath()); }
+            MessageBox.Show(String.Format("ReSharper Feature Catalog (RsFeatureCatalog.xml) is updated successfully according to version {0}.",
+                    GeneralHelpers.GetCurrentVersion()),
+                "Export completed", MessageBoxButtons.OK);
         }
-
     }
 }

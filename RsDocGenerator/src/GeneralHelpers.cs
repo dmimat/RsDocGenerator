@@ -136,22 +136,16 @@ namespace RsDocGenerator
           {"REGULAR_EXPRESSION", "Regular expressions"}
       };
 
-      [CanBeNull]
-    public static string GetOutputFolder(IDataContext context)
+    [CanBeNull]
+    public static string GetDotnetDocsRootFolder(IDataContext context)
     {
-      return GetPathFromSettings(context, key => key.RsDocOutputFolder, "Choose where to save XML topics");
+      return GetPathFromSettings(context, key => key.RsDocDotnetRootFolder, "Choose the dotnet help directory root");
     }
 
     [CanBeNull]
     public static string GetCaPath(IDataContext context)
     {
       return GetPathFromSettings(context, key => key.RsDocCaFolder, "Specify the folder with context actions samples");
-    }
-
-      [CanBeNull]
-    public static string GetFeatureCatalogFolder(IDataContext context)
-    {
-      return GetPathFromSettings(context, key => key.RsDocFeatureCatalog, "Specify the folder for feature catalog file (RsFeatureCatalog.xml)");
     }
 
     [CanBeNull]
@@ -174,7 +168,7 @@ namespace RsDocGenerator
 
     public static void ShowSuccessMessage(string what, string where)
     {
-      DialogResult result = MessageBox.Show(String.Format("{0} are saved successfully to \n" +
+      var result = MessageBox.Show(String.Format("{0} are saved successfully to \n" +
                                                           "{1}\n" +
                                                           "Do you want to open the output folder?", what, where),
         "Export completed", MessageBoxButtons.YesNo);

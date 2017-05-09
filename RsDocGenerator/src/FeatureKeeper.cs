@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
+using JetBrains.Util;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace RsDocGenerator
 {
@@ -19,8 +21,10 @@ namespace RsDocGenerator
 
         public FeatureKeeper(IDataContext context)
         {
-            _catalogFile = Path.Combine(GeneralHelpers.GetFeatureCatalogFolder(context) ?? Path.GetTempPath(),
-                FileName);
+            var rootFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
+            if (rootFolder.IsNullOrEmpty()) return;
+
+            _catalogFile = Path.Combine(rootFolder + "\\nonProject", FileName);
             if (File.Exists(_catalogFile))
             {
                 try

@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using JetBrains;
 using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.UI.ActionsRevised;
-using JetBrains.Util;
 
 namespace RsDocGenerator
 {
@@ -16,6 +13,11 @@ namespace RsDocGenerator
   internal class RsDocExportContextActions : RsDocExportBase
   {
     protected override string GenerateContent(IDataContext context, string outputFolder)
+    {
+      return StartContentGeneration(context, outputFolder);
+    }
+
+    public static string StartContentGeneration(IDataContext context, string outputFolder)
     {
       const string caTopicId = "CA_Chunks";
       var caLibrary = XmlHelpers.CreateHmTopic(caTopicId, "Context Actions chunks");
@@ -42,8 +44,7 @@ namespace RsDocGenerator
           new XElement("td", new XElement("b", ca.Name)),
           new XElement("td",
             ca.Description ?? "", exampleTable,
-            XmlHelpers.CreateInclude("CA_Static_Chunks",
-              ca.ActionKey.NormalizeStringForAttribute()))));
+            XmlHelpers.CreateInclude("CA_Static_Chunks", ca.ActionKey.NormalizeStringForAttribute(), true))));
       }
 
       foreach (var table in tablesByLanguage)
@@ -67,7 +68,7 @@ namespace RsDocGenerator
     }
 
     [CanBeNull]
-    private XElement ExtractExamples(IContextActionInfo contextAction, string caPath, string lang)
+    private static XElement ExtractExamples(IContextActionInfo contextAction, string caPath, string lang)
     {
       // temporarily disabled
       return null;

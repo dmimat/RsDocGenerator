@@ -22,6 +22,11 @@ namespace RsDocGenerator
   {
     protected override string GenerateContent(IDataContext context, string outputFolder)
     {
+      return StartContentGeneration(context, outputFolder);
+    }
+
+    public static string StartContentGeneration(IDataContext context, string outputFolder)
+    {
       var shortcutsXmlDoc = new XDocument();
       var actionMapElement = new XElement("Keymap");
       shortcutsXmlDoc.Add(actionMapElement);
@@ -129,9 +134,10 @@ namespace RsDocGenerator
         actionMapElement.Add(actionElement);
       }
 
+      var generatedFolder = outputFolder + "\\topics\\ReSharper\\Generated";
       shortcutsXmlDoc.Save(Path.Combine(outputFolder, "keymap.xml"));
-      menuPathLibrary.Save(Path.Combine(outputFolder, menuPathLibId + ".xml"));
-      accessIntroLibrary.Save(Path.Combine(outputFolder, accessIntroLibId + ".xml"));
+      menuPathLibrary.Save(Path.Combine(generatedFolder, menuPathLibId + ".xml"));
+      accessIntroLibrary.Save(Path.Combine(generatedFolder, accessIntroLibId + ".xml"));
       return "Shortcuts and actions";
     }
 
