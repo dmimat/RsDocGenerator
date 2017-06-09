@@ -29,6 +29,7 @@ namespace RsDocGenerator
             RsDocExportInspectionsIndex.StartContentGeneration(context,generatedFolder);
             RsDocExportContextActions.StartContentGeneration(context,generatedFolder);
             RsDocExportFixInScope.StartContentGeneration(context,generatedFolder);
+            RsDocExportThirdParty.StartContentGeneration(context,generatedFolder);
 
             GeneralHelpers.ShowSuccessMessage("Everything", outputFolder);
         }

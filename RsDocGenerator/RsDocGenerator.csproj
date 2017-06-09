@@ -48,6 +48,7 @@
     <Compile Include="src\RsDocExportPostfixTemplates.cs" />
     <Compile Include="src\RsDocExportShortcuts.cs" />
     <Compile Include="src\RsDocExportTemplates.cs" />
+    <Compile Include="src\RsDocExportThirdParty.cs" />
     <Compile Include="src\RsDocGeneratorActionGroup.cs" />
     <Compile Include="src\RsDocOptionsPage.cs" />
     <Compile Include="src\RsDocUpdateAll.cs" />
