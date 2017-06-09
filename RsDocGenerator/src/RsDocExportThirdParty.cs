@@ -70,7 +70,7 @@ namespace RsDocGenerator
                 string [] removeStrings = {"JetBrains.", ".JetBrains", "&nbsp;"};
                 foreach (var str in removeStrings)
                 {
-                    int index = libString.IndexOf(str, StringComparison.Ordinal);
+                    var index = libString.IndexOf(str, StringComparison.Ordinal);
                     libString = (index < 0) ? libString : libString.Remove(index, str.Length);
                 }
                 
