@@ -21,14 +21,14 @@ namespace RsDocGenerator
         {
             var rootFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
             if (string.IsNullOrEmpty(rootFolder)) return "Nothing";
-            var dinfo = new DirectoryInfo(rootFolder + "\\nonProject\\third-party");
+            DirectoryInfo dinfo = new DirectoryInfo(rootFolder + "\\nonProject\\third-party");
             var files = dinfo.GetFiles("*.txt");
-            
-            var libraryList = new Dictionary<string, string>();  
 
-            foreach (var file in files)
+            var libraryList = new Dictionary<string, string>();
+
+            foreach (FileInfo file in files)
             {
-                if(file == null) continue;
+                if (file == null) continue;
                 var productId = "";
                 if (file.Name.Contains("dotCover.")) productId = "dcv";
                 if (file.Name.Contains("dotMemory.")) productId = "dm";
@@ -39,9 +39,9 @@ namespace RsDocGenerator
                 if (file.Name.Contains("ReSharperCli.")) productId = "cli";
                 if (file.Name.Contains("ReSharperHost.")) productId = "rshost";
                 if (file.Name.Contains("teamCityAddin.")) productId = "tca";
-                if (file.Name.Contains("manual_additions")) productId = "man";
+//                if (file.Name.Contains("manual_additions")) productId = "man";
                 if (file.Name.Contains("Rider")) productId = "rdr";
-                
+
                 var lines = File.ReadLines(file.FullName);
                 foreach (var line in lines)
                 {
@@ -49,36 +49,46 @@ namespace RsDocGenerator
                         continue;
                     if (libraryList.Keys.Contains(line))
                     {
-                        libraryList[line] += ("," + productId);
+                        libraryList[line] += "," + productId;
                         continue;
                     }
                     libraryList.Add(line, productId);
                 }
             }
-            
+
             const string thirdPartyTopicId = "Third_Party_Generated";
-            var thirdPartyTopic = XmlHelpers.CreateHmTopic(thirdPartyTopicId, "Third-Party Libraries");
-            
-            var thirdPartyTable = XmlHelpers.CreateTable(new[] {"Software", "Version", "License"}, null);
+            XDocument thirdPartyTopic = XmlHelpers.CreateHmTopic(thirdPartyTopicId, "Third-Party Libraries");
+
+            XElement thirdPartyTable = new XElement("table");
+            XElement headerRow = new XElement("tr");
+            headerRow.Add(new XElement("td", "Software"));
+            headerRow.Add(new XElement("td", "Version"));
+            headerRow.Add(new XElement("td", "License"));
+            headerRow.Add(new XElement("td", "Authors", new XAttribute("filter", "dotNet")));
+            headerRow.Add(new XElement("td", "Copyright", new XAttribute("filter", "dotNet")));
+
+            thirdPartyTable.Add(headerRow);
+
+            var rows = new SortedList<string, XElement>();
 
             foreach (var lib in libraryList)
             {
-                var libRow = new XElement("tr");
+                XElement libRow = new XElement("tr");
                 libRow.Add(new XAttribute("filter", lib.Value));
                 var libString = lib.Key;
-                
-                string [] removeStrings = {"JetBrains.", ".JetBrains", "&nbsp;"};
+
+                string[] removeStrings = {"JetBrains.", ".JetBrains", "JetBrains Platform ", "&nbsp;", "Â"};
                 foreach (var str in removeStrings)
                 {
                     var index = libString.IndexOf(str, StringComparison.Ordinal);
-                    libString = (index < 0) ? libString : libString.Remove(index, str.Length);
+                    libString = index < 0 ? libString : libString.Remove(index, str.Length);
                 }
-                
+
                 var splitterPos = new List<int>();
-                int bracketCount = 0;
+                var bracketCount = 0;
                 for (var i = 0; i < libString.Length; i++)
                 {
-                    char ch = libString[i];
+                    var ch = libString[i];
                     if (ch == '[')
                         bracketCount++;
                     if (ch == ']')
@@ -86,16 +96,24 @@ namespace RsDocGenerator
                     if (ch == '|' && bracketCount == 0)
                         splitterPos.Add(i);
                 }
-                string sw = libString.Substring(splitterPos[0] + 1, splitterPos[1] - splitterPos[0] - 1);
-                string ver = libString.Substring(splitterPos[1] + 1, splitterPos[2] - splitterPos[1] - 1);
-                string lis = libString.Substring(splitterPos[2] + 1, splitterPos[3] - splitterPos[2] -1);
 
-                libRow.Add(new XElement("td", TryGetHyperLink(sw, "Software")));
-                libRow.Add(new XElement("td", TryGetHyperLink(ver, "Version")));
-                libRow.Add(new XElement("td", TryGetHyperLink(lis, "License")));
-                thirdPartyTable.Add(libRow);
+                for (var i = 0; i < splitterPos.Count - 1; i++)
+                {
+                    var cellContent = libString.Substring(splitterPos[i] + 1,
+                        splitterPos[i + 1] - splitterPos[i] - 1);
+                    XElement td = new XElement("td", TryGetHyperLink(cellContent));
+                    if (i > 2)
+                        td.Add(new XAttribute(new XAttribute("filter", "dotNet")));
+                    libRow.Add(td);
+                }
+
+                rows.Add(libString.TrimStart('|').TrimStart('['), libRow);
             }
-            var thirdPartyChunk = XmlHelpers.CreateChunk("table");
+
+            foreach (XElement libRow in rows.Values)
+                thirdPartyTable.Add(libRow);
+
+            XElement thirdPartyChunk = XmlHelpers.CreateChunk("table");
             thirdPartyChunk.Add(thirdPartyTable);
             thirdPartyTopic.Root.Add(thirdPartyChunk);
 
@@ -103,8 +121,9 @@ namespace RsDocGenerator
             return "Third-Party Libraries";
         }
 
-        private static object TryGetHyperLink(string text, string linkText)
+        private static object TryGetHyperLink(string text)
         {
+            var linkText = "License";
             if (text.IsNullOrEmpty() || !text.StartsWith("["))
                 return text;
 
@@ -121,7 +140,7 @@ namespace RsDocGenerator
                 linkUrl = parts[1];
             }
 
-            return XmlHelpers.CreateHyperlink(linkText, linkUrl, null, false);
+            return XmlHelpers.CreateHyperlink(linkText, linkUrl, anchor: null, nullable: false);
         }
     }
 }
