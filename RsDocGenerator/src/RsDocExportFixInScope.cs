@@ -3,7 +3,8 @@ using System.IO;
 using System.Xml.Linq;
 using System.Linq;
 using JetBrains.Application.DataContext;
-using JetBrains.UI.ActionsRevised;
+using JetBrains.Application.UI.ActionsRevised.Menu;
+
 
 namespace RsDocGenerator
 {

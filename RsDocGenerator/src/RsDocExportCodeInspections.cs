@@ -4,12 +4,12 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml.Linq;
-using JetBrains.ActionManagement;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.UI.Actions;
+using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.UI.ActionsRevised;
 using MessageBox = JetBrains.Util.MessageBox;
 
 namespace RsDocGenerator

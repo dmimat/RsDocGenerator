@@ -1,10 +1,11 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
-using JetBrains.UI.ActionsRevised;
+using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Util.Extension;
 
 namespace RsDocGenerator

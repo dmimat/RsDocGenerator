@@ -1,9 +1,11 @@
-﻿using JetBrains.Application.Settings;
+﻿
+using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.WellKnownRootKeys;
+using JetBrains.Application.UI.Options;
+using JetBrains.Application.UI.Options.OptionPages;
+using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.DataFlow;
 using JetBrains.ReSharper.Feature.Services.Resources;
-using JetBrains.UI.Options;
-using JetBrains.UI.Options.OptionPages.ToolsPages;
-using JetBrains.UI.Options.OptionsDialog2.SimpleOptions;
 using JetBrains.Util;
 
 namespace RsDocGenerator
@@ -30,7 +32,7 @@ namespace RsDocGenerator
                     (RsDocSettingsKey key) => key.RsDocDotnetRootFolder, a.New.FullPath);
             });
             AddText("Dotnet docs root folder:");
-            var outputPathOption = AddFolderChooserOption(outputPath, null, null);
+            var outputPathOption = AddFolderChooserOption(outputPath, null, null, null);
             outputPathOption.IsEnabledProperty.SetValue(true);
 
             // folder with samples for context actions
@@ -45,7 +47,7 @@ namespace RsDocGenerator
                     (RsDocSettingsKey key) => key.RsDocCaFolder, a.New.FullPath);
             });
             AddText("Folder with context actions samples:");
-            var caFoolderOption = AddFolderChooserOption(caFolder, null, null);
+            var caFoolderOption = AddFolderChooserOption(caFolder, null, null, null);
             caFoolderOption.IsEnabledProperty.SetValue(true);
         }
     }

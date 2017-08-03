@@ -2,15 +2,17 @@
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Macros;
 using JetBrains.ReSharper.LiveTemplates;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.UI.ActionsRevised;
+
 
 namespace RsDocGenerator
 {
   [Action("RsDocExportMacros", "Export Template Macros", Id = 7969)]
-  internal class RsDocExportMacros : RsDocExportBase
+  internal class RsDocExportMacros : RsDocExportBase, IAction
   {
     protected override string GenerateContent(IDataContext context, string outputFolder)
     {

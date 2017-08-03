@@ -1,14 +1,16 @@
 ﻿using System.IO;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.UI.ActionsRevised;
+
 using JetBrains.Util;
 
 namespace RsDocGenerator
 {
     [Action("RsDocExportInspectionsIndex", "Export Code Inpsection Index", Id = 643759)]
-    internal class RsDocExportInspectionsIndex : RsDocExportBase
+    internal class RsDocExportInspectionsIndex : RsDocExportBase, IAction
     {
         protected override string GenerateContent(IDataContext context, string outputFolder)
         {

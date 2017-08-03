@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
-using JetBrains.Ide.Resources;
+using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.PostfixTemplates;
-using JetBrains.UI.ActionsRevised;
+
 
 namespace RsDocGenerator
 {

@@ -4,13 +4,15 @@ using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
-using JetBrains.UI.ActionsRevised;
+
 
 namespace RsDocGenerator
 {
   [Action("RsDocExportContextActions", "Export Context Actions", Id = 8673421)]
-  internal class RsDocExportContextActions : RsDocExportBase
+  internal class RsDocExportContextActions : RsDocExportBase, IAction
   {
     protected override string GenerateContent(IDataContext context, string outputFolder)
     {

@@ -3,14 +3,14 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
-using JetBrains.ActionManagement;
 using JetBrains.Application;
 using JetBrains.Application.Catalogs;
 using JetBrains.Application.Catalogs.Filtering;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.UI.Actions.ActionManager;
+using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Application.UI.ActionSystem.ActionsRevised.Loader;
 using JetBrains.ReSharper.Feature.Services.Util;
-using JetBrains.UI.ActionsRevised;
-using JetBrains.UI.ActionsRevised.Loader;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.Sources;
 

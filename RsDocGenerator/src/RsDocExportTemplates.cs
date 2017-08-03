@@ -1,6 +1,6 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,13 +13,12 @@ using JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Settings;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates;
 using JetBrains.ReSharper.LiveTemplates;
-using JetBrains.UI.ActionsRevised;
 using JetBrains.Util;
 using MessageBox = JetBrains.Util.MessageBox;
 
 namespace RsDocGenerator
 {
-  [Action("RsDocExportTemplates", "Export Templates", Id = 6759)]
+  [JetBrains.Application.UI.ActionsRevised.Menu.Action("RsDocExportTemplates", "Export Templates", Id = 6759)]
   internal class RsDocExportTemplates : RsDocExportBase
   {
     private static string _templatesOutputFolder;

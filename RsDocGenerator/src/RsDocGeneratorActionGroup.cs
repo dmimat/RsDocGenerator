@@ -1,5 +1,5 @@
-﻿using JetBrains.UI.ActionsRevised;
-using JetBrains.UI.MenuGroups;
+﻿using JetBrains.Application.UI.Actions.MenuGroups;
+using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 
 namespace RsDocGenerator
 {

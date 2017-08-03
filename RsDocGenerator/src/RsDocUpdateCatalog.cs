@@ -1,10 +1,8 @@
 ﻿using System;
-using System.IO;
-using JetBrains.ActionManagement;
-using JetBrains.Application.DataContext;
-using JetBrains.UI.ActionsRevised;
-using System.Diagnostics;
 using System.Windows.Forms;
+using JetBrains.Application.DataContext;
+using JetBrains.Application.UI.Actions;
+using JetBrains.Application.UI.ActionsRevised.Menu;
 using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace RsDocGenerator
