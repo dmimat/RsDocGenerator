@@ -65,7 +65,8 @@ namespace RsDocGenerator
       var topicRoot = topic.Root;
 
       topicRoot.Add(new XElement("p",
-        new XElement("menupath", "ReSharper | Tools | Templates Explorer | " + type + " Templates")));
+        new XElement("menupath", "ReSharper | Tools | Templates Explorer | " + type + " Templates"),
+        new XAttribute("product","rs")));
 
       topicRoot.Add(new XElement("p",
         "This section lists all predefined " + type + " templates in %product% %currentVersion%."));
@@ -198,7 +199,8 @@ namespace RsDocGenerator
       var topicRoot = topic.Root;
 
       topicRoot.Add(new XElement("p",
-        new XElement("menupath", String.Format("ReSharper | Templates Explorer | {0} Templates | {1}", type, lang))));
+        new XElement("menupath", String.Format("ReSharper | Templates Explorer | {0} Templates | {1}", type, lang)),
+        new XAttribute("product","rs")));
 
       string learnMoreTopic = "Templates__Applying_Templates";
 
@@ -219,7 +221,7 @@ namespace RsDocGenerator
 
       topicRoot.Add(new XElement("p",
         String.Format(
-          "This topic lists all predefined {0} templates for {1} in ReSharper {2}. For more information about {0} templates, see ",
+          "This topic lists all predefined {0} templates for {1} in %product% %currentVersion%. For more information about {0} templates, see ",
           type.ToLower(), lang, version),
         XmlHelpers.CreateHyperlink(null, learnMoreTopic, null, false)));
       topicRoot.Add(table);
