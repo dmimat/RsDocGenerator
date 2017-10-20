@@ -140,6 +140,8 @@ namespace RsDocGenerator
                 linkText = parts[0];
                 linkUrl = parts[1];
             }
+            if (linkUrl == "https://www.devexpress.com/Products/NET/Controls/WinForms/")
+                linkText = "DevExpress WinForms Controls and Libraries";
 
             return XmlHelpers.CreateHyperlink(linkText, linkUrl, anchor: null, nullable: false);
         }

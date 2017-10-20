@@ -166,10 +166,16 @@ namespace RsDocGenerator
 
       foreach (var table in tables)
       {
-        summaryTable.Add(new XElement("tr",
+        var lang = table.Key;
+        var langHeaderRow = new XElement("tr",
           new XElement("td",
             new XAttribute("colspan", "2"),
-            new XElement("b", table.Key))));
+            new XElement("b", lang)));
+        
+        if (lang =="C++")
+          XmlHelpers.AddRsOnlyAttribute(langHeaderRow);
+        
+        summaryTable.Add(langHeaderRow);
 
         foreach (var item in summaryItems)
         {
@@ -177,10 +183,10 @@ namespace RsDocGenerator
             summaryTable.Add(item.Item2);
         }
 
-        var langForHeading = table.Key;
-        if (langForHeading == "Global")
-          langForHeading = "Global Usage";
-        CreateTopicForLang(langForHeading, type, table.Value, version);
+        
+        if (lang == "Global")
+          lang = "Global Usage";
+        CreateTopicForLang(table.Key, lang, type, table.Value, version);
       }
 
       var indexChapter = XmlHelpers.CreateChapter(String.Format("Index of {0} Templates", type));
@@ -190,10 +196,10 @@ namespace RsDocGenerator
       topic.Save(fileName);
     }
 
-    private static void CreateTopicForLang(string lang, string type, XElement table, string version)
+    private static void CreateTopicForLang(string lang, string langForHeading, string type, XElement table, string version)
     {
       var topicId = CreateTopicIdForTypeAndLang(lang, type);
-      var topicTitle = CreateTopicTitleForTypeAndLang(lang, type);
+      var topicTitle = CreateTopicTitleForTypeAndLang(langForHeading, type);
       var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
       var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
@@ -222,7 +228,7 @@ namespace RsDocGenerator
       topicRoot.Add(new XElement("p",
         String.Format(
           "This topic lists all predefined {0} templates for {1} in %product% %currentVersion%. For more information about {0} templates, see ",
-          type.ToLower(), lang, version),
+          type.ToLower(), lang),
         XmlHelpers.CreateHyperlink(null, learnMoreTopic, null, false)));
       topicRoot.Add(table);
       topic.Save(fileName);
@@ -271,11 +277,17 @@ namespace RsDocGenerator
           paramElement,
           XmlHelpers.CreateInclude("TR", templateIdFull, true))));
 
+      var summaryItemRow = new XElement("tr",
+        new XElement("td",
+          XmlHelpers.CreateHyperlink(templateId, CreateTopicIdForTypeAndLang(lang, type), templateIdFull, false),
+          imported),
+        new XElement("td", noDescriptionFallback));
+      if (lang == "C++")
+        XmlHelpers.AddRsOnlyAttribute(summaryItemRow);
+      
+
       summaryItems.Add(
-        new Tuple<string, XElement>(lang, new XElement("tr",
-          new XElement("td",
-            XmlHelpers.CreateHyperlink(templateId, CreateTopicIdForTypeAndLang(lang, type), templateIdFull, false), imported),
-          new XElement("td", noDescriptionFallback))));
+        new Tuple<string, XElement>(lang, summaryItemRow));
     }
   }
 }

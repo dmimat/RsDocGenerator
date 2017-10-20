@@ -120,5 +120,10 @@ namespace RsDocGenerator
           "This topic was generated automatically with the ReSharper Documentation Generator plugin. " +
           "ReSharper version: " + GeneralHelpers.GetCurrentVersion()));
     }
+
+    public static void AddRsOnlyAttribute(XElement element)
+    {
+      element.Add(new XAttribute("product", "rs"));
+    }
   }
 }

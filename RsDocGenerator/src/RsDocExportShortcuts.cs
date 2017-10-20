@@ -122,6 +122,8 @@ namespace RsDocGenerator
 
         AddShortcuts(ideaShortcuts, actionElement, "rs");
         AddShortcuts(vsShortcuts, actionElement, "vs");
+        if (actionId == "GotoImplementations")
+          AddShortcuts(new object[] {"Ctrl+F12"}, actionElement, "vs");
 
         if (actionId == "ParameterInfoShow")
           actionElement.Add(new XElement("Shortcut", "Control+Shift+Space", new XAttribute("layout", "vs")));
