@@ -172,7 +172,7 @@ namespace RsDocGenerator
             new XAttribute("colspan", "2"),
             new XElement("b", lang)));
         
-        if (lang =="C++")
+        if (lang == "C++" || lang == "Angular 2 HTML")
           XmlHelpers.AddRsOnlyAttribute(langHeaderRow);
         
         summaryTable.Add(langHeaderRow);
@@ -282,7 +282,7 @@ namespace RsDocGenerator
           XmlHelpers.CreateHyperlink(templateId, CreateTopicIdForTypeAndLang(lang, type), templateIdFull, false),
           imported),
         new XElement("td", noDescriptionFallback));
-      if (lang == "C++")
+      if (lang == "C++" || lang == "Angular 2 HTML")
         XmlHelpers.AddRsOnlyAttribute(summaryItemRow);
       
 

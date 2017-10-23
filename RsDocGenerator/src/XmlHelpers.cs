@@ -102,6 +102,7 @@ namespace RsDocGenerator
           case "XAML (VB)":
           case "HTML-Like":
           case "Razor (C#)":
+          case "Angular 2 HTML":
             lang = "HTML";
             break;
           case "Resx":
