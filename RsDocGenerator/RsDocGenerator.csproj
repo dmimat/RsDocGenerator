@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.2.0.20170530.0\build\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.Props" />
-  <Import Project="..\packages\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.2.0.20170530.0\build\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.Props" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -52,6 +51,7 @@
     <Compile Include="src\RsDocExportTemplates.cs" />
     <Compile Include="src\RsDocExportThirdParty.cs" />
     <Compile Include="src\RsDocGeneratorActionGroup.cs" />
+    <Compile Include="src\RsDocExportEditorConfigStyles.cs" />
     <Compile Include="src\RsDocOptionsPage.cs" />
     <Compile Include="src\RsDocUpdateAll.cs" />
     <Compile Include="src\RsDocUpdateCatalog.cs" />
@@ -111,7 +111,6 @@
     <Reference Include="MahApps.Metro, Version=1.5.0.23, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f">
       <HintPath>..\packages\JetBrains.MahApps.Metro.1.5.0.1\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Deployment.Compression, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ce35f76fcda82bad">
       <HintPath>..\packages\JetBrains.Microsoft.Deployment.Compression.Cab.3.11.0\lib\net20\Microsoft.Deployment.Compression.dll</HintPath>
     </Reference>
@@ -142,74 +141,50 @@
     <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <HintPath>..\packages\Windows7APICodePack.JetBrains.Stripped.1.1.20150225.0\lib\Net\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Client, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Client.dll</HintPath>
+    <Reference Include="NuGet.Commands, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Commands.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Commands, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Commands.dll</HintPath>
+    <Reference Include="NuGet.Common, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Common.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Common, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Configuration, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Configuration.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.ContentModel, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.ContentModel.dll</HintPath>
+    <Reference Include="NuGet.Configuration, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="NuGet.Core, Version=2.14.0.832, Culture=neutral, PublicKeyToken=5aaa11a165479571">
       <HintPath>..\packages\JetBrains.NuGet.Core.2.14.1\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.DependencyResolver.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.DependencyResolver.Core.dll</HintPath>
+    <Reference Include="NuGet.DependencyResolver.Core, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.DependencyResolver.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Frameworks, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Frameworks.4.3.0.2418\lib\net45\NuGet.Frameworks.dll</HintPath>
+    <Reference Include="NuGet.Frameworks, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Frameworks.4.3.0.10000\lib\net45\NuGet.Frameworks.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.LibraryModel, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.LibraryModel.dll</HintPath>
+    <Reference Include="NuGet.LibraryModel, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.LibraryModel.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.PackageManagement, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.PackageManagement.dll</HintPath>
+    <Reference Include="NuGet.PackageManagement, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.PackageManagement.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Packaging, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Packaging.dll</HintPath>
+    <Reference Include="NuGet.Packaging, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Packaging.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Packaging.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Packaging.Core.dll</HintPath>
+    <Reference Include="NuGet.Packaging.Core, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Packaging.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Packaging.Core.Types, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Packaging.Core.Types.dll</HintPath>
+    <Reference Include="NuGet.ProjectModel, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.ProjectModel.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.ProjectManagement, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.ProjectManagement.dll</HintPath>
+    <Reference Include="NuGet.Protocol, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Protocol.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.ProjectModel, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.ProjectModel.dll</HintPath>
+    <Reference Include="NuGet.Resolver, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.10000\lib\net45\NuGet.Resolver.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Protocol.Core.Types, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Protocol.Core.Types.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Protocol.Core.v3, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Protocol.Core.v3.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Protocol.VisualStudio, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Protocol.VisualStudio.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Repositories, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Repositories.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Resolver, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.Resolver.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.RuntimeModel, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Ultimate.4.3.0.2420\lib\net45\NuGet.RuntimeModel.dll</HintPath>
-    </Reference>
-    <Reference Include="NuGet.Versioning, Version=4.3.0.0, Culture=neutral, PublicKeyToken=5aaa11a165479571">
-      <HintPath>..\packages\JetBrains.NuGet.Versioning.4.3.0.2418\lib\net45\NuGet.Versioning.dll</HintPath>
+    <Reference Include="NuGet.Versioning, Version=4.3.0.5, Culture=neutral, PublicKeyToken=5aaa11a165479571">
+      <HintPath>..\packages\JetBrains.NuGet.Versioning.4.3.0.10000\lib\net45\NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
@@ -271,24 +246,26 @@
   </Target>
   <Import Project="..\packages\Antlr2.Tools.2.7.6.4\build\Antlr2.Tools.targets" />
   <Import Project="..\packages\JetBrains.Build.Platform.Tasks.ThemedIconsPacker.2.0.20151217.1\build\JetBrains.Build.Platform.Tasks.ThemedIconsPacker.Targets" />
-  <Import Project="..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Framework.109.0.20170726.71431-eap10\build\JetBrains.Platform.Interop.dotMemoryUnit.Framework.targets" />
-  <Import Project="..\packages\JetBrains.Platform.Core.Shell.109.0.20170726.70743-eap10\build\JetBrains.Platform.Core.Shell.targets" />
-  <Import Project="..\packages\JetBrains.Platform.Core.Text.109.0.20170726.71431-eap10\build\JetBrains.Platform.Core.Text.targets" />
-  <Import Project="..\packages\JetBrains.Platform.Interop.CommandLine.109.0.20170726.71431-eap10\build\JetBrains.Platform.Interop.CommandLine.targets" />
-  <Import Project="..\packages\JetBrains.Platform.RdProtocol.109.0.20170726.71431-eap10\build\JetBrains.Platform.RdProtocol.targets" />
-  <Import Project="..\packages\JetBrains.Platform.Core.Ide.109.0.20170726.71431-eap10\build\JetBrains.Platform.Core.Ide.targets" />
-  <Import Project="..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Interop.Ide.109.0.20170726.71431-eap10\build\JetBrains.Platform.Interop.dotMemoryUnit.Interop.Ide.targets" />
-  <Import Project="..\packages\JetBrains.Platform.Tests.Framework.109.0.20170726.71431-eap10\build\JetBrains.Platform.Tests.Framework.targets" />
-  <Import Project="..\packages\JetBrains.Platform.UIInteractive.Shell.109.0.20170726.71431-eap10\build\JetBrains.Platform.UIInteractive.Shell.targets" />
-  <Import Project="..\packages\JetBrains.Platform.UIInteractive.Text.109.0.20170726.71431-eap10\build\JetBrains.Platform.UIInteractive.Text.targets" />
-  <Import Project="..\packages\JetBrains.Platform.UIInteractive.Ide.109.0.20170726.71431-eap10\build\JetBrains.Platform.UIInteractive.Ide.targets" />
-  <Import Project="..\packages\JetBrains.Psi.Features.Tasks.109.0.20170726.71947-eap10\build\JetBrains.Psi.Features.Tasks.targets" />
-  <Import Project="..\packages\JetBrains.Psi.Features.Core.109.0.20170726.71947-eap10\build\JetBrains.Psi.Features.Core.targets" />
-  <Import Project="..\packages\JetBrains.Psi.Features.UIInteractive.Core.109.0.20170726.71947-eap10\build\JetBrains.Psi.Features.UIInteractive.Core.targets" />
-  <Import Project="..\packages\JetBrains.Psi.Features.src.109.0.20170726.71947-eap10\build\JetBrains.Psi.Features.src.targets" />
-  <Import Project="..\packages\JetBrains.Psi.Features.UnitTesting.109.0.20170726.71947-eap10\build\JetBrains.Psi.Features.UnitTesting.targets" />
-  <Import Project="..\packages\JetBrains.Psi.Features.test.Framework.109.0.20170726.71947-eap10\build\JetBrains.Psi.Features.test.Framework.targets" />
-  <Import Project="..\packages\JetBrains.ReSharper.SDK.Internal.109.0.20170726.80040-eap10\build\JetBrains.ReSharper.SDK.Internal.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Framework.109.0.20171006.122404\build\JetBrains.Platform.Interop.dotMemoryUnit.Framework.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Core.Shell.109.0.20171006.121610\build\JetBrains.Platform.Core.Shell.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Core.Text.109.0.20171006.122404\build\JetBrains.Platform.Core.Text.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Interop.CommandLine.109.0.20171006.122404\build\JetBrains.Platform.Interop.CommandLine.targets" />
+  <Import Project="..\packages\JetBrains.Platform.RdProtocol.109.0.20171006.122404\build\JetBrains.Platform.RdProtocol.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Core.Ide.109.0.20171006.122404\build\JetBrains.Platform.Core.Ide.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Interop.Console.109.0.20171006.122404\build\JetBrains.Platform.Interop.dotMemoryUnit.Interop.Console.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Interop.Ide.109.0.20171006.122404\build\JetBrains.Platform.Interop.dotMemoryUnit.Interop.Ide.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Sdk.109.0.20171006.122404\build\JetBrains.Platform.Sdk.targets" />
+  <Import Project="..\packages\JetBrains.Platform.Tests.Framework.109.0.20171006.122404\build\JetBrains.Platform.Tests.Framework.targets" />
+  <Import Project="..\packages\JetBrains.Platform.UIInteractive.Shell.109.0.20171006.122404\build\JetBrains.Platform.UIInteractive.Shell.targets" />
+  <Import Project="..\packages\JetBrains.Platform.UIInteractive.Text.109.0.20171006.122404\build\JetBrains.Platform.UIInteractive.Text.targets" />
+  <Import Project="..\packages\JetBrains.Platform.UIInteractive.Ide.109.0.20171006.122404\build\JetBrains.Platform.UIInteractive.Ide.targets" />
+  <Import Project="..\packages\JetBrains.Psi.Features.Tasks.109.0.20171006.122856\build\JetBrains.Psi.Features.Tasks.targets" />
+  <Import Project="..\packages\JetBrains.Psi.Features.Core.109.0.20171006.122856\build\JetBrains.Psi.Features.Core.targets" />
+  <Import Project="..\packages\JetBrains.Psi.Features.UIInteractive.Core.109.0.20171006.122856\build\JetBrains.Psi.Features.UIInteractive.Core.targets" />
+  <Import Project="..\packages\JetBrains.Psi.Features.src.109.0.20171006.122856\build\JetBrains.Psi.Features.src.targets" />
+  <Import Project="..\packages\JetBrains.Psi.Features.UnitTesting.109.0.20171006.122856\build\JetBrains.Psi.Features.UnitTesting.targets" />
+  <Import Project="..\packages\JetBrains.Psi.Features.test.Framework.109.0.20171006.122856\build\JetBrains.Psi.Features.test.Framework.targets" />
+  <Import Project="..\packages\JetBrains.ReSharper.SDK.Internal.109.0.20171006.130447\build\JetBrains.ReSharper.SDK.Internal.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
