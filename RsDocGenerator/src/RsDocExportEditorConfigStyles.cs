@@ -125,7 +125,7 @@ namespace RsDocGenerator
 
                         var fileName = "EditorConfig_" + language.Name + "_" + schema.GetType().Name;
                         using (var writer = StartDocument(path, host, fileName,
-                            "{0} - {1}".FormatEx(language.PresentableName, schema.PageName), 2))
+                            "{0} - {1}".FormatEx(language.PresentableName, schema.PageName)))
                         {
                             foreach (var entry in schema.Entries)
                             {
@@ -164,7 +164,7 @@ namespace RsDocGenerator
             IEditorConfigSchema schema)
         {
             using (var writer = StartDocument(path, host, GeneralizedPropsFileName,
-                "Generalized EditorConfig properties", 1))
+                "Generalized EditorConfig properties"))
             {
                 foreach (var propInfo in schema.GetAllProperties())
                 {
@@ -223,8 +223,7 @@ namespace RsDocGenerator
             string path,
             IApplicationHost host,
             string fileName,
-            string title,
-            int includeTocDepth)
+            string title)
         {
             var writer = XmlWriter.Create(Path.Combine(path, fileName + ".xml"), XmlWriterEx.WriterSettings);
             writer.WriteStartDocument();
@@ -240,12 +239,7 @@ namespace RsDocGenerator
                 host.HostProductInfo.BuildDate.ToString("yyyy MMMM dd", DateTimeFormatInfo.InvariantInfo)));
 
             writer.StartElem("include").Attr("src", "FC.xml").Attr("include-id", "%thisTopic%").EndElem();
-
-            if (includeTocDepth != 0)
-            {
-                writer.StartElem("tag-list").Attr("of", "chapter").Attr("mode", "tree").Attr("depth", includeTocDepth)
-                    .EndElem();
-            }
+         
 
             return writer;
         }
@@ -255,7 +249,7 @@ namespace RsDocGenerator
             IEditorConfigSchema ecService)
         {
             var fileName = "EditorConfig_Index";
-            using (var writer = StartDocument(path, host, fileName, "Index of EditorConfig properties", 0))
+            using (var writer = StartDocument(path, host, fileName, "Index of EditorConfig properties"))
             {
                 writer
                     .StartElem("table")
