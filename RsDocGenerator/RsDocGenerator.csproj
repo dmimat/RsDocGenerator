@@ -40,6 +40,7 @@
     <Compile Include="src\FeatureKeeper.cs" />
     <Compile Include="src\GeneralHelpers.cs" />
     <Compile Include="src\RsDocExportBase.cs" />
+    <Compile Include="src\RsDocExportClangOptions.cs" />
     <Compile Include="src\RsDocExportCodeInspections.cs" />
     <Compile Include="src\RsDocExportContextActions.cs" />
     <Compile Include="src\RsDocExportFeatures.cs" />

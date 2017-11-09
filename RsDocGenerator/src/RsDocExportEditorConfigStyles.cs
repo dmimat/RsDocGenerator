@@ -42,7 +42,6 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            Console.WriteLine("test");
             var solution = context.GetData(ProjectModelDataConstants.SOLUTION);
             if (solution == null) return "Open a solution to enable generation";
 
