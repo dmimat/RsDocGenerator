@@ -162,6 +162,9 @@ namespace RsDocGenerator
             string path, IApplicationHost host, OneToListMultimap<string, PropertyDescription> map,
             IEditorConfigSchema schema)
         {
+            EditorConfigTests.CreateGeneralizedPropertiesTopic(path,host,map, schema);
+            return;
+            
             using (var writer = StartDocument(path, host, GeneralizedPropsFileName,
                 "Generalized EditorConfig properties"))
             {
@@ -237,7 +240,8 @@ namespace RsDocGenerator
                 host.HostProductInfo.PresentableInfoForAboutBox(),
                 host.HostProductInfo.BuildDate.ToString("yyyy MMMM dd", DateTimeFormatInfo.InvariantInfo)));
 
-            writer.StartElem("include").Attr("src", "FC.xml").Attr("include-id", "%thisTopic%").EndElem();
+            writer.StartElem("include").
+                Attr("src", "FC.xml").Attr("include-id", "%thisTopic%").Attr("nullable","true").EndElem();
          
 
             return writer;
@@ -247,6 +251,9 @@ namespace RsDocGenerator
             string path, IApplicationHost host, OneToListMultimap<string, PropertyDescription> map,
             IEditorConfigSchema ecService)
         {
+            EditorConfigTests.CreateIndex(path, host, map, ecService);
+            return;
+            
             var fileName = "EditorConfig_Index";
             using (var writer = StartDocument(path, host, fileName, "Index of EditorConfig properties"))
             {
@@ -734,7 +741,7 @@ namespace RsDocGenerator
             return possibleValues;
         }
 
-        private class PropertyDescription
+        public class PropertyDescription
         {
             public string FileName { get; set; }
             public string Id { get; set; }

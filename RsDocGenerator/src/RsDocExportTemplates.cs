@@ -134,9 +134,12 @@ namespace RsDocGenerator
           if (expr != null)
           {
             var macro = MacroDescriptionFormatter.GetMacroAttribute(expr.Definition);
-            paramItemElement.Add(" - " + macro.LongDescription + " (",
-              XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
-              ")");
+            paramItemElement.Add(" - " + macro.LongDescription);
+              paramItemElement.Add(new XElement("for", 
+                " (",
+                XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
+                ")", 
+                new XAttribute("product", "!rdr")));
           }
           else
             paramItemElement.Add(" - " + "no macro");
