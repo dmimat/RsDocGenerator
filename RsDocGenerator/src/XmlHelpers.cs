@@ -60,13 +60,26 @@ namespace RsDocGenerator
     {
       return CreateChapter(title, title.NormalizeStringForAttribute());
     }
+    
+    public static XElement CreateChapterWithoutId(string title)
+    {
+      return CreateChapter(title, null, false);
+    }
 
     public static XElement CreateChapter(string title, string id)
     {
-      return new XElement("chapter",
-        new XAttribute("id", id),
+      return CreateChapter(title, id, true);
+    }
+
+    private static XElement CreateChapter(string title, string id, bool needId)
+    {
+      var chapter = new XElement("chapter",
         new XAttribute("caps", "aswritten"),
         new XAttribute("title", title));
+      if (needId)
+        chapter.Add(new XAttribute("id", id));
+      
+      return chapter;
     }
 
     public static XElement CreateHyperlink([CanBeNull] string content, [CanBeNull] string href, [CanBeNull] string anchor, bool nullable)

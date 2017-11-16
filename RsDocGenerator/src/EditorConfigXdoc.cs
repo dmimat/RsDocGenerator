@@ -13,7 +13,7 @@ using JetBrains.Util.dataStructures;
 
 namespace RsDocGenerator
 {
-    public static class EditorConfigTests
+    public static class EditorConfigXdoc
     {
         private const string GeneralizedPropsFileName = "EditorConfig_Generalized";
 
@@ -128,7 +128,7 @@ namespace RsDocGenerator
                         .ToArray(),
                     "Language-specific aliases:");
 
-                var chapterAllows = XmlHelpers.CreateChapter("Allows setting the following properties:");
+                var chapterAllows = XmlHelpers.CreateChapterWithoutId("Allows setting the following properties:");
                 var list = new XElement("list");
 
                 foreach (var val1 in map[propInfo.Alias])
@@ -170,7 +170,7 @@ namespace RsDocGenerator
                     }
                 }
             }
-            var chapter = XmlHelpers.CreateChapter(title);
+            var chapter = XmlHelpers.CreateChapterWithoutId(title);
             var paragraph = new XElement("p");
 
             bool addComma = false;
@@ -218,7 +218,7 @@ namespace RsDocGenerator
 
             if (possibleValues != null)
             {
-                var chapterPossibleValues = XmlHelpers.CreateChapter("Possible values:");
+                var chapterPossibleValues = XmlHelpers.CreateChapterWithoutId("Possible values:");
 
                 if (type == typeof(int))
                 {

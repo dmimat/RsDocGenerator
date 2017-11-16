@@ -162,7 +162,7 @@ namespace RsDocGenerator
             string path, IApplicationHost host, OneToListMultimap<string, PropertyDescription> map,
             IEditorConfigSchema schema)
         {
-            EditorConfigTests.CreateGeneralizedPropertiesTopic(path,host,map, schema);
+            EditorConfigXdoc.CreateGeneralizedPropertiesTopic(path,host,map, schema);
             return;
             
             using (var writer = StartDocument(path, host, GeneralizedPropsFileName,
@@ -251,7 +251,7 @@ namespace RsDocGenerator
             string path, IApplicationHost host, OneToListMultimap<string, PropertyDescription> map,
             IEditorConfigSchema ecService)
         {
-            EditorConfigTests.CreateIndex(path, host, map, ecService);
+            EditorConfigXdoc.CreateIndex(path, host, map, ecService);
             return;
             
             var fileName = "EditorConfig_Index";

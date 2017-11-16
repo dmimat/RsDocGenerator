@@ -49,7 +49,7 @@ namespace RsDocGenerator
         var example = postTempalte.Annotation.Example;
 
         var shortcutCell = XElement.Parse("<td><b>." + shortcut + "</b></td>");
-        shortcutCell.Add(new XAttribute("id", shortcut));
+        shortcutCell.Add(new XAttribute("id", lang + "_" + shortcut));
         var descriptionCell = XElement.Parse("<td>" + description + "</td>");
         var exampleCell = new XElement("td", new XElement("code", example));
 
