@@ -103,7 +103,7 @@ namespace RsDocGenerator
                                                             IEditorConfigSchema schema)
         {
             var editorConfigGeneralizedTopic =
-                XmlHelpers.CreateHmTopic(GeneralizedPropsFileName, "Index of EditorConfig properties");
+                XmlHelpers.CreateHmTopic(GeneralizedPropsFileName, "Generalized EditorConfig properties");
             editorConfigGeneralizedTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", false));
 
             foreach (var propInfo in schema.GetAllProperties())
