@@ -79,7 +79,16 @@ namespace RsDocGenerator
                     .Compose();
 
                 var schemas = container.GetComponents<ICodeStylePageSchema>()
-                    .OrderBy(schema => schema.GetType().FullName);
+                    .OrderBy(schema => schema.GetType().FullName).ToList();
+                
+//                Path.Combine("debug.log").WriteTextStreamDenyWrite(writer =>
+//                {
+//                    writer.WriteLine("Count = {0}", schemas.Count);
+//                    for (int i = 0; i < schemas.Count; i++)
+//                    {
+//                        writer.WriteLine("{0}. {1}: {2}", i, schemas[i].GetType().FullName, schemas[i].PageName);
+//                    }
+//                });
 
                 // To filter out duplicate entries for one setting
                 var settingsToEntry = new Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>>();
@@ -153,8 +162,8 @@ namespace RsDocGenerator
                     }
                 }
 
-                CreateGeneralizedPropertiesDoc(path, host, map, ecService);
                 CreateIndex(path, host, map, ecService);
+                CreateGeneralizedPropertiesDoc(path, host, map, ecService);
             });
         }
 
@@ -227,6 +236,8 @@ namespace RsDocGenerator
             string fileName,
             string title)
         {
+            
+            
             var writer = XmlWriter.Create(Path.Combine(path, fileName + ".xml"), XmlWriterEx.WriterSettings);
             writer.WriteStartDocument();
             writer.WriteStartElement("topic");

@@ -33,6 +33,7 @@ namespace RsDocGenerator
                 var productId = "";
                 if (file.Name.Contains("dotCover.")) productId = "dcv";
                 if (file.Name.Contains("dotMemory.")) productId = "dm";
+                if (file.Name.Contains("dotMemoryUnit.")) productId = "dmu";
                 if (file.Name.Contains("dotPeek.")) productId = "dpk";
                 if (file.Name.Contains("dotTrace.")) productId = "dt";
                 if (file.Name.Contains("ReSharper.")) productId = "rs";
