@@ -76,12 +76,13 @@ namespace RsDocGenerator
                     .Register(contextBoundSettingsStoreLive)
                     .Register<ValueEditorViewModelFactory>()
                     .Register<SettingsToHide>()
+                    .Register<IndentStyleSettingsAvailabilityChecker>()
                     .Compose();
 
                 var schemas = container.GetComponents<ICodeStylePageSchema>()
                     .OrderBy(schema => schema.GetType().FullName).ToList();
                 
-//                Path.Combine("debug.log").WriteTextStreamDenyWrite(writer =>
+//                FileSystemPath.Parse(path).Combine("debug.log").WriteTextStreamDenyWrite(writer =>
 //                {
 //                    writer.WriteLine("Count = {0}", schemas.Count);
 //                    for (int i = 0; i < schemas.Count; i++)
