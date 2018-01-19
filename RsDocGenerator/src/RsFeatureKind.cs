@@ -7,6 +7,7 @@
         ContextAction,
         QuickFix,
         FixInScope,
-        ContextActionInScope
+        ContextActionInScope,
+        InspectionWithQuickFix
     }
 }

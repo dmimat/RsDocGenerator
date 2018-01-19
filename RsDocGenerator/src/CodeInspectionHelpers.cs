@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Application.Catalogs;
+﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Daemon.Razor.Highlightings;
 using JetBrains.ReSharper.Daemon.WebConfig.Highlightings;
 using JetBrains.ReSharper.Daemon.Xaml.Highlightings;
-using JetBrains.ReSharper.Resources.Shell;
 
 namespace RsDocGenerator
 {
@@ -79,8 +76,13 @@ namespace RsDocGenerator
                 {WebConfigStaticHighlightingsGroups.WEB_CONFIG_ERRORS_GROUP, "Web.Config"},
                 {XamlStaticHighlightingsGroups.XAML_ERRORS_GROUP, "XAML"},
                 {"HtmlErrors", "HTML"},
+                {"XMLErrors", "XML"},
                 {"AsxxErrors", "ASXX"},
-                {"AspErrors", "ASPX"}
+                {"AspErrors", "ASPX"},
+                {"CppCompilerErrors", "CPP"},
+                {"VBErrors", "VBASIC"},
+                {"JScriptErrors", "JAVA_SCRIPT"},
+                {RazorStaticHighlightingsGroups.RazorErrorsGroup, "Razor"}
             };
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using JetBrains;
 using JetBrains.Application.DataContext;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -21,6 +22,8 @@ namespace RsDocGenerator
         private readonly FeatureCatalog _contexActionsCatalog;
         private readonly FeatureCatalog _contexActionInScopeCatalog;
         private readonly FeatureCatalog _staticInspectionCatalog;
+        private readonly FeatureCatalog _configurableInspectionCatalog;
+        private readonly FeatureCatalog _inspectionWithQuickFixCatalog;
 
         public FeatureDigger(IDataContext context)
         {
@@ -30,11 +33,21 @@ namespace RsDocGenerator
             _quickFixCatalog = new FeatureCatalog(RsFeatureKind.QuickFix);
             _fixInScopeCatalog = new FeatureCatalog(RsFeatureKind.FixInScope);
             _staticInspectionCatalog = new FeatureCatalog(RsFeatureKind.StaticInspection);
+            _configurableInspectionCatalog = DigConfigurableInspections();
             _contexActionInScopeCatalog = new FeatureCatalog(RsFeatureKind.ContextActionInScope);
+            _inspectionWithQuickFixCatalog = new FeatureCatalog(RsFeatureKind.InspectionWithQuickFix);
             DigFeaturesByTypes();
         }
 
-        public FeatureCatalog GetConfigurableInspections()
+        public FeatureCatalog GetConfigurableInspections() => _configurableInspectionCatalog;
+        public FeatureCatalog GetContextActions() => _contexActionsCatalog;
+        public FeatureCatalog GetStaticInspections() => _staticInspectionCatalog;
+        public FeatureCatalog GetQuickFixes() => _quickFixCatalog;
+        public FeatureCatalog GetFixesInScope() => _fixInScopeCatalog;
+        public FeatureCatalog GetContextActionsInScope() => _contexActionInScopeCatalog;
+        public FeatureCatalog GetInspectionsWithFixes() => _inspectionWithQuickFixCatalog;
+
+        private FeatureCatalog DigConfigurableInspections()
         {
             var configInspectionsCatalog = new FeatureCatalog(RsFeatureKind.ConfigInspection);
 
@@ -70,16 +83,6 @@ namespace RsDocGenerator
                 actionsCatalog.AddFeature(feature, lang);
             }
             return actionsCatalog;
-        }
-
-        public FeatureCatalog GetContextActions()
-        {
-            return _contexActionsCatalog;
-        }
-
-        public FeatureCatalog GetStaticInspections()
-        {
-            return _staticInspectionCatalog;
         }
 
         private void DigFeaturesByTypes()
@@ -153,6 +156,7 @@ namespace RsDocGenerator
                 }
             }
 
+            var uncountedStaticInspections = new List<Type>();
             foreach (var staticInspection in staticInspections)
             {
                 var type = staticInspection.Key;
@@ -164,7 +168,17 @@ namespace RsDocGenerator
                     continue;
 
                 var groupId = staticSeverityAttribute.GroupId;
+                if (groupId == "StructuralSearch")
+                    continue;
                 var langs = GetLangsFromHighlightingAttribute(staticSeverityAttribute.Languages, groupId);
+                if (langs.Count == 0)
+                {
+                    if (type.FullName.Contains("Protobuf"))
+                        langs.Add("Protobuf");
+                    else if (type.FullName.Contains("UnresolvedPathError"))
+                        langs.Add("Common");
+                    else uncountedStaticInspections.Add(type);
+                }
                 var text = staticSeverityAttribute.ToolTipFormatString;
                 if (text.IsNullOrEmpty() || text.IsWhitespace() || text == "{0}")
                 {
@@ -175,6 +189,30 @@ namespace RsDocGenerator
                     var feature = new RsFeature(type.FullName, text, lang, langs,
                         RsFeatureKind.StaticInspection, staticSeverityAttribute.Severity, null, groupId);
                     _staticInspectionCatalog.AddFeature(feature, lang);
+                }
+            }
+
+            foreach (var inspectionType in inspectionTypesWithQuickFixes)
+            {
+                var staticInspectionFeature =
+                    _staticInspectionCatalog.Features.FirstOrDefault(f => f.Id == inspectionType.FullName);
+                if (staticInspectionFeature != null)
+                    _inspectionWithQuickFixCatalog.AddFeature(staticInspectionFeature, staticInspectionFeature.Lang);
+                else
+                {
+                    var configurableSeverityAttribute = Attribute.GetCustomAttribute(inspectionType,
+                        typeof(ConfigurableSeverityHighlightingAttribute)) as ConfigurableSeverityHighlightingAttribute;
+                    if (configurableSeverityAttribute != null)
+                    {
+                        var configInspectionFeatures =
+                            _configurableInspectionCatalog.Features.Where(f =>
+                                f.Id == configurableSeverityAttribute.ConfigurableSeverityId);
+                        foreach (var configInspectionFeature in configInspectionFeatures)
+                        {
+                            _inspectionWithQuickFixCatalog.AddFeature(configInspectionFeature,
+                                configInspectionFeature.Lang);
+                        }
+                    }
                 }
             }
         }
@@ -242,23 +280,9 @@ namespace RsDocGenerator
                 CodeInspectionHelpers.PsiLanguagesByCategoryNames.ContainsKey(groupId))
                 langString = CodeInspectionHelpers.PsiLanguagesByCategoryNames[groupId];
             if (langString == null) return new List<string>();
-            var langs = langString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList();
-            return langs.ToList();
+            return langString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
-        public FeatureCatalog GetQuickFixes()
-        {
-            return _quickFixCatalog;
-        }
 
-        public FeatureCatalog GetFixesInScope()
-        {
-            return _fixInScopeCatalog;
-        }
-
-        public FeatureCatalog GetContextActionsInScope()
-        {
-            return _contexActionInScopeCatalog;
-        }
     }
 }

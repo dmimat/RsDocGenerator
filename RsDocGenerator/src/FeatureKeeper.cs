@@ -34,18 +34,21 @@ namespace RsDocGenerator
                 catch (Exception e)
                 {
                     var result = MessageBox.Show(
-                        String.Format("ReSharper feature catalog (RsFeatureCatalog.xml) is corrupted and can be neither read nor updated. \n" +
-                                                               "Do you want to overwrite this file?"),
+                        String.Format(
+                            "ReSharper feature catalog (RsFeatureCatalog.xml) is corrupted and can be neither read nor updated. \n" +
+                            "Do you want to overwrite this file?"),
                         "RsFeatureCatalog.xml is corrupted", MessageBoxButtons.YesNo);
                     if (result == DialogResult.No)
                         throw;
                 }
             }
-            if(_catalogDocument == null)
+
+            if (_catalogDocument == null)
             {
                 _catalogDocument = new XDocument();
                 _catalogDocument.Add(new XElement(RootNodeName));
             }
+
             var currentVersionString = GeneralHelpers.GetCurrentVersion();
             _currentVersionElement = (from el in _catalogDocument.Root.Elements(VersionElementName)
                 where (string) el.Attribute("v") == currentVersionString
@@ -59,7 +62,7 @@ namespace RsDocGenerator
 
         public void CloseSession()
         {
-       //     AddExternalWikiLinks();
+            //     AddExternalWikiLinks();
             _catalogDocument.Save(_catalogFile);
         }
 
@@ -78,6 +81,7 @@ namespace RsDocGenerator
                     new XAttribute("Id", item.Key),
                     new XAttribute("Url", link)));
             }
+
             _catalogDocument.Root.Add(wiki);
         }
 
@@ -85,12 +89,16 @@ namespace RsDocGenerator
         {
             var totalFeatures = 0;
             var totalFeaturesInVersion = 0;
+            var totalFeaturesCpp = 0;
 
             foreach (var lang in featureCatalog.Languages)
             {
                 var langPresentation = GeneralHelpers.GetPsiLanguagePresentation(lang);
                 var langImplementations = featureCatalog.GetLangImplementations(lang);
                 totalFeatures += langImplementations.Count;
+                if (lang == "CPP")
+                    totalFeaturesCpp = langImplementations.Count;
+
                 var featureRootNodeName = featureCatalog.FeatureKind + "Node";
                 var totalLangFeaturesInVersion = 0;
 
@@ -114,9 +122,13 @@ namespace RsDocGenerator
                 {
                     if (existingLangFeatures.Contains(feature.Id)) continue;
 
-                    featuresRootElemnt.Add(new XElement(featureCatalog.FeatureKind.ToString(),
-                        new XAttribute("id", feature.Id),
-                        new XAttribute("text", feature.Text)));
+                    if (featureCatalog.FeatureKind != RsFeatureKind.InspectionWithQuickFix)
+                    {
+                        featuresRootElemnt.Add(new XElement(featureCatalog.FeatureKind.ToString(),
+                            new XAttribute("id", feature.Id),
+                            new XAttribute("text", feature.Text)));
+                    }
+
                     totalLangFeaturesInVersion += 1;
                     totalFeaturesInVersion += 1;
                 }
@@ -136,17 +148,26 @@ namespace RsDocGenerator
                         select el).FirstOrDefault() == null)
                     _currentVersionElement.Add(langElement);
             }
+
             var statNode = _currentVersionElement.Element("statistics");
+
             if (statNode == null)
             {
                 statNode = new XElement("statistics");
                 _currentVersionElement.AddFirst(statNode);
             }
+
             if (statNode.Element(featureCatalog.FeatureKind.ToString()) != null) return;
-            statNode.Add(new XElement(featureCatalog.FeatureKind.ToString(),
-                new XAttribute("total", totalFeatures),
-                new XAttribute("new", totalFeaturesInVersion)
-            ));
+
+            var statFeatureNode =
+                new XElement(featureCatalog.FeatureKind.ToString(),
+                    new XAttribute("total", totalFeatures),
+                    new XAttribute("total_no_Cpp", totalFeatures - totalFeaturesCpp));
+
+            if (featureCatalog.FeatureKind != RsFeatureKind.InspectionWithQuickFix)
+                statFeatureNode.Add(new XAttribute("new", totalFeaturesInVersion));
+
+            statNode.Add(statFeatureNode);
         }
     }
 }

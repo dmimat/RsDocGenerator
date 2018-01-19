@@ -30,6 +30,7 @@ namespace RsDocGenerator
             var quickFixes = featureDigger.GetQuickFixes();
             var fixesInScope = featureDigger.GetFixesInScope();
             var actionsInScope = featureDigger.GetContextActionsInScope();
+            var inspectionsWithQuickFixes = featureDigger.GetInspectionsWithFixes();
 
             featureKeeper.AddFeatures(configurableInspetions);
             featureKeeper.AddFeatures(staticInspetions);
@@ -37,6 +38,7 @@ namespace RsDocGenerator
             featureKeeper.AddFeatures(quickFixes);
             featureKeeper.AddFeatures(fixesInScope);
             featureKeeper.AddFeatures(actionsInScope);
+            featureKeeper.AddFeatures(inspectionsWithQuickFixes);
 
             featureKeeper.CloseSession();
 
