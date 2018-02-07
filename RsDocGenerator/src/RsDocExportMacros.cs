@@ -79,7 +79,7 @@ namespace RsDocGenerator
 
       macroChunk.Add(macroTable);
       macroLibrary.Root.Add(XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Macros", "intro", false));
-      macroLibrary.Root.Add(new XElement("p", "Here is the full list of template macros provided by ReSharper:"));
+      macroLibrary.Root.Add(new XElement("p", "Here is the full list of template macros provided by %product%:"));
       macroLibrary.Root.Add(macroChunk);
       macroLibrary.Save(Path.Combine(outputFolder + "\\CodeTemplates", macroTopicId + ".xml"));
       return "Template macros";

@@ -64,6 +64,7 @@ namespace RsDocGenerator
       var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
 
+      // TODO: template explorer path for Rider
       topicRoot.Add(new XElement("p",
         new XElement("menupath", "ReSharper | Tools | Templates Explorer | " + type + " Templates"),
         new XAttribute("product","rs")));
@@ -134,7 +135,7 @@ namespace RsDocGenerator
           if (expr != null)
           {
             var macro = MacroDescriptionFormatter.GetMacroAttribute(expr.Definition);
-            paramItemElement.Add(" - " + macro.LongDescription);
+            paramItemElement.Add(" - " + macro.LongDescription.CleanProductName());
               paramItemElement.Add(new XElement("for", 
                 " (",
                 XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
@@ -207,6 +208,7 @@ namespace RsDocGenerator
       var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
       var topicRoot = topic.Root;
 
+      // TODO: templates explorer path for Rider
       topicRoot.Add(new XElement("p",
         new XElement("menupath", String.Format("ReSharper | Templates Explorer | {0} Templates | {1}", type, lang)),
         new XAttribute("product","rs")));

@@ -192,6 +192,14 @@ namespace RsDocGenerator
           var name = splitString.Substring(0, 1) + splitString.Substring(1).ToLower();
           return char.ToUpper(name[0]) + name.Substring(1);
       }
+      
+      public static string CleanProductName(this string input)
+      {
+          if (input == null) return input;
+          input = input.Replace(" ReSharper ", " %product% ");
+          input = input.Replace(" options", " %settingsLower%");
+          return input;
+      }
 
   }
 }

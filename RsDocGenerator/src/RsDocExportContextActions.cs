@@ -59,7 +59,7 @@ namespace RsDocGenerator
           ? "common use"
           : table.Key;
         languageChunk.Add(new XElement("p",
-          "ReSharper provides the following context actions for " +
+          "%product% provides the following context actions for " +
           langText + ":"));
         languageChunk.Add(table.Value);
         caLibrary.Root.Add(languageChunk);
