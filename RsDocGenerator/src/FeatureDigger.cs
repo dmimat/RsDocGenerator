@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using JetBrains;
 using JetBrains.Application.DataContext;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
@@ -67,6 +68,16 @@ namespace RsDocGenerator
                         continue;
 
                     configInspectionsCatalog.AddFeature(feature, language);
+                }
+                // If description contains a hyperlink, add this link to CodeInspectionHelpers.ExternalInspectionLinks
+                if (inspection.Description != null && inspection.Description.Contains("a href="))
+                {
+                    var regex = "href=\"(.*)\"";
+                    var match = Regex.Match(inspection.Description, regex);
+                    if (!match.Success) continue;
+                    if(CodeInspectionHelpers.ExternalInspectionLinks.Keys.Contains(inspection.Id)) continue;
+                    CodeInspectionHelpers.ExternalInspectionLinks.Add(inspection.Id, match.Groups[1].Value);
+
                 }
             }
             return configInspectionsCatalog;

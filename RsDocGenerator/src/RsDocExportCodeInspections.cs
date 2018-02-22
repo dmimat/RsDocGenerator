@@ -42,14 +42,14 @@ namespace RsDocGenerator
         var cppInspectionsHtml = new XElement("Html");
         foreach (ConfigurableSeverityItem inspection in configurations)
         {
-          if (inspection.Internal)
+          if (inspection.Internal || inspection.Id.Contains("CppClangTidy")) 
             continue;
-
+          
           var inspectionId = inspection.Id;
           var inspectionElement = new XElement("Inspection", inspection.Description);
 
           inspectionElement.Add(new XAttribute("id", inspectionId));
-          inspectionElement.Add(new XAttribute("lang", this.GetLangsForInspection(inspectionId)));
+          inspectionElement.Add(new XAttribute("lang", GetLangsForInspection(inspectionId)));
           inspectionElement.Add(new XAttribute("FullTitle", inspection.FullTitle));
           inspectionElement.Add(new XAttribute("Title", inspection.Title));
 //          inspectionElement.Add(new XAttribute("InsType", inspection.GetType().ToString()));
@@ -63,10 +63,10 @@ namespace RsDocGenerator
             duplicateIds.Add(new Tuple<string, XElement>(inspectionId, inspectionElement));
           inspectionRootElement.Add(inspectionElement);
 
-            var cppInspectionHtml = new XElement("tr", XElement.Parse("<th></th>"), XElement.Parse("<td class='supported supported-not'>No matching functionality</td>"));
+            var cppInspectionHtml = new XElement("tr", XElement.Parse("<td class='_no-highlighted'></td>"), XElement.Parse("<td class='_icon-cross'>No matching functionality</td>"));
             if (GetLangsForInspection(inspectionId) == "CPP")
             {
-                cppInspectionHtml.Add(new XElement("td", new XAttribute("class", "supported"), inspection.FullTitle));
+                cppInspectionHtml.Add(new XElement("td", new XAttribute("class", "_icon-check"), inspection.FullTitle));
                 cppInspectionsHtml.Add(cppInspectionHtml);
             }
         }
