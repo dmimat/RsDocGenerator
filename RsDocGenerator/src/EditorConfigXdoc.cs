@@ -145,7 +145,7 @@ namespace RsDocGenerator
                 chapterAllows.Add(list);
                 chapterTopLevel.Add(chapterAllows);
 
-                DescribePossibleValues(chapterTopLevel, propInfo.ValueType, propInfo.Values);
+                DescribePossibleValues(chapterTopLevel, propInfo.ValueTypeInfo.ValueType, propInfo.ValueTypeInfo.Values);
 
                 editorConfigGeneralizedTopic.Root.Add(chapterTopLevel);
             }

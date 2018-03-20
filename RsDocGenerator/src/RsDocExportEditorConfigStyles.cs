@@ -222,7 +222,7 @@ namespace RsDocGenerator
                     writer.EndElem().EndElem();
                     ;
 
-                    DescribePossibleValues(writer, propInfo.ValueType, propInfo.Values);
+                    DescribePossibleValues(writer, propInfo.ValueTypeInfo.ValueType, propInfo.ValueTypeInfo.Values);
 
                     writer.EndElem();
                 }
@@ -571,7 +571,7 @@ namespace RsDocGenerator
             }
 
             var valueType = settingsEntry.ValueClrType;
-            var enumValues = propertyInfo.Values;
+            var enumValues = propertyInfo.ValueTypeInfo.Values;
             var possibleValues = DescribePossibleValues(writer, valueType, enumValues);
 
             if (possibleValues != null && (previewType == PreviewType.Diff || previewType == PreviewType.Code))
