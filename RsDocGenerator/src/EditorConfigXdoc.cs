@@ -377,6 +377,19 @@ namespace RsDocGenerator
                         foreach (var pair in possibleValues)
                         {
                             XElement table;
+                            var tr = new XElement("tr");
+
+                            if (previewType == PreviewType.Diff)
+                            {
+                                table = XmlHelpers.CreateTwoColumnTable("Before formatting",
+                                    "After formatting, " + pair.Item1, "50%");
+                                tr.Add(new XElement("td",
+                                    XmlHelpers.CreateCodeBlock(codeBefore, language.PresentableName, true)));
+                            }
+                            else
+                                table = XmlHelpers.CreateTable(new[] {pair.Item1}, null);
+
+                            previewSettings.SetValue(settingsEntry, pair.Item3, null); 
                             preparator.PrepareText(
                                 solution,
                                 documentAfter,
@@ -384,26 +397,9 @@ namespace RsDocGenerator
                                 previewData.Parse,
                                 previewSettings);
                             
-                            var tdWithCodeAfter = new XElement("td", 
-                                XmlHelpers.CreateCodeBlock(documentAfter.GetText(), language.PresentableName, true));
-                            
-                            if (previewType == PreviewType.Diff)
-                            {
-                                table = XmlHelpers.CreateTwoColumnTable("Before formatting",
-                                    "After formatting, " + pair.Item1, "50%");
-                                var tr = new XElement("tr");
-                                var tdBefore = new XElement("td", 
-                                    XmlHelpers.CreateCodeBlock(codeBefore, language.PresentableName, true));
-                                tr.Add(tdBefore);
-                                tr.Add(tdWithCodeAfter);
-                                table.Add(tr);
-                            }
-                            else
-                            {
-                                table = XmlHelpers.CreateTable(new[] {pair.Item1}, null);
-                                table.Add(new XElement("tr", tdWithCodeAfter));
-                            }
-                            previewSettings.SetValue(settingsEntry, pair.Item3, null); // Why?
+                            tr.Add(new XElement("td", 
+                                XmlHelpers.CreateCodeBlock(documentAfter.GetText(), language.PresentableName, true)));
+                            table.Add(tr);
                             chapterExamples.Add(table);
                         }
                     }
