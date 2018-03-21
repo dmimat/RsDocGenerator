@@ -43,9 +43,9 @@ namespace RsDocGenerator
       return table;
     }
 
-    public static XElement CreateChunk(string includeiD)
+    public static XElement CreateChunk(string includeId)
     {
-      return new XElement("chunk", new XAttribute("include-id", includeiD));
+      return new XElement("chunk", new XAttribute("include-id", includeId));
     }
 
     public static XElement CreateInclude(string src, string id, bool nullable)
@@ -73,12 +73,15 @@ namespace RsDocGenerator
 
     private static XElement CreateChapter(string title, string id, bool needId)
     {
+      if (title == null)
+        title = "UNKNOWN";
       var chapter = new XElement("chapter",
         new XAttribute("caps", "aswritten"),
         new XAttribute("title", title));
-      if (needId)
-        chapter.Add(new XAttribute("id", id));
-      
+      if (!needId) return chapter;
+      if (id == null)
+        id = "UNKNOWN";
+      chapter.Add(new XAttribute("id", id));
       return chapter;
     }
 
@@ -94,7 +97,7 @@ namespace RsDocGenerator
       return link;
     }
 
-    public static XElement CreateCodeBlock([NotNull] string content, [CanBeNull] string lang)
+    public static XElement CreateCodeBlock([NotNull] string content, [CanBeNull] string lang, bool showSpaces)
     {
       var codeElement = new XElement("code", content.CleanCodeSample(),
         new XAttribute("style", "block"));
@@ -109,6 +112,7 @@ namespace RsDocGenerator
           case "ASP.NET(C#)":
           case "ASP.NET (VB)":
           case "ASP.NET(VB.NET)":
+          case "Razor CSharp":
             lang = "ASP.NET";
             break;
           case "XAML (C#)":
@@ -124,6 +128,10 @@ namespace RsDocGenerator
         }
         codeElement.Add(new XAttribute("lang", lang));
       }
+
+      if (showSpaces)
+        codeElement.Add(new XAttribute("show-white-spaces", "true"));
+      
       return codeElement;
     }
 

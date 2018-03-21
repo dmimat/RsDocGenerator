@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
@@ -11,9 +8,9 @@ namespace RsDocGenerator
 {
     public class FeatureCatalog
     {
-        public RsFeatureKind FeatureKind { get; set; }
-        public List<string> Languages { get; set; }
-        public List<RsFeature> Features { get; set; }
+        public RsFeatureKind FeatureKind { get; }
+        public List<string> Languages { get; }
+        public List<RsFeature> Features { get; }
 
         public FeatureCatalog(RsFeatureKind featureKind)
         {
@@ -33,12 +30,14 @@ namespace RsDocGenerator
         {
             var highlightingManager = Shell.Instance.GetComponent<HighlightingSettingsManager>();
             var groups = new Dictionary<string, List<RsFeature>>();
-            var groupIds = highlightingManager.ConfigurableGroups.OrderBy(g => g.Title).Select(g => g.Key).ToList();
+            var groupIds = 
+                highlightingManager.ConfigurableGroups.OrderBy(g => g.Title).Select(g => g.Key).ToList();
             groupIds.AddRange(highlightingManager.StaticGroups.OrderBy(g => g.Name).Select(g => g.Key));
 
             foreach (var group in groupIds)
             {
-                var features = Features.Where(f => f.Lang.Equals(lang) && f.GroupId == group).OrderBy(f => f.Text).ToList();
+                var features =
+                    Features.Where(f => f.Lang.Equals(lang) && f.GroupId == group).OrderBy(f => f.Text).ToList();
                 if (!features.IsEmpty())
                     groups[group] = features;
             }

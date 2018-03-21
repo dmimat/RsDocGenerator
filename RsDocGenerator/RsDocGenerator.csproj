@@ -136,6 +136,9 @@
     <Reference Include="JetBrains.MSBuild.Logger.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1982a8b0ca24c5dc">
       <HintPath>..\packages\JetBrains.Platform.MSBuild.Logger.Api.1.0.20170809\lib\net\JetBrains.MSBuild.Logger.Api.dll</HintPath>
     </Reference>
+    <Reference Include="JetBrains.ReSharper.Feature.Services.Cpp, Version=112.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
+      <HintPath>..\..\..\Users\dmitry.matveev\AppData\Local\JetBrains\Installations\ReSharperPlatformVs15_1cf50363\JetBrains.ReSharper.Feature.Services.Cpp.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.ReSharper.Psi.Html.Scheme, Version=1.1.0.0, Culture=neutral, PublicKeyToken=07da599cfe29efaf">
       <HintPath>..\packages\JetBrains.ReSharper.Psi.Html.Scheme.1.1.0\lib\net45\JetBrains.ReSharper.Psi.Html.Scheme.dll</HintPath>
     </Reference>

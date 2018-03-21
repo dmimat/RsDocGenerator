@@ -277,7 +277,7 @@ namespace RsDocGenerator
           new XElement("p", noDescriptionFallback),
           new XElement("p", new XElement("b", "Scope "), scopeString),
           new XElement("p", new XElement("b", "Body ")),
-          XmlHelpers.CreateCodeBlock(template.Text, lang),
+          XmlHelpers.CreateCodeBlock(template.Text, lang, false),
           paramHeader,
           paramElement,
           XmlHelpers.CreateInclude("TR", templateIdFull, true))));

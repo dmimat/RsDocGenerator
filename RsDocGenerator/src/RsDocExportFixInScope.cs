@@ -41,7 +41,7 @@ namespace RsDocGenerator
         private static XElement CreateScopeChunk(FeatureCatalog fixesInScope, string chunkName)
         {
             var chunk = XmlHelpers.CreateChunk(chunkName);
-            foreach (var lang in fixesInScope.Languages)
+            foreach (var lang in fixesInScope.Languages.OrderBy())
             {
                 var langChapter = XmlHelpers.CreateChapter(GeneralHelpers.GetPsiLanguagePresentation(lang), lang);
                 var langList = new XElement("list");

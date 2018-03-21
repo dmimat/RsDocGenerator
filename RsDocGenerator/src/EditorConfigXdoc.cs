@@ -2,10 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using JetBrains;
 using JetBrains.Application;
 using JetBrains.Application.Catalogs;
+using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.Implementation;
+using JetBrains.DataFlow;
+using JetBrains.DocumentModel;
+using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle;
+using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle.ViewModels;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.EditorConfig;
 using JetBrains.ReSharper.Psi.impl.EditorConfig;
 using JetBrains.Util;
@@ -18,8 +27,8 @@ namespace RsDocGenerator
         private const string GeneralizedPropsFileName = "EditorConfig_Generalized";
 
         public static void CreateIndex(string path, IApplicationHost host,
-                                       OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
-                                       IEditorConfigSchema ecService)
+            OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
+            IEditorConfigSchema ecService)
         {
             const string editorConfigIndexTopicId = "EditorConfig_Index";
             var editorConfigIndexTopic =
@@ -58,9 +67,8 @@ namespace RsDocGenerator
                         var propInfo = ecService.GetSettingsForAlias(propName);
                         Assertion.Assert(propInfo != null, "Property must exist {0}", propName);
                         if (propInfo.Grandparent != null)
-                        {
                             propInfo = propInfo.Grandparent;
-                        }
+
                         Assertion.Assert(!propInfo.Description.IsNullOrEmpty(),
                             "Description must be not null for property {0}",
                             propName);
@@ -83,6 +91,7 @@ namespace RsDocGenerator
                                 currentElement = new XElement("for", new XAttribute("product", "!rdr"));
                                 contentTd.Add(currentElement);
                             }
+
                             if (comma) currentElement.Add(", ");
                             comma = true;
                             var link = XmlHelpers.CreateHyperlink(lang, val1.FileName, val1.Id, false);
@@ -93,14 +102,15 @@ namespace RsDocGenerator
                 }
                 table.Add(propRow);
             }
+
             editorConfigIndexTopic.Root.Add(table);
             editorConfigIndexTopic.Save(Path.Combine(path, editorConfigIndexTopicId + ".xml"));
         }
 
         public static void CreateGeneralizedPropertiesTopic(string path, IApplicationHost host,
-                                                            OneToListMultimap<string, RsDocExportEditorConfigStyles.
-                                                                PropertyDescription> map,
-                                                            IEditorConfigSchema schema)
+            OneToListMultimap<string, RsDocExportEditorConfigStyles.
+                PropertyDescription> map,
+            IEditorConfigSchema schema)
         {
             var editorConfigGeneralizedTopic =
                 XmlHelpers.CreateHmTopic(GeneralizedPropsFileName, "Generalized EditorConfig properties");
@@ -142,10 +152,12 @@ namespace RsDocGenerator
                         li.Add(new XAttribute("product", "!rdr"));
                     list.Add(li);
                 }
+
                 chapterAllows.Add(list);
                 chapterTopLevel.Add(chapterAllows);
 
-                DescribePossibleValues(chapterTopLevel, propInfo.ValueTypeInfo.ValueType, propInfo.ValueTypeInfo.Values);
+                DescribePossibleValues(chapterTopLevel, propInfo.ValueTypeInfo.ValueType,
+                    propInfo.ValueTypeInfo.Values);
 
                 editorConfigGeneralizedTopic.Root.Add(chapterTopLevel);
             }
@@ -153,6 +165,256 @@ namespace RsDocGenerator
             editorConfigGeneralizedTopic.Save(Path.Combine(path, GeneralizedPropsFileName + ".xml"));
         }
 
+        public static void ProcessEntries(KnownLanguage language, ICodeStylePageSchema schema, string path,
+            IDocument documentBefore, IDocument documentAfter, Lifetime lifetime,
+            SettingsStore settingsStore, IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
+            IEditorConfigSchema ecService,
+            Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
+            HashSet<ICodeStyleEntry> excludedEntries, CodePreviewPreparator preparator, ISolution solution,
+            OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map)
+        {
+            var topicId = "EditorConfig_" + language.Name.Replace(" ", "_") + "_" + schema.GetType().Name;
+            var topic = XmlHelpers.CreateHmTopic(topicId, 
+                "{0} - {1}".FormatEx(language.PresentableName, schema.PageName));
+            topic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", true));
+
+            foreach (var entry in schema.Entries)
+            {
+                ProcessEntry(
+                    null,
+                    entry,
+                    topic.Root,
+                    preparator,
+                    solution,
+                    documentBefore,
+                    lifetime,
+                    settingsStore,
+                    contextBoundSettingsStoreLive,
+                    documentAfter,
+                    ecService,
+                    settingsToEntry,
+                    excludedEntries,
+                    language,
+                    map,
+                    null, topicId);
+            }
+            topic.Save(Path.Combine(path, topicId + ".xml"));
+        }
+
+        private static void ProcessEntry(string parentId, ICodeStyleEntry entry, XElement container,
+            CodePreviewPreparator preparator, ISolution solution, IDocument documentBefore,
+            Lifetime lifetime,
+            SettingsStore settingsStore,
+            IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
+            IDocument documentAfter, IEditorConfigSchema ecService,
+            Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>>
+                settingsToEntry,
+            HashSet<ICodeStyleEntry> excludedEntries, KnownLanguage language,
+            OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
+            string parentDescription, string fileName)
+        {
+            if (excludedEntries.Contains(entry)) return;
+
+            string settingsName = null;
+            var settingsEntry = entry.SettingsEntry;
+            if (settingsEntry != null)
+                if (settingsToEntry.GetValueSafe(settingsEntry).First != entry)
+                    settingsEntry = null;
+
+            IEditorConfigPropertyInfo propertyInfo = null;
+
+            var description = entry.Description;
+            if (settingsEntry != null)
+            {
+                propertyInfo = ecService.GetPropertiesForSettingsEntry(settingsEntry)
+                    .OrderByDescending(it => it.Priority)
+                    .FirstOrDefault();
+
+                if (propertyInfo != null)
+                {
+                    settingsName = propertyInfo.Alias;
+                    description = propertyInfo.Description;
+                }
+            }
+
+            var id = settingsName
+                     ?? (parentId == null
+                         ? ConvertToId(description)
+                         : parentId + "_" + ConvertToId(description));
+
+            var chapter = XmlHelpers.CreateChapter(description, id);
+
+            if (settingsEntry != null)
+            {
+                foreach (var prop in ecService.GetPropertiesForSettingsEntry(settingsEntry))
+                {
+                    map.Add(prop.Alias,
+                        new RsDocExportEditorConfigStyles.PropertyDescription
+                        {
+                            Description = description,
+                            FileName = fileName,
+                            Id = id,
+                            Language = language,
+                            SectionDescription = parentDescription,
+                            IsGeneralized = prop.IsGeneralized
+                        });
+                }
+
+                WriteScalarEntry(propertyInfo, entry, chapter, preparator, solution, documentBefore, lifetime, settingsStore,
+                    contextBoundSettingsStoreLive, documentAfter, settingsEntry, ecService, language);
+            }
+
+            foreach (var child in entry.Children)
+                ProcessEntry(id, child, chapter, preparator, solution, documentBefore, lifetime, settingsStore,
+                    contextBoundSettingsStoreLive, documentAfter, ecService, settingsToEntry, excludedEntries, language,
+                    map, description, fileName);
+
+            container.Add(chapter);
+        }
+
+        private static string ConvertToId(string text)
+        {
+            if (text == null)
+                throw new ArgumentNullException("text");
+
+            int nToRemove = 0;
+
+            for (int a = 0; a < text.Length; a++)
+            {
+                char ch = text[a];
+                if (!ch.IsIdentifierPart()) nToRemove++;
+            }
+
+            // Original?
+            if (nToRemove == 0)
+                return text;
+
+            var sb = new StringBuilder(text.Length);
+            bool afterUnderscore = false;
+            for (int a = 0; a < text.Length; a++)
+            {
+                char ch = text[a];
+                if (ch.IsIdentifierPart())
+                {
+                    if (ch == '_')
+                    {
+                        if (afterUnderscore) continue;
+                        afterUnderscore = true;
+                    }
+                    else
+                        afterUnderscore = false;
+
+                    sb.Append(ch);
+                }
+                else
+                {
+                    if (afterUnderscore) continue;
+                    sb.Append('_');
+                    afterUnderscore = true;
+                }
+            }
+            return sb.ToString();
+        }
+
+        private static void WriteScalarEntry(
+            IEditorConfigPropertyInfo propertyInfo,
+            ICodeStyleEntry entry, XElement container,
+            CodePreviewPreparator preparator,
+            ISolution solution, IDocument documentBefore, Lifetime lifetime, SettingsStore settingsStore,
+            IContextBoundSettingsStoreLive contextBoundSettingsStoreLive, IDocument documentAfter,
+            SettingsScalarEntry settingsEntry, IEditorConfigSchema ecService,
+            KnownLanguage language)
+        {
+            var aliases = ecService.GetPropertiesForSettingsEntry(settingsEntry)
+                .OrderByDescending(it => it.Priority)
+                .ToArray();
+
+            if (aliases.Length > 0)
+                WriteAliases(container, aliases, "Property names:");
+
+            var havePreview = entry as IHavePreview;
+            var previewData = havePreview == null ? null : havePreview.PreviewData as CodeFormatterPreview;
+
+            var previewType = previewData == null ? PreviewType.None : previewData.Type;
+            if (previewType == PreviewType.Description)
+                container.Add(XmlHelpers.CreateCodeBlock(previewData.Text, language.Name, true));
+
+            var valueType = settingsEntry.ValueClrType;
+            var enumValues = propertyInfo.ValueTypeInfo.Values;
+            var possibleValues = DescribePossibleValues(container, valueType, enumValues);
+
+            if (possibleValues != null && (previewType == PreviewType.Diff || previewType == PreviewType.Code))
+            {
+                var chapterExamples = XmlHelpers.CreateChapterWithoutId("Examples:");
+                
+                Lifetimes.Using(lifetime, lf =>
+                {
+                    var previewSettings = settingsStore
+                        .CreateNestedTransaction(lf, "Code formatter options UpdatePreview")
+                        .BindToMountPoints(contextBoundSettingsStoreLive.InvolvedMountPoints);
+
+                    if (previewData != null)
+                        previewData.FixupSettingsForPreview(previewSettings);
+
+                    string codeBefore = null;
+
+                    if (previewType == PreviewType.Diff)
+                    {
+                        preparator.PrepareText(
+                            solution,
+                            documentBefore,
+                            previewData.Text,
+                            previewData.Parse,
+                            null);
+
+                        codeBefore = documentBefore.GetText();
+                    }
+                    
+                    var oldValue = previewSettings.GetValue(settingsEntry, null);
+                    
+                    try
+                    {
+                        foreach (var pair in possibleValues)
+                        {
+                            XElement table;
+                            preparator.PrepareText(
+                                solution,
+                                documentAfter,
+                                previewData.Text,
+                                previewData.Parse,
+                                previewSettings);
+                            
+                            var tdWithCodeAfter = new XElement("td", 
+                                XmlHelpers.CreateCodeBlock(documentAfter.GetText(), language.PresentableName, true));
+                            
+                            if (previewType == PreviewType.Diff)
+                            {
+                                table = XmlHelpers.CreateTwoColumnTable("Before formatting",
+                                    "After formatting, " + pair.Item1, "50%");
+                                var tr = new XElement("tr");
+                                var tdBefore = new XElement("td", 
+                                    XmlHelpers.CreateCodeBlock(codeBefore, language.PresentableName, true));
+                                tr.Add(tdBefore);
+                                tr.Add(tdWithCodeAfter);
+                                table.Add(tr);
+                            }
+                            else
+                            {
+                                table = XmlHelpers.CreateTable(new[] {pair.Item1}, null);
+                                table.Add(new XElement("tr", tdWithCodeAfter));
+                            }
+                            previewSettings.SetValue(settingsEntry, pair.Item3, null); // Why?
+                            chapterExamples.Add(table);
+                        }
+                    }
+                    finally
+                    {
+                        previewSettings.SetValue(settingsEntry, oldValue, null);
+                    }
+                    container.Add(chapterExamples);
+                });
+            }
+        }
 
         private static void WriteAliases(XElement container, IEditorConfigPropertyInfo[] aliases, string title)
         {
@@ -170,6 +432,7 @@ namespace RsDocGenerator
                     }
                 }
             }
+
             var chapter = XmlHelpers.CreateChapterWithoutId(title);
             var paragraph = new XElement("p");
 
@@ -181,6 +444,7 @@ namespace RsDocGenerator
                 addComma = true;
                 paragraph.Add(new XElement("code", alias));
             }
+            
             chapter.Add(paragraph);
             container.Add(chapter);
         }
@@ -221,13 +485,9 @@ namespace RsDocGenerator
                 var chapterPossibleValues = XmlHelpers.CreateChapterWithoutId("Possible values:");
 
                 if (type == typeof(int))
-                {
                     chapterPossibleValues.Add(new XElement("p", "an integer"));
-                }
                 else if (type == typeof(bool))
-                {
                     chapterPossibleValues.Add(new XElement("p", new XElement("code", "true | false")));
-                }
                 else
                 {
                     var list = new XElement("list");
