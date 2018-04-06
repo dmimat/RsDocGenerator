@@ -8,6 +8,7 @@ using JetBrains.Application.Catalogs;
 using JetBrains.Application.Catalogs.Filtering;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions.ActionManager;
+using JetBrains.Application.UI.Actions.Utils;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Application.UI.ActionSystem.ActionsRevised.Loader;
 using JetBrains.ReSharper.Feature.Services.Util;

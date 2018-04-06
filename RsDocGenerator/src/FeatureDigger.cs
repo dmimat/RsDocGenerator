@@ -8,6 +8,7 @@ using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Intentions.Scoped;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
+using JetBrains.ReSharper.Psi.EditorConfig;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 
@@ -24,11 +25,13 @@ namespace RsDocGenerator
         private readonly FeatureCatalog _staticInspectionCatalog;
         private readonly FeatureCatalog _configurableInspectionCatalog;
         private readonly FeatureCatalog _inspectionWithQuickFixCatalog;
+        private readonly IEditorConfigSchema _editorConfigSchema;
 
         public FeatureDigger(IDataContext context)
         {
             _myContext = context;
             _highlightingSettingsManager = _myContext.GetComponent<HighlightingSettingsManager>();
+            _editorConfigSchema = _myContext.GetComponent<IEditorConfigSchema>();
             _contexActionsCatalog = DigContextActions();
             _quickFixCatalog = new FeatureCatalog(RsFeatureKind.QuickFix);
             _fixInScopeCatalog = new FeatureCatalog(RsFeatureKind.FixInScope);
@@ -62,7 +65,7 @@ namespace RsDocGenerator
                 {
                     var feature = new RsFeature(inspection.Id, inspection.FullTitle, language, langs,
                         RsFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName,
-                        inspection.GroupId);
+                        inspection.GroupId, _editorConfigSchema.GetPropertyNameForHighlightingId(inspection.Id));
                     if (configInspectionsCatalog.Features.FirstOrDefault(f => f.Id == inspection.Id && f.Lang == language) != null)
                         continue;
 
@@ -88,8 +91,7 @@ namespace RsDocGenerator
             foreach (var ca in _myContext.GetComponent<IContextActionTable>().AllActions)
             {
                 var lang = GeneralHelpers.GetPsiLangByPresentation(ca.Group);
-                var feature = new RsFeature(ca.ActionKey, ca.Name, lang, null,
-                    RsFeatureKind.ContextAction, Severity.INFO, null, null);
+                var feature = new RsFeature(ca.ActionKey, ca.Name, lang, null, RsFeatureKind.ContextAction);
                 actionsCatalog.AddFeature(feature, lang);
             }
             return actionsCatalog;
@@ -140,8 +142,8 @@ namespace RsDocGenerator
                         var action = _contexActionsCatalog.Features.FirstOrDefault(f => f.Id == type.FullName);
                         if (action != null)
                         {
-                            var feature = new RsFeature(type.FullName, action.Text, action.Lang, action.Multilang, RsFeatureKind.ContextActionInScope, Severity.INFO, null,
-                                null);
+                            var feature = new RsFeature(type.FullName, 
+                                action.Text, action.Lang, action.Multilang, RsFeatureKind.ContextActionInScope);
                             _contexActionInScopeCatalog.AddFeature(feature, action.Lang);
                         }
                         continue;
@@ -274,12 +276,10 @@ namespace RsDocGenerator
 
             foreach (var lang in allLanguages.Distinct().ToList())
             {
-                var feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.QuickFix, Severity.INFO,
-                    null, null);
+                var feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.QuickFix);
                 _quickFixCatalog.AddFeature(feature, lang);
                 if (!typeof(IScopedAction).IsAssignableFrom(type)) continue;
-                feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.FixInScope, Severity.INFO, null,
-                    null);
+                feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.FixInScope);
                 _fixInScopeCatalog.AddFeature(feature, lang);
             }
         }

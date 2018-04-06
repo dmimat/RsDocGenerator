@@ -28,7 +28,7 @@ namespace RsDocGenerator
       return CreateTable(new[] {firstColName, secondColName}, new[] {firstColWidth});
     }
 
-    public static XElement CreateTable([NotNull] string[] colNames, [CanBeNull] string[] colWidths)
+    public static XElement CreateTable([NotNull] string[] colNames, [CanBeNull] string[] colWidths = null)
     {
       var table = new XElement("table");
       var headerRow = new XElement("tr");
@@ -48,7 +48,7 @@ namespace RsDocGenerator
       return new XElement("chunk", new XAttribute("include-id", includeId));
     }
 
-    public static XElement CreateInclude(string src, string id, bool nullable)
+    public static XElement CreateInclude(string src, string id, bool nullable = false)
     {
       return new XElement("include",
         new XAttribute("nullable", nullable ? "true" : "false"),
@@ -85,7 +85,8 @@ namespace RsDocGenerator
       return chapter;
     }
 
-    public static XElement CreateHyperlink([CanBeNull] string content, [CanBeNull] string href, [CanBeNull] string anchor, bool nullable)
+    public static XElement CreateHyperlink([CanBeNull] string content, [CanBeNull] string href, 
+      [CanBeNull] string anchor = null, bool nullable = false)
     {
       var link = new XElement("a", content);
       if(nullable)

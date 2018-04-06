@@ -6,8 +6,9 @@ namespace RsDocGenerator
 {
     public class RsFeature
     {
-        public RsFeature([NotNull]string id, string text,
-            string lang, List<string> multilang, RsFeatureKind kind, Severity severity, string compoundName, string groupId)
+        public RsFeature([NotNull]string id, string text, string lang, List<string> multilang, RsFeatureKind kind, 
+            Severity severity = Severity.INFO, string compoundName= null, string groupId=null, 
+            string editorConfigId = null)
         {
             if (text == null)
                 text = id;
@@ -21,8 +22,10 @@ namespace RsDocGenerator
             Severity = severity;
             CompoundName = compoundName;
             GroupId = groupId;
+            EditorConfigId = editorConfigId;
         }
 
+        public string EditorConfigId { get; set; }
         public string Id { get; set; }
         public string Text { get; set; }
         public string GroupId { get; set; }

@@ -33,16 +33,14 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            var solution = context.GetData(ProjectModelDataConstants.SOLUTION);
-            if (solution == null) return "Open a solution to enable generation";
-
-            GenerateDocs(solution, outputFolder + "\\EditorConfig");
-
-            return "Editorconfig styles";
+            return GenerateDocs(context, outputFolder + "\\EditorConfig");
         }
 
-        public static void GenerateDocs(ISolution solution, string path)
+        public static string GenerateDocs(IDataContext context, string path)
         {
+            var solution = context.GetData(ProjectModelDataConstants.SOLUTION);
+            if (solution == null) return "Open a solution to enable generation";
+            
             Lifetimes.Using(lifetime =>
             {
                 var ecService = solution.GetComponent<IEditorConfigSchema>();
@@ -119,9 +117,10 @@ namespace RsDocGenerator
                     }
                 }
 
-                EditorConfigXdoc.CreateIndex(path, host, map, ecService);
+                EditorConfigXdoc.CreateIndex(path, context, map, ecService);
                 EditorConfigXdoc.CreateGeneralizedPropertiesTopic(path, host, map, ecService);
             });
+            return "Editorconfig styles";
         }
 
         private static void FillSettingsToEntryDictionary(

@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using JetBrains;
 using JetBrains.Application;
 using JetBrains.Application.Catalogs;
+using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Implementation;
 using JetBrains.DataFlow;
@@ -26,16 +27,19 @@ namespace RsDocGenerator
     {
         private const string GeneralizedPropsFileName = "EditorConfig_Generalized";
 
-        public static void CreateIndex(string path, IApplicationHost host,
+        public static void CreateIndex(string path, IDataContext context,
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
             IEditorConfigSchema ecService)
         {
             const string editorConfigIndexTopicId = "EditorConfig_Index";
             var editorConfigIndexTopic =
                 XmlHelpers.CreateHmTopic(editorConfigIndexTopicId, "Index of EditorConfig properties");
-            var table = XmlHelpers.CreateTwoColumnTable("Property name", "Description", "40%");
 
-            editorConfigIndexTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", false));
+            editorConfigIndexTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%"));
+
+            var table = XmlHelpers.CreateTwoColumnTable("Property name", "Description", "50%");
+
+            var tableRows = new SortedDictionary<string, XElement>();
 
             foreach (string propName in map.Keys.OrderBy())
             {
@@ -56,7 +60,7 @@ namespace RsDocGenerator
                                       ? val.Description
                                       : val.SectionDescription + " - " + val.Description) + " (" + lang + ")";
                     propRow.Add(new XElement("td",
-                        XmlHelpers.CreateHyperlink(content, val.FileName, val.Id, false)));
+                        XmlHelpers.CreateHyperlink(content, val.FileName, val.Id)));
                 }
                 else
                 {
@@ -98,11 +102,34 @@ namespace RsDocGenerator
                             currentElement.Add(link);
                         }
                     }
+
                     propRow.Add(contentTd);
                 }
-                table.Add(propRow);
+
+                if (!tableRows.ContainsKey(propName))
+                    tableRows.Add(propName, propRow);
             }
 
+            var featureDigger = new FeatureDigger(context);
+            var configurableInspetions = featureDigger.GetConfigurableInspections();
+            foreach (var inspection in configurableInspetions.Features)
+            {
+                var propName = inspection.EditorConfigId;
+                var propRow = new XElement("tr");
+                if (inspection.Lang == "CPP")
+                    propRow.Add(new XAttribute("product", "!rdr"));
+                propRow.Add(new XElement("td", new XElement("code", propName)));
+                propRow.Add(new XElement("td",
+                    XmlHelpers.CreateHyperlink("Code Inspection", "Code_Analysis__Code_Inspections"),
+                    new XText(": "),
+                    XmlHelpers.CreateHyperlink(inspection.Text,
+                        CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null, true)));
+                if (!tableRows.ContainsKey(propName))
+                    tableRows.Add(inspection.EditorConfigId, propRow);
+            }
+
+            foreach (var row in tableRows)
+                table.Add(row.Value);
             editorConfigIndexTopic.Root.Add(table);
             editorConfigIndexTopic.Save(Path.Combine(path, editorConfigIndexTopicId + ".xml"));
         }
@@ -114,7 +141,7 @@ namespace RsDocGenerator
         {
             var editorConfigGeneralizedTopic =
                 XmlHelpers.CreateHmTopic(GeneralizedPropsFileName, "Generalized EditorConfig properties");
-            editorConfigGeneralizedTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", false));
+            editorConfigGeneralizedTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%"));
 
             foreach (var propInfo in schema.GetAllProperties())
             {
@@ -174,7 +201,7 @@ namespace RsDocGenerator
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map)
         {
             var topicId = "EditorConfig_" + language.Name.Replace(" ", "_") + "_" + schema.GetType().Name;
-            var topic = XmlHelpers.CreateHmTopic(topicId, 
+            var topic = XmlHelpers.CreateHmTopic(topicId,
                 "{0} - {1}".FormatEx(language.PresentableName, schema.PageName));
             topic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", true));
 
@@ -198,6 +225,7 @@ namespace RsDocGenerator
                     map,
                     null, topicId);
             }
+
             topic.Save(Path.Combine(path, topicId + ".xml"));
         }
 
@@ -260,7 +288,8 @@ namespace RsDocGenerator
                         });
                 }
 
-                WriteScalarEntry(propertyInfo, entry, chapter, preparator, solution, documentBefore, lifetime, settingsStore,
+                WriteScalarEntry(propertyInfo, entry, chapter, preparator, solution, documentBefore, lifetime,
+                    settingsStore,
                     contextBoundSettingsStoreLive, documentAfter, settingsEntry, ecService, language);
             }
 
@@ -313,6 +342,7 @@ namespace RsDocGenerator
                     afterUnderscore = true;
                 }
             }
+
             return sb.ToString();
         }
 
@@ -346,7 +376,7 @@ namespace RsDocGenerator
             if (possibleValues != null && (previewType == PreviewType.Diff || previewType == PreviewType.Code))
             {
                 var chapterExamples = XmlHelpers.CreateChapterWithoutId("Examples:");
-                
+
                 Lifetimes.Using(lifetime, lf =>
                 {
                     var previewSettings = settingsStore
@@ -369,9 +399,9 @@ namespace RsDocGenerator
 
                         codeBefore = documentBefore.GetText();
                     }
-                    
+
                     var oldValue = previewSettings.GetValue(settingsEntry, null);
-                    
+
                     try
                     {
                         foreach (var pair in possibleValues)
@@ -389,15 +419,15 @@ namespace RsDocGenerator
                             else
                                 table = XmlHelpers.CreateTable(new[] {pair.Item1}, null);
 
-                            previewSettings.SetValue(settingsEntry, pair.Item3, null); 
+                            previewSettings.SetValue(settingsEntry, pair.Item3, null);
                             preparator.PrepareText(
                                 solution,
                                 documentAfter,
                                 previewData.Text,
                                 previewData.Parse,
                                 previewSettings);
-                            
-                            tr.Add(new XElement("td", 
+
+                            tr.Add(new XElement("td",
                                 XmlHelpers.CreateCodeBlock(documentAfter.GetText(), language.PresentableName, true)));
                             table.Add(tr);
                             chapterExamples.Add(table);
@@ -407,6 +437,7 @@ namespace RsDocGenerator
                     {
                         previewSettings.SetValue(settingsEntry, oldValue, null);
                     }
+
                     container.Add(chapterExamples);
                 });
             }
@@ -440,7 +471,7 @@ namespace RsDocGenerator
                 addComma = true;
                 paragraph.Add(new XElement("code", alias));
             }
-            
+
             chapter.Add(paragraph);
             container.Add(chapter);
         }
@@ -492,10 +523,13 @@ namespace RsDocGenerator
                         list.Add(new XElement("li",
                             new XElement("code", value.Item1), value.Item2 == null ? null : ": " + value.Item2));
                     }
+
                     chapterPossibleValues.Add(list);
                 }
+
                 container.Add(chapterPossibleValues);
             }
+
             return possibleValues;
         }
     }

@@ -33,7 +33,7 @@ namespace RsDocGenerator
                 var fileName = Path.Combine(outputFolder + "\\CodeInspectionIndex", topicId + ".xml");
                 var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
                 var topicRoot = topic.Root;
-                var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro", false);
+                var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
                 var errorCount = staticInspetions.GetLangImplementations(language).Count;
                 if (staticInspetions.GetLangImplementations(language).Count < 2)
                     intro.Add(new XAttribute("filter", "empty"));
@@ -51,7 +51,7 @@ namespace RsDocGenerator
                 topicRoot.Add(intro);
 
                 if (langPresentable.Equals("C++"))
-                    topicRoot.Add(XmlHelpers.CreateInclude("Code_Analysis_in_CPP", "cpp_support_note", false));
+                    topicRoot.Add(XmlHelpers.CreateInclude("Code_Analysis_in_CPP", "cpp_support_note"));
 
                 foreach (var category in configCategories)
                 {
@@ -61,9 +61,9 @@ namespace RsDocGenerator
                             string.Format("{0} ({1} {2})", FeatureCatalog.GetGroupTitle(category.Key), count,
                                 NounUtil.ToPluralOrSingular("inspection", count)),
                             category.Key);
-                    chapter.Add(XmlHelpers.CreateInclude("Code_Analysis__Code_Inspections", category.Key, false));
-                    var summaryTable = XmlHelpers.CreateTable(new[] {"Inspection", "Default Severity"},
-                        new[] {"80%", "20%"});
+                    chapter.Add(XmlHelpers.CreateInclude("Code_Analysis__Code_Inspections", category.Key));
+                    var summaryTable = new XElement("table");
+                    summaryTable.Add(XmlHelpers.CreateInclude("CA", "tr_code_inspection_index_header"));
                     foreach (var inspection in category.Value)
                     {
                         var compoundName = inspection.CompoundName ?? "not compound";
@@ -73,6 +73,8 @@ namespace RsDocGenerator
                                     XmlHelpers.CreateHyperlink(inspection.Text,
                                         CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null, true),
                                     new XComment(compoundName)),
+                                new XElement("td", new XElement("code", inspection.Id)),
+                                new XElement("td", new XElement("code", inspection.EditorConfigId)),
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
                     }
                     chapter.Add(summaryTable);
