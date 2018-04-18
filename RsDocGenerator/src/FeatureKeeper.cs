@@ -14,17 +14,20 @@ namespace RsDocGenerator
         private readonly string _catalogFile;
         private readonly XDocument _catalogDocument;
         private const string FileName = "RsFeatureCatalog.xml";
-        private const string RootNodeName = "RsFeatureCatalog";
+        private const string FileNameVs = "VsFeatureCatalog.xml";
+        private const string RootNodeName = "FeatureCatalog";
         private const string VersionElementName = "version";
         private const string Externalwikilinks = "ExternalWikiLinks";
         private readonly XElement _currentVersionElement;
 
-        public FeatureKeeper(IDataContext context)
+        public FeatureKeeper(IDataContext context, bool isVs = false)
         {
             var rootFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
+            var currentFileName = isVs ? FileNameVs : FileName;
+            
             if (rootFolder.IsNullOrEmpty()) return;
 
-            _catalogFile = Path.Combine(rootFolder + "\\nonProject", FileName);
+            _catalogFile = Path.Combine(rootFolder + "\\nonProject", currentFileName);
             if (File.Exists(_catalogFile))
             {
                 try
