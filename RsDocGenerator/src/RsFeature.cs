@@ -24,6 +24,7 @@ namespace RsDocGenerator
             GroupId = groupId;
             EditorConfigId = editorConfigId;
             RelatedInspectionIds = relatedInspectionIds;
+            Tags = new List<string>();
         }
 
         public string EditorConfigId { get; set; }
@@ -36,5 +37,6 @@ namespace RsDocGenerator
         public RsFeatureKind Kind { get; set; }
         public Severity Severity { get; set; }
         public string CompoundName { get; set; }
+        public List<string> Tags { get; set; }
     }
 }

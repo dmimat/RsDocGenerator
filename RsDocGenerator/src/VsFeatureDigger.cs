@@ -1,30 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using JetBrains.Application.DataContext;
-using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Feature.Services.Intentions.Scoped;
-using JetBrains.ReSharper.Feature.Services.QuickFixes;
 using JetBrains.Util;
 using JetBrains.VsIntegration.Shell;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CodeRefactorings;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono.Cecil.Rocks;
 
 namespace RsDocGenerator
 {
     public class VsFeatureDigger
     {
-        private readonly IDataContext _myContext;
-        private readonly HighlightingSettingsManager _highlightingSettingsManager;
         private readonly FeatureCatalog _quickFixCatalog;
         private readonly FeatureCatalog _fixInScopeCatalog;
         private readonly FeatureCatalog _contexActionsCatalog;
@@ -36,28 +25,26 @@ namespace RsDocGenerator
 
         public VsFeatureDigger(IDataContext context)
         {
-            _myContext = context;
             _quickFixCatalog = DigQuickFixes(context);
-            _configurableInspectionCatalog = DigConfigurableInspections();
+            _configurableInspectionCatalog = new FeatureCatalog(RsFeatureKind.ConfigInspection);
             _contexActionsCatalog = null;
             _fixInScopeCatalog = new FeatureCatalog(RsFeatureKind.FixInScope);
             _staticInspectionCatalog = new FeatureCatalog(RsFeatureKind.StaticInspection);
-            
             _contexActionInScopeCatalog = new FeatureCatalog(RsFeatureKind.ContextActionInScope);
             _inspectionWithQuickFixCatalog = new FeatureCatalog(RsFeatureKind.InspectionWithQuickFix);
-            //DigFeaturesByTypes();
+            DigInspections();
         }
 
         public FeatureCatalog GetQuickFixes() => _quickFixCatalog;
         public FeatureCatalog GetConfigurableInspections() => _configurableInspectionCatalog;
-        public FeatureCatalog GetContextActions() => _contexActionsCatalog;
         public FeatureCatalog GetStaticInspections() => _staticInspectionCatalog;
         
+        public FeatureCatalog GetContextActions() => _contexActionsCatalog;
         public FeatureCatalog GetFixesInScope() => _fixInScopeCatalog;
         public FeatureCatalog GetContextActionsInScope() => _contexActionInScopeCatalog;
         public FeatureCatalog GetInspectionsWithFixes() => _inspectionWithQuickFixCatalog;
 
-        private FeatureCatalog DigQuickFixes(IDataContext context)
+        FeatureCatalog DigQuickFixes(IDataContext context)
         {
             var quickFixCatalog = new FeatureCatalog(RsFeatureKind.QuickFix);
             try
@@ -122,9 +109,8 @@ namespace RsDocGenerator
             return quickFixCatalog;
         }
 
-        private FeatureCatalog DigConfigurableInspections()
+        void DigInspections()
         {
-            var configInspectionsCatalog = new FeatureCatalog(RsFeatureKind.ConfigInspection);
 
             var path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\";
             var files = Directory.GetFiles(path, "*CodeAnalysis*.dll", SearchOption.AllDirectories);
@@ -153,13 +139,13 @@ namespace RsDocGenerator
                                         {
                                             language = fix.Lang;
                                             AddInspection(isnpectionId, inspectionText, language,
-                                                configInspectionsCatalog);
+                                                _configurableInspectionCatalog);
                                             added = true;
                                         }
                                     }
                                 }
                                 if(!added)
-                                    AddInspection(isnpectionId, inspectionText, language, configInspectionsCatalog);
+                                    AddInspection(isnpectionId, inspectionText, language, _configurableInspectionCatalog);
                             }
                         }
                         
@@ -167,23 +153,32 @@ namespace RsDocGenerator
                             foreach (var field in type.Fields)
                                 AddInspection(field.Constant.ToString(),
                                     GetTextFromTypeName(field.Name, "Id"), "XAML",
-                                    configInspectionsCatalog);
+                                    _configurableInspectionCatalog);
 
                         if (type.IsEnum && type.Name == "ErrorCode")
                             foreach (var field in type.Fields)
+                            {
                                 if (field.Name.Contains("WRN"))
-                                    AddInspection(
-                                        "CS" + ((int) field.Constant).ToString("D4", CultureInfo.InvariantCulture),
+                                    AddInspection(GetIdFromConstant(field), 
                                         GetTextFromTypeName(field.Name, null, "WRN_"),
-                                        "C#", configInspectionsCatalog);
+                                        "C#", _configurableInspectionCatalog);
+                                if (field.Name.Contains("ERR"))
+                                    AddInspection(GetIdFromConstant(field), 
+                                        GetTextFromTypeName(field.Name, null, "ERR_"),
+                                        "C#", _staticInspectionCatalog);
+                            }
 
                         if (type.IsEnum && type.Name == "ERRID")
                             foreach (var field in type.Fields)
+                            {
+                                var id = "BC" + field.Constant;
                                 if (field.Name.Contains("WRN"))
-                                    AddInspection(
-                                        "BC" + field.Constant,
-                                        GetTextFromTypeName(field.Name, null, "WRN_"),
-                                        "VB.NET", configInspectionsCatalog);
+                                    AddInspection(id, GetTextFromTypeName(field.Name, null, "WRN_"),
+                                        "VB.NET", _configurableInspectionCatalog);
+                                if (field.Name.Contains("ERR"))
+                                    AddInspection(id, GetTextFromTypeName(field.Name, null, "ERR_"),
+                                        "VB.NET", _staticInspectionCatalog);
+                            }
 
                     }
                 }
@@ -192,23 +187,22 @@ namespace RsDocGenerator
                     Console.WriteLine("EXCEPTION:" + e);
                 }
             }
-
-            return configInspectionsCatalog;
         }
+        
+        string GetIdFromConstant(FieldDefinition field) => "CS" + ((int) field.Constant).ToString("D4", CultureInfo.InvariantCulture);
 
-
-        private void AddInspection(string id, string text, string language, FeatureCatalog configInspectionsCatalog)
+        void AddInspection(string id, string text, string language, FeatureCatalog catalog)
         {
             var feature = new RsFeature(id, text, language, null,
-                RsFeatureKind.ConfigInspection, Severity.DO_NOT_SHOW);
+                catalog.FeatureKind, Severity.DO_NOT_SHOW);
 
-            if (configInspectionsCatalog.Features.FirstOrDefault(f =>
+            if (catalog.Features.FirstOrDefault(f =>
                     f.Id == id && f.Lang == language) != null)
                 return;
-            configInspectionsCatalog.AddFeature(feature, language);
+            catalog.AddFeature(feature, language);
         }
 
-        private string GetTextFromTypeName(string typeName, string trimEnd = null, string trimStart = null)
+        string GetTextFromTypeName(string typeName, string trimEnd = null, string trimStart = null)
         {
             if (trimEnd != null)
                 typeName = typeName.TrimFromEnd(trimEnd);
@@ -217,50 +211,5 @@ namespace RsDocGenerator
             return string.Join(" ", Regex.Split(typeName, @"(?<!^)(?=[A-Z])")).ToLower();
         }
 
-
-
-
-        private void AddQuickFixImplementations(Type type)
-        {
-            string text;
-            try
-            {
-                text =
-                    type.GetProperty("Text")
-                        .GetValue(FormatterServices.GetUninitializedObject(type), null)
-                        .ToString();
-            }
-            catch (Exception)
-            {
-                text = type.Name.TextFromTypeName();
-            }
-
-            var inspectionTypes = _myContext.GetComponent<QuickFixTable>().GetHighlightingTypesForQuickFix(type);
-            var allLanguages = new List<string>();
-          
-
-            if (allLanguages.IsEmpty())
-            {
-                allLanguages.Add(GeneralHelpers.TryGetPsiLangFromTypeName(type.FullName));
-            }
-
-            foreach (var lang in allLanguages.Distinct().ToList())
-            {
-                var feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.QuickFix);
-                //_quickFixCatalog.AddFeature(feature, lang);
-                if (!typeof(IScopedAction).IsAssignableFrom(type)) continue;
-                feature = new RsFeature(type.FullName, text, lang, allLanguages, RsFeatureKind.FixInScope);
-                _fixInScopeCatalog.AddFeature(feature, lang);
-            }
-        }
-
-        private static List<string> GetLangsFromHighlightingAttribute(string langString, string groupId)
-        {
-            if (groupId != null && langString == null &&
-                CodeInspectionHelpers.PsiLanguagesByCategoryNames.ContainsKey(groupId))
-                langString = CodeInspectionHelpers.PsiLanguagesByCategoryNames[groupId];
-            if (langString == null) return new List<string>();
-            return langString.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).ToList();
-        }
     }
 }

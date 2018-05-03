@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -105,11 +106,24 @@ namespace RsDocGenerator
                 var featureRootNodeName = featureCatalog.FeatureKind + "Node";
                 var totalLangFeaturesInVersion = 0;
 
-                var existingLangFeatures = (from el in _catalogDocument.Root.Descendants("lang")
-                        where (string) el.Attribute("name") == langPresentation
-                        select el).Descendants(featureCatalog.FeatureKind.ToString())
-                    .Select(e => e.Attribute("id").Value)
-                    .ToList();
+                var allLangFeatures = (from el in _catalogDocument.Root.Descendants("lang")
+                    where (string) el.Attribute("name") == langPresentation
+                    select el).Descendants(featureCatalog.FeatureKind.ToString());
+
+                var existingLangFeatures = allLangFeatures.Select(e => e.Attribute("id").Value).ToList();
+                
+                var elementsWithTags = allLangFeatures.Where(e => e.Elements("tag").Any()).ToList();
+
+                if (elementsWithTags.Any())
+                {
+                    foreach (var element in elementsWithTags)
+                    {
+                        var feature = 
+                            langImplementations.FirstOrDefault(f => f.Id.Equals(element.Attribute("id").Value));
+                        if (feature != null) 
+                            feature.Tags = element.Elements("tag").Select(el => el.Value).ToList();
+                    }
+                }
 
                 var langElement = (from el in _currentVersionElement.Elements("lang")
                                       where (string) el.Attribute("name") == langPresentation

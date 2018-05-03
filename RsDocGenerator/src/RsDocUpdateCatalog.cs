@@ -26,16 +26,18 @@ namespace RsDocGenerator
             var vsFeatureKeeper = new FeatureKeeper(context, true);
             var featureDigger = new FeatureDigger(context);
             var vsFeatureDigger = new VsFeatureDigger(context);
-            var configurableInspetions = featureDigger.GetConfigurableInspections();
-            var vsConfigurableInspetions = vsFeatureDigger.GetConfigurableInspections();
             
+            var configurableInspetions = featureDigger.GetConfigurableInspections();
             var staticInspetions = featureDigger.GetStaticInspections();
             var contextActions = featureDigger.GetContextActions();
             var quickFixes = featureDigger.GetQuickFixes();
-            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
             var fixesInScope = featureDigger.GetFixesInScope();
             var actionsInScope = featureDigger.GetContextActionsInScope();
             var inspectionsWithQuickFixes = featureDigger.GetInspectionsWithFixes();
+            
+            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
+            var vsConfigurableInspetions = vsFeatureDigger.GetConfigurableInspections();
+            var vsStaticInspetions = vsFeatureDigger.GetStaticInspections();
 
             featureKeeper.AddFeatures(configurableInspetions);
             featureKeeper.AddFeatures(staticInspetions);
@@ -47,9 +49,16 @@ namespace RsDocGenerator
             
             vsFeatureKeeper.AddFeatures(vsConfigurableInspetions);
             vsFeatureKeeper.AddFeatures(vsQuickFixes);
+            vsFeatureKeeper.AddFeatures(vsStaticInspetions);
 
             featureKeeper.CloseSession();
             vsFeatureKeeper.CloseSession();
+            
+            var featuresByTag = new TagKeeper(context);
+            featuresByTag.AddFeatures(configurableInspetions, "ReSharper");
+            featuresByTag.AddFeatures(vsConfigurableInspetions, "Visual Studio");
+            
+            featuresByTag.CloseSession();
             
             //RsDocUpdateVsFeaturesCatalog.Execute(context, null);
 
