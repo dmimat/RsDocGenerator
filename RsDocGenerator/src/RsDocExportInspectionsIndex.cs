@@ -23,13 +23,18 @@ namespace RsDocGenerator
             var configurableInspetions = featureDigger.GetConfigurableInspections();
             var staticInspetions = featureDigger.GetStaticInspections();
 
+            const string sweaTopicId = "Solution_Wide_Inspections_Generated";
+            var sweaFileName = Path.Combine(outputFolder, sweaTopicId + ".xml");
+            var sweaTopic = XmlHelpers.CreateHmTopic(sweaTopicId, "Solution-Wide Inspections");
+            var sweaTable = XmlHelpers.CreateTable(new[] {"Inspection", "Language", "Default Severity"});
+
             foreach (var language in configurableInspetions.Languages)
             {
                 var configCategories = configurableInspetions.GetFeaturesByCategories(language);
                 if (configCategories.IsEmpty())
                     continue;
                 var langPresentable = GeneralHelpers.GetPsiLanguagePresentation(language);
-                var topicId = string.Format("Reference__Code_Inspections_{0}", language);
+                var topicId = $"Reference__Code_Inspections_{language}";
                 var fileName = Path.Combine(outputFolder + "\\CodeInspectionIndex", topicId + ".xml");
                 var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
                 var topicRoot = topic.Root;
@@ -76,12 +81,23 @@ namespace RsDocGenerator
                                 new XElement("td", new XElement("code", inspection.Id)),
                                 new XElement("td", new XElement("code", inspection.EditorConfigId)),
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
+                        if (inspection.SweaRequired)
+                            sweaTable.Add(
+                            new XElement("tr",
+                                new XElement("td", 
+                                    XmlHelpers.CreateHyperlink(inspection.Text, inspection.Id, null, true)),
+                                new XElement("td", langPresentable),
+                                new XElement("td", GetSeverityLink(inspection.Severity))));
                     }
                     chapter.Add(summaryTable);
                     topicRoot.Add(chapter);
                 }
                 topic.Save(fileName);
             }
+            
+            sweaTable.Add(new XAttribute("include-id", "swea_table"));
+            sweaTopic.Root.Add(sweaTable);
+            sweaTopic.Save(sweaFileName);
 
             return "Code inspections index";
         }

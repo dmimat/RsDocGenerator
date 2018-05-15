@@ -56,6 +56,7 @@ namespace RsDocGenerator
 
             foreach (var inspection in _highlightingSettingsManager.SeverityConfigurations)
             {
+                var swea = inspection.Id.Contains(".Global");
                 if (inspection.Internal && !Shell.Instance.IsInInternalMode) continue;
 
                 List<string> langs = _highlightingSettingsManager.GetInspectionImplementations(inspection.Id)
@@ -65,7 +66,8 @@ namespace RsDocGenerator
                 {
                     var feature = new RsFeature(inspection.Id, inspection.FullTitle, language, langs,
                         RsFeatureKind.ConfigInspection, inspection.DefaultSeverity, inspection.CompoundItemName,
-                        inspection.GroupId, _editorConfigSchema.GetPropertyNameForHighlightingId(inspection.Id));
+                        inspection.GroupId, _editorConfigSchema.GetPropertyNameForHighlightingId(inspection.Id), null, 
+                        swea);
                     if (configInspectionsCatalog.Features.FirstOrDefault(f => f.Id == inspection.Id && f.Lang == language) != null)
                         continue;
 
