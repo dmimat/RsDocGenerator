@@ -4,6 +4,10 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.Settings;
+using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.DataContext;
+using JetBrains.ReSharper.Daemon.CSharp.EditorConfig;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Intentions.Scoped;
@@ -53,9 +57,23 @@ namespace RsDocGenerator
         private FeatureCatalog DigConfigurableInspections()
         {
             var configInspectionsCatalog = new FeatureCatalog(RsFeatureKind.ConfigInspection);
-
+            var solution = _myContext.GetData(ProjectModelDataConstants.SOLUTION);
+            var styleCopRules = solution.GetComponent<StyleCopSettingsService>().GetSettingsWithAffectingRules();
+            
             foreach (var inspection in _highlightingSettingsManager.SeverityConfigurations)
-            {
+            {                
+/*                foreach (var copRule in styleCopRules)
+                {
+                    if (copRule.Key.First is SettingsIndexedEntry)
+                    {
+                        
+                        if (copRule.Key.Second == inspection.Id)
+                        {
+                            Console.WriteLine(inspection.Id);                            
+                        }                        
+                    }
+                }*/
+                
                 var swea = inspection.Id.Contains(".Global");
                 if (inspection.Internal && !Shell.Instance.IsInInternalMode) continue;
 
