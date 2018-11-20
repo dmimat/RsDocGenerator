@@ -116,7 +116,7 @@ namespace RsDocGenerator
           accessIntroWrapper.Add(new XElement("shortcut", new XAttribute("key", actionId)));
           accessIntroWrapper.Add(new XElement("br"));
         }
-        accessIntroWrapper.Add(new XElement("code", String.Format("ReSharper_{0}", actionId),
+        accessIntroWrapper.Add(new XElement("code", $"ReSharper_{actionId}",
           new XAttribute("product", "rs,dcv")));
         accessIntroChunk.Add(accessIntroWrapper);
         accessIntroLibrary.Root.Add(accessIntroChunk);
