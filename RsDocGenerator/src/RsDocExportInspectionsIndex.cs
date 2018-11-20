@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace RsDocGenerator
 {
-    [Action("RsDocExportInspectionsIndex", "Export Code Inpsection Index", Id = 643759)]
+    [Action("RsDocExportInspectionsIndex", "Export Code Inspection Index", Id = 643759)]
     internal class RsDocExportInspectionsIndex : RsDocExportBase, IAction
     {
         protected override string GenerateContent(IDataContext context, string outputFolder)
@@ -20,17 +20,17 @@ namespace RsDocGenerator
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
             var featureDigger = new FeatureDigger(context);
-            var configurableInspetions = featureDigger.GetConfigurableInspections();
-            var staticInspetions = featureDigger.GetStaticInspections();
+            var configurableInspections = featureDigger.GetConfigurableInspections();
+            var staticInspections = featureDigger.GetStaticInspections();
 
             const string sweaTopicId = "Solution_Wide_Inspections_Generated";
             var sweaFileName = Path.Combine(outputFolder, sweaTopicId + ".xml");
             var sweaTopic = XmlHelpers.CreateHmTopic(sweaTopicId, "Solution-Wide Inspections");
             var sweaTable = XmlHelpers.CreateTable(new[] {"Inspection", "Language", "Default Severity"});
 
-            foreach (var language in configurableInspetions.Languages)
+            foreach (var language in configurableInspections.Languages)
             {
-                var configCategories = configurableInspetions.GetFeaturesByCategories(language);
+                var configCategories = configurableInspections.GetFeaturesByCategories(language);
                 if (configCategories.IsEmpty())
                     continue;
                 var langPresentable = GeneralHelpers.GetPsiLanguagePresentation(language);
@@ -39,8 +39,8 @@ namespace RsDocGenerator
                 var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
                 var topicRoot = topic.Root;
                 var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
-                var errorCount = staticInspetions.GetLangImplementations(language).Count;
-                if (staticInspetions.GetLangImplementations(language).Count < 2)
+                var errorCount = staticInspections.GetLangImplementations(language).Count;
+                if (staticInspections.GetLangImplementations(language).Count < 2)
                     intro.Add(new XAttribute("filter", "empty"));
                 intro.Add(
                     new XElement("var",
@@ -48,7 +48,7 @@ namespace RsDocGenerator
                         new XAttribute("value", langPresentable)),
                     new XElement("var",
                             new XAttribute("name", "count"),
-                            new XAttribute("value", configurableInspetions.GetLangImplementations(language).Count)),
+                            new XAttribute("value", configurableInspections.GetLangImplementations(language).Count)),
                         new XElement("var",
                             new XAttribute("name", "errCount"),
                             new XAttribute("value", errorCount)));

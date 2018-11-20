@@ -23,40 +23,40 @@ namespace RsDocGenerator
         public static void UpdateCatalog(IDataContext context)
         {
             var featureKeeper = new FeatureKeeper(context);
-            var vsFeatureKeeper = new FeatureKeeper(context, true);
             var featureDigger = new FeatureDigger(context);
-            var vsFeatureDigger = new VsFeatureDigger(context);
+//            var vsFeatureKeeper = new FeatureKeeper(context, true);
+//            var vsFeatureDigger = new VsFeatureDigger(context);
             
-            var configurableInspetions = featureDigger.GetConfigurableInspections();
-            var staticInspetions = featureDigger.GetStaticInspections();
+            var configurableInspections = featureDigger.GetConfigurableInspections();
+            var staticInspections = featureDigger.GetStaticInspections();
             var contextActions = featureDigger.GetContextActions();
             var quickFixes = featureDigger.GetQuickFixes();
             var fixesInScope = featureDigger.GetFixesInScope();
             var actionsInScope = featureDigger.GetContextActionsInScope();
             var inspectionsWithQuickFixes = featureDigger.GetInspectionsWithFixes();
             
-            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
-            var vsConfigurableInspetions = vsFeatureDigger.GetConfigurableInspections();
-            var vsStaticInspetions = vsFeatureDigger.GetStaticInspections();
+//            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
+//            var vsConfigurableInspections = vsFeatureDigger.GetConfigurableInspections();
+//            var vsStaticInspections = vsFeatureDigger.GetStaticInspections();
 
-            featureKeeper.AddFeatures(configurableInspetions);
-            featureKeeper.AddFeatures(staticInspetions);
+            featureKeeper.AddFeatures(configurableInspections);
+            featureKeeper.AddFeatures(staticInspections);
             featureKeeper.AddFeatures(contextActions);
             featureKeeper.AddFeatures(quickFixes);
             featureKeeper.AddFeatures(fixesInScope);
             featureKeeper.AddFeatures(actionsInScope);
             featureKeeper.AddFeatures(inspectionsWithQuickFixes);
             
-            vsFeatureKeeper.AddFeatures(vsConfigurableInspetions);
-            vsFeatureKeeper.AddFeatures(vsQuickFixes);
-            vsFeatureKeeper.AddFeatures(vsStaticInspetions);
+//            vsFeatureKeeper.AddFeatures(vsConfigurableInspections);
+//            vsFeatureKeeper.AddFeatures(vsQuickFixes);
+//            vsFeatureKeeper.AddFeatures(vsStaticInspections);
 
             featureKeeper.CloseSession();
-            vsFeatureKeeper.CloseSession();
+//            vsFeatureKeeper.CloseSession();
             
             var featuresByTag = new TagKeeper(context);
-            featuresByTag.AddFeatures(configurableInspetions, "ReSharper");
-            featuresByTag.AddFeatures(vsConfigurableInspetions, "Visual Studio");
+            featuresByTag.AddFeatures(configurableInspections, "ReSharper");
+//            featuresByTag.AddFeatures(vsConfigurableInspections, "Visual Studio");
             
             featuresByTag.CloseSession();
             

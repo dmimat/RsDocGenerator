@@ -33,6 +33,7 @@ namespace RsDocGenerator
         string fileName = Path.Combine(saveDirectoryPath, inspectionsFileName + ".xml");
 
         var allIds = new List<string>();
+        var aaallIds = new List<string>();
         var duplicateIds = new List<Tuple<string, XElement>>();
 
         var inspectionTopic = new XDocument();

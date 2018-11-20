@@ -18,19 +18,21 @@ namespace RsDocGenerator
             var outputFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
             if (outputFolder.IsNullOrEmpty()) return;
 
-            RsDocExportShortcuts.StartContentGeneration(context,outputFolder);
+            RsDocExportShortcuts.StartContentGeneration(context, outputFolder);
+            RsDocExportOptions.StartContentGeneration(context, outputFolder);
             RsDocUpdateCatalog.UpdateCatalog(context);
 
             var generatedFolder = outputFolder + "\\topics\\ReSharper\\Generated";
 
-            RsDocExportTemplates.StartContentGeneration(context,generatedFolder);
-            RsDocExportPostfixTemplates.StartContentGeneration(context,generatedFolder);
-            RsDocExportMacros.StartContentGeneration(context,generatedFolder);
-            RsDocExportInspectionsIndex.StartContentGeneration(context,generatedFolder);
-            RsDocExportContextActions.StartContentGeneration(context,generatedFolder);
-            RsDocExportFixInScope.StartContentGeneration(context,generatedFolder);
-            RsDocExportThirdParty.StartContentGeneration(context,generatedFolder);
-            RsDocExportEditorConfigStyles.StartContentGeneration(context,generatedFolder);
+            RsDocExportTemplates.StartContentGeneration(context, generatedFolder);
+            RsDocExportPostfixTemplates.StartContentGeneration(context, generatedFolder);
+            RsDocExportMacros.StartContentGeneration(context, generatedFolder);
+            RsDocExportInspectionsIndex.StartContentGeneration(context, generatedFolder);
+            RsDocExportContextActions.StartContentGeneration(context, generatedFolder);
+            RsDocExportFixInScope.StartContentGeneration(context, generatedFolder);
+            RsDocExportThirdParty.StartContentGeneration(context, generatedFolder);
+            RsDocExportEditorConfigStyles.StartContentGeneration(context, generatedFolder);
+
 
             GeneralHelpers.ShowSuccessMessage("Everything", outputFolder);
         }
