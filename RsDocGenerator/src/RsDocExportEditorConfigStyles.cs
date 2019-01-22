@@ -63,7 +63,7 @@ namespace RsDocGenerator
                     .Register(contextBoundSettingsStoreLive)
                     .Register<ValueEditorViewModelFactory>()
                     .Register<SettingsToHide>()
-                    .Register<IndentStyleSettingsAvailabilityChecker>()
+                    //.Register<IndentStyleSettingsAvailabilityChecker>()
                     .Compose();
 
                 var schemas = container.GetComponents<ICodeStylePageSchema>()

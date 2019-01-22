@@ -2,14 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Windows.Forms;
 using System.Xml.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
-using JetBrains.Application.Diagnostics;
 using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 using JetBrains.Application.UI.Extensions;
 using JetBrains.Application.UI.Options;
 using JetBrains.Application.UI.Options.OptionPages;
@@ -17,13 +14,12 @@ using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions;
 using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel;
 using JetBrains.DataFlow;
-using JetBrains.IDE.Internal;
 using JetBrains.Util;
 
 namespace RsDocGenerator
 {
     [Action("Dump settings pages content")]
-    public class RsDocExportOptions : IExecutableAction, IInsertLast<InternalDumpMenu>
+    public class RsDocExportOptions : IExecutableAction
     {
         private static string _optionsFile;
         private static XDocument _catalogDocument;
