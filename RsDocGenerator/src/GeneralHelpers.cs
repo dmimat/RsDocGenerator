@@ -62,7 +62,26 @@ namespace RsDocGenerator
       return "Common";
     }
 
-      public static string TryGetPsiLangFromTypeName(string fullName)
+    public static bool IsLangSupportedInRider(this string lang)
+    {
+        switch (lang)
+        {
+            case "C++" :
+            case "CPP" :
+            case "JavaScript":
+            case "TypeScript":
+            case "HTML":
+            case "XML":
+            case "XMLDOC":
+            case "Css":
+            case "CSS":
+            case "Protobuf":
+                return false;
+        }
+        return true;
+    }
+
+    public static string TryGetPsiLangFromTypeName(string fullName)
       {
           if (fullName.Contains("Asp"))
               return "ASPX";
