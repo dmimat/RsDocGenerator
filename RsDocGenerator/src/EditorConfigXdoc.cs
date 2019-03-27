@@ -55,7 +55,7 @@ namespace RsDocGenerator
                     var val = values.First();
                     var lang = val.Language.PresentableName;
 
-                    if (lang == "C++")
+                    if (!lang.IsLangSupportedInRider())
                         propRow.Add(new XAttribute("product", "!rdr"));
 
                     var content = (val.SectionDescription == null
@@ -92,7 +92,7 @@ namespace RsDocGenerator
                         {
                             var currentElement = contentTd;
                             var lang = val1.Language.PresentableName;
-                            if (lang == "C++")
+                            if (!lang.IsLangSupportedInRider())
                             {
                                 currentElement = new XElement("for", new XAttribute("product", "!rdr"));
                                 contentTd.Add(currentElement);
@@ -118,7 +118,7 @@ namespace RsDocGenerator
             {
                 var propName = inspection.EditorConfigId;
                 var propRow = new XElement("tr");
-                if (inspection.Lang == "CPP")
+                if (!inspection.Lang.IsLangSupportedInRider())
                     propRow.Add(new XAttribute("product", "!rdr"));
                 propRow.Add(new XElement("td", new XElement("code", propName)));
                 propRow.Add(new XElement("td",
@@ -176,7 +176,7 @@ namespace RsDocGenerator
                         ? val1.Description
                         : val1.SectionDescription + " - " + val1.Description + " (" + lang + ")";
                     var li = new XElement("li", XmlHelpers.CreateHyperlink(content, val1.FileName, val1.Id, false));
-                    if (lang == "C++")
+                    if (!lang.IsLangSupportedInRider())
                         li.Add(new XAttribute("product", "!rdr"));
                     list.Add(li);
                 }
