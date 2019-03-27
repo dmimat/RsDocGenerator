@@ -7,12 +7,9 @@ namespace RsDocGenerator
 {
     public static class CodeInspectionHelpers
     {
-        public static  Dictionary<string, string> ExternalInspectionLinks { get; set; }
-        public static  Dictionary<string, string> PsiLanguagesByCategoryNames { get; set; }
-
         static CodeInspectionHelpers()
         {
-            ExternalInspectionLinks = new Dictionary<string, string>()
+            ExternalInspectionLinks = new Dictionary<string, string>
             {
                 {"CSharpWarnings::CS0108", "https://msdn.microsoft.com/en-us/library/3s8070fc.aspx"},
                 {"CSharpWarnings::CS0109", "https://msdn.microsoft.com/en-us/library/css4y2c4.aspx"},
@@ -57,7 +54,10 @@ namespace RsDocGenerator
                 {"CSharpWarnings::CS1957", "https://msdn.microsoft.com/en-us/library/bb882562.aspx"},
                 {"CSharpWarnings::CS4014", "https://msdn.microsoft.com/en-us/library/hh873131.aspx"},
                 {"CSharpWarnings::CS0078", "https://msdn.microsoft.com/en-us/library/s74dtt7k.aspx"},
-                {"CSharpWarnings::CS1584,CS1711,CS1572,CS1581,CS1580", "CSharpWarnings_CS1584_CS1711_CS1572_CS1581_CS1580"},
+                {
+                    "CSharpWarnings::CS1584,CS1711,CS1572,CS1581,CS1580",
+                    "CSharpWarnings_CS1584_CS1711_CS1572_CS1581_CS1580"
+                },
                 {"CSharpWarnings::CS0108,CS0114", "CSharpWarnings_CS0108_CS0114"},
                 {"CSharpWarnings::CS0660,CS0661", "CSharpWarnings_CS0660_CS0661"},
                 {"CSharpWarnings::CS0252,CS0253", "CSharpWarnings_CS0252_CS0253"},
@@ -70,7 +70,7 @@ namespace RsDocGenerator
                 {"VBWarnings::BC42104", "https://msdn.microsoft.com/en-us/library/3fdk625a.aspx"}
             };
 
-            PsiLanguagesByCategoryNames = new Dictionary<string, string>()
+            PsiLanguagesByCategoryNames = new Dictionary<string, string>
             {
                 {"CSharpErrors", "CSHARP"},
                 {WebConfigStaticHighlightingsGroups.WEB_CONFIG_ERRORS_GROUP, "Web.Config"},
@@ -86,10 +86,14 @@ namespace RsDocGenerator
             };
         }
 
+        public static Dictionary<string, string> ExternalInspectionLinks { get; set; }
+        public static Dictionary<string, string> PsiLanguagesByCategoryNames { get; set; }
+
         public static string TryGetStaticHref(string inspectionId)
         {
-            return ExternalInspectionLinks.ContainsKey(inspectionId) ?
-                ExternalInspectionLinks[inspectionId] : inspectionId;
+            return ExternalInspectionLinks.ContainsKey(inspectionId)
+                ? ExternalInspectionLinks[inspectionId]
+                : inspectionId;
         }
     }
 }

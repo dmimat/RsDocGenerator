@@ -1,21 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.Util;
-using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace RsDocGenerator
 {
     public sealed class TagKeeper
     {
-        private readonly string _catalogFile;
-        private readonly XDocument _catalogDocument;
-        private readonly XElement _catalogRoot = new XElement("Tags");
         private const string FileName = "FeaturesByTags.xml";
+        private readonly XDocument _catalogDocument;
+        private readonly string _catalogFile;
+        private readonly XElement _catalogRoot = new XElement("Tags");
 
         public TagKeeper(IDataContext context)
         {
@@ -28,7 +24,7 @@ namespace RsDocGenerator
             _catalogDocument.Add(new XComment("C++ features are not included"));
 
             var currentVersionString = GeneralHelpers.GetCurrentVersion();
-            
+
             _catalogRoot.Add(new XElement("Other"));
         }
 
@@ -53,7 +49,8 @@ namespace RsDocGenerator
                 featureTypeElement = new XElement(feature.Kind + "Node");
                 tagElement.Add(featureTypeElement);
             }
-            featureTypeElement.Add(new XElement(feature.Kind.ToString(), 
+
+            featureTypeElement.Add(new XElement(feature.Kind.ToString(),
                 new XAttribute("lang", GeneralHelpers.GetPsiLanguagePresentation(feature.Lang)),
                 new XAttribute("product", product),
                 new XAttribute("id", feature.Id),

@@ -14,6 +14,7 @@ using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions;
 using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel;
 using JetBrains.DataFlow;
+using JetBrains.Lifetimes;
 using JetBrains.Util;
 
 namespace RsDocGenerator
@@ -43,7 +44,7 @@ namespace RsDocGenerator
             _catalogDocument.Add(new XElement("Options"));
             _currentParent = _catalogDocument.Root;
 
-            Lifetimes.Using(
+            Lifetime.Using(
                 lt =>
                 {
                     var optionsDialogOwner = context.GetComponent<OptionsDialogOwner>();
@@ -59,7 +60,6 @@ namespace RsDocGenerator
                         dialog.Model.Options.OptionPagesTree.RootElement,
                         state,
                         descriptor => { dialog.OptionsAutomation.SelectPage(descriptor.Id); });
-
                 });
             _catalogDocument.Save(_optionsFile);
         }
@@ -89,14 +89,15 @@ namespace RsDocGenerator
             var compositeOptionPage = page as CompositeOptionPage;
             if (compositeOptionPage != null)
             {
-                
                 state.Indent++;
                 foreach (var child in compositeOptionPage.Pages)
                     TryDumpPage(child, state, parent, optionsPageAttribute);
                 state.Indent--;
             }
             else
+            {
                 TryDumpSimplePage(page, state, parent, optionsPageAttribute);
+            }
         }
 
         private static void TryDumpSimplePage(IOptionsPage page, OptionsPagesTraverseState state, XElement parent,
@@ -170,7 +171,7 @@ namespace RsDocGenerator
                         [typeof(ComboEnumWithCaptionViewModelBase)] = o => Dump((ComboEnumWithCaptionViewModelBase) o),
                         [typeof(IntOptionViewModel)] = o => Dump((IntOptionViewModel) o),
                         [typeof(FolderChooserViewModel)] = o => Dump((FolderChooserViewModel) o),
-                        [typeof(FileChooserViewModel)] = o => Dump((FileChooserViewModel) o),
+                        [typeof(FileChooserViewModel)] = o => Dump((FileChooserViewModel) o)
                     };
             }
 
@@ -233,10 +234,7 @@ namespace RsDocGenerator
             {
                 var sb = new StringBuilder();
                 sb.AppendLine($"{vm.Prefix} + {vm.Suffix}");
-                foreach (var point in vm.Points)
-                {
-                    sb.AppendLine($"-{point.Text}");
-                }
+                foreach (var point in vm.Points) sb.AppendLine($"-{point.Text}");
 
                 return sb.ToString();
             }

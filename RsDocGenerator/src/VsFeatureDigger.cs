@@ -14,13 +14,13 @@ namespace RsDocGenerator
 {
     public class VsFeatureDigger
     {
-        private readonly FeatureCatalog _quickFixCatalog;
-        private readonly FeatureCatalog _fixInScopeCatalog;
-        private readonly FeatureCatalog _contexActionsCatalog;
-        private readonly FeatureCatalog _contexActionInScopeCatalog;
-        private readonly FeatureCatalog _staticInspectionCatalog;
         private readonly FeatureCatalog _configurableInspectionCatalog;
+        private readonly FeatureCatalog _contexActionInScopeCatalog;
+        private readonly FeatureCatalog _contexActionsCatalog;
+        private readonly FeatureCatalog _fixInScopeCatalog;
         private readonly FeatureCatalog _inspectionWithQuickFixCatalog;
+        private readonly FeatureCatalog _quickFixCatalog;
+        private readonly FeatureCatalog _staticInspectionCatalog;
 
 
         public VsFeatureDigger(IDataContext context)
@@ -35,16 +35,42 @@ namespace RsDocGenerator
             DigInspections();
         }
 
-        public FeatureCatalog GetQuickFixes() => _quickFixCatalog;
-        public FeatureCatalog GetConfigurableInspections() => _configurableInspectionCatalog;
-        public FeatureCatalog GetStaticInspections() => _staticInspectionCatalog;
-        
-        public FeatureCatalog GetContextActions() => _contexActionsCatalog;
-        public FeatureCatalog GetFixesInScope() => _fixInScopeCatalog;
-        public FeatureCatalog GetContextActionsInScope() => _contexActionInScopeCatalog;
-        public FeatureCatalog GetInspectionsWithFixes() => _inspectionWithQuickFixCatalog;
+        public FeatureCatalog GetQuickFixes()
+        {
+            return _quickFixCatalog;
+        }
 
-        FeatureCatalog DigQuickFixes(IDataContext context)
+        public FeatureCatalog GetConfigurableInspections()
+        {
+            return _configurableInspectionCatalog;
+        }
+
+        public FeatureCatalog GetStaticInspections()
+        {
+            return _staticInspectionCatalog;
+        }
+
+        public FeatureCatalog GetContextActions()
+        {
+            return _contexActionsCatalog;
+        }
+
+        public FeatureCatalog GetFixesInScope()
+        {
+            return _fixInScopeCatalog;
+        }
+
+        public FeatureCatalog GetContextActionsInScope()
+        {
+            return _contexActionInScopeCatalog;
+        }
+
+        public FeatureCatalog GetInspectionsWithFixes()
+        {
+            return _inspectionWithQuickFixCatalog;
+        }
+
+        private FeatureCatalog DigQuickFixes(IDataContext context)
         {
             var quickFixCatalog = new FeatureCatalog(RsFeatureKind.QuickFix);
             try
@@ -57,12 +83,12 @@ namespace RsDocGenerator
                 }
 
                 var fixProviders = componentModel.GetExtensions<CodeFixProvider>().ToList();
-                
-                foreach (CodeFixProvider codeFixProvider in fixProviders)
+
+                foreach (var codeFixProvider in fixProviders)
                 {
                     var typeName = codeFixProvider.GetType().Name;
                     var id = codeFixProvider.GetType().FullName;
-                
+
                     var language = "Common";
                     if (id.Contains("CSharp"))
                     {
@@ -74,14 +100,14 @@ namespace RsDocGenerator
                     {
                         language = "VB.NET";
                         typeName = typeName.TrimFromStart("VisualBasic");
-                    }  
-                    
+                    }
+
                     if (id.Contains("Xaml"))
                     {
                         language = "XAML";
                         typeName = typeName.TrimFromStart("Xaml");
-                    }               
-                    
+                    }
+
                     if (id.Contains("FSharp"))
                     {
                         language = "F#";
@@ -89,16 +115,16 @@ namespace RsDocGenerator
                     }
 
                     var qfText = GetTextFromTypeName(typeName, "CodeFixProvider");
-                    
+
                     var feature = new RsFeature(id, qfText, language, null,
-                        RsFeatureKind.QuickFix, Severity.DO_NOT_SHOW,null,null,null, codeFixProvider.FixableDiagnosticIds.ToList());
-                                
+                        RsFeatureKind.QuickFix, Severity.DO_NOT_SHOW, null, null, null,
+                        codeFixProvider.FixableDiagnosticIds.ToList());
+
                     if (quickFixCatalog.Features.FirstOrDefault(f =>
                             f.Id == id && f.Lang == language) != null)
                         continue;
                     quickFixCatalog.AddFeature(feature, language);
                 }
-
             }
             catch (Exception ex)
             {
@@ -109,15 +135,13 @@ namespace RsDocGenerator
             return quickFixCatalog;
         }
 
-        void DigInspections()
+        private void DigInspections()
         {
-
-            var path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\";
+            var path = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview";
             var files = Directory.GetFiles(path, "*CodeAnalysis*.dll", SearchOption.AllDirectories);
             var assemblies = files.Select(file => AssemblyDefinition.ReadAssembly(file)).ToList();
 
             foreach (var assembly in assemblies)
-            {
                 try
                 {
                     foreach (var type in assembly.Modules.SelectMany(md => md.GetTypes()))
@@ -127,28 +151,26 @@ namespace RsDocGenerator
                             var language = "Common";
                             foreach (var field in type.Fields)
                             {
-                                bool added = false;
+                                var added = false;
                                 var isnpectionId = field.Constant.ToString();
                                 var inspectionText = GetTextFromTypeName(field.Name, "DiagnosticId");
 
                                 foreach (var fix in _quickFixCatalog.Features)
-                                {
-                                    foreach (var id in fix.RelatedInspectionIds)
+                                foreach (var id in fix.RelatedInspectionIds)
+                                    if (isnpectionId == id)
                                     {
-                                        if (isnpectionId == id)
-                                        {
-                                            language = fix.Lang;
-                                            AddInspection(isnpectionId, inspectionText, language,
-                                                _configurableInspectionCatalog);
-                                            added = true;
-                                        }
+                                        language = fix.Lang;
+                                        AddInspection(isnpectionId, inspectionText, language,
+                                            _configurableInspectionCatalog);
+                                        added = true;
                                     }
-                                }
-                                if(!added)
-                                    AddInspection(isnpectionId, inspectionText, language, _configurableInspectionCatalog);
+
+                                if (!added)
+                                    AddInspection(isnpectionId, inspectionText, language,
+                                        _configurableInspectionCatalog);
                             }
                         }
-                        
+
                         if (type.Name.Contains("XamlDiagnosticIds"))
                             foreach (var field in type.Fields)
                                 AddInspection(field.Constant.ToString(),
@@ -159,11 +181,11 @@ namespace RsDocGenerator
                             foreach (var field in type.Fields)
                             {
                                 if (field.Name.Contains("WRN"))
-                                    AddInspection(GetIdFromConstant(field), 
+                                    AddInspection(GetIdFromConstant(field),
                                         GetTextFromTypeName(field.Name, null, "WRN_"),
                                         "C#", _configurableInspectionCatalog);
                                 if (field.Name.Contains("ERR"))
-                                    AddInspection(GetIdFromConstant(field), 
+                                    AddInspection(GetIdFromConstant(field),
                                         GetTextFromTypeName(field.Name, null, "ERR_"),
                                         "C#", _staticInspectionCatalog);
                             }
@@ -179,19 +201,20 @@ namespace RsDocGenerator
                                     AddInspection(id, GetTextFromTypeName(field.Name, null, "ERR_"),
                                         "VB.NET", _staticInspectionCatalog);
                             }
-
                     }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("EXCEPTION:" + e);
                 }
-            }
         }
-        
-        string GetIdFromConstant(FieldDefinition field) => "CS" + ((int) field.Constant).ToString("D4", CultureInfo.InvariantCulture);
 
-        void AddInspection(string id, string text, string language, FeatureCatalog catalog)
+        private string GetIdFromConstant(FieldDefinition field)
+        {
+            return "CS" + ((int) field.Constant).ToString("D4", CultureInfo.InvariantCulture);
+        }
+
+        private void AddInspection(string id, string text, string language, FeatureCatalog catalog)
         {
             var feature = new RsFeature(id, text, language, null,
                 catalog.FeatureKind, Severity.DO_NOT_SHOW);
@@ -202,7 +225,7 @@ namespace RsDocGenerator
             catalog.AddFeature(feature, language);
         }
 
-        string GetTextFromTypeName(string typeName, string trimEnd = null, string trimStart = null)
+        private string GetTextFromTypeName(string typeName, string trimEnd = null, string trimStart = null)
         {
             if (trimEnd != null)
                 typeName = typeName.TrimFromEnd(trimEnd);
@@ -210,6 +233,5 @@ namespace RsDocGenerator
                 typeName = typeName.TrimFromStart(trimStart);
             return string.Join(" ", Regex.Split(typeName, @"(?<!^)(?=[A-Z])")).ToLower();
         }
-
     }
 }

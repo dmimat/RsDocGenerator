@@ -4,8 +4,9 @@ namespace RsDocGenerator
 {
     [ZoneMarker]
     public class ZoneMarker
-    //      :
-    //    IRequire<ISolutionBuilderProductZone>,    
-    //    IRequire<IVisualStudioZone>
-    { }
+        //      :
+        //    IRequire<ISolutionBuilderProductZone>,    
+        //    IRequire<IVisualStudioZone>
+    {
+    }
 }

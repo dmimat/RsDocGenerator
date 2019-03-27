@@ -1,10 +1,10 @@
-﻿
-using JetBrains.Application.Settings;
+﻿using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.WellKnownRootKeys;
 using JetBrains.Application.UI.Options;
 using JetBrains.Application.UI.Options.OptionPages;
 using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.DataFlow;
+using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Feature.Services.Resources;
 using JetBrains.Util;
 
@@ -12,7 +12,7 @@ namespace RsDocGenerator
 {
     [OptionsPage(PID, "Documentation Generator", typeof(FeaturesEnvironmentOptionsThemedIcons.GeneratedCode),
         ParentId = ToolsPage.PID)]
-    class RsDocOptionsPage : SimpleOptionsPage
+    internal class RsDocOptionsPage : SimpleOptionsPage
     {
         private const string PID = "RsDocGenerator";
 
@@ -55,7 +55,10 @@ namespace RsDocGenerator
     [SettingsKey(typeof(EnvironmentSettings), "Documentation generator settings")]
     public class RsDocSettingsKey
     {
-        [SettingsEntry("", "Dotnet docs root folder")] public string RsDocDotnetRootFolder;
-        [SettingsEntry("", "Folder with context actions samples")] public string RsDocCaFolder;
+        [SettingsEntry("", "Folder with context actions samples")]
+        public string RsDocCaFolder;
+
+        [SettingsEntry("", "Dotnet docs root folder")]
+        public string RsDocDotnetRootFolder;
     }
 }

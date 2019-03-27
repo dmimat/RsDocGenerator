@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,22 +12,19 @@ using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.QuickFixes;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using MessageBox = JetBrains.Util.MessageBox;
 
 namespace RsDocGenerator
 {
-
-
-  // This is an old implementation, doesn't work now, but may contain some hints as of where to get the data from.
+    // This is an old implementation, doesn't work now, but may contain some hints as of where to get the data from.
 
     [Action("RsDocExportFeatures", Id = 6969)]
     internal class RsDocExportFeatures : IExecutableAction
     {
-        readonly string[] myTestAssemblyNames =
-          {
+        private readonly string[] myTestAssemblyNames =
+        {
             "JetBrains.ReSharper.IntentionsTests",
             "JetBrains.ReSharper.Intentions.Asp.Tests",
             "JetBrains.ReSharper.Intentions.Asp.CSharp.Tests",
@@ -42,10 +38,11 @@ namespace RsDocGenerator
             "JetBrains.ReSharper.CssTests",
             "JetBrains.ReSharper.HtmlTests",
             "JetBrains.ReSharper.JavaScriptTests"
-          };
+        };
+
+        private readonly List<Type> myUnmatchedTests = new List<Type>();
 
         private List<Assembly> myTestAssemblies;
-        private readonly List<Type> myUnmatchedTests = new List<Type>();
         private string version = "undefined";
 
         public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)
@@ -55,7 +52,7 @@ namespace RsDocGenerator
 
         public void Execute(IDataContext context, DelegateExecute nextExecute)
         {
-            this.ExportFeaturesForDocumentation();
+            ExportFeaturesForDocumentation();
 
 //            using (var brwsr = new FolderBrowserDialog() { Description = "Choose where to save XML topics." })
 //            {
@@ -70,33 +67,33 @@ namespace RsDocGenerator
         }
 
         /// <summary>
-        /// Export all features for documentation
+        ///     Export all features for documentation
         /// </summary>
         private void ExportFeaturesForDocumentation()
         {
             MessageBox.ShowInfo("latest");
-            var brwsr = new FolderBrowserDialog() { Description = "Choose where to save the ResharperFeatures.xml file." };
+            var brwsr = new FolderBrowserDialog {Description = "Choose where to save the ResharperFeatures.xml file."};
             if (brwsr.ShowDialog() == DialogResult.Cancel) return;
-            string saveDirectoryPath = brwsr.SelectedPath;
-            string fileName = Path.Combine(saveDirectoryPath, "ResharperFeatures.xml");
+            var saveDirectoryPath = brwsr.SelectedPath;
+            var fileName = Path.Combine(saveDirectoryPath, "ResharperFeatures.xml");
             var xDoc = new XDocument();
             var xDocRoot = new XElement("Features");
 
 //            var productVersion = new ReSharperApplicationDescriptor().ProductVersion;
 //            version = String.Format("{0}.{1}", productVersion.Major, productVersion.Minor);
-            this.version = "9.0";
+            version = "9.0";
 
-            this.myTestAssemblies = new List<Assembly>();
-            foreach (var testAssemblyName in this.myTestAssemblyNames)
+            myTestAssemblies = new List<Assembly>();
+            foreach (var testAssemblyName in myTestAssemblyNames)
             {
                 var testAssembly = Assembly.Load(testAssemblyName);
-                this.myTestAssemblies.Add(testAssembly);
+                myTestAssemblies.Add(testAssembly);
             }
 
-           // var cache = this.GetTestsForFeatures();
+            // var cache = this.GetTestsForFeatures();
 
             // Context actions
-            int cAnumber = 0;
+            var cAnumber = 0;
 //            var contextActionTable = Shell.Instance.GetComponent<ContextActionTable>();
 //            foreach (var ca in contextActionTable.AllActions)
 //            {
@@ -106,8 +103,8 @@ namespace RsDocGenerator
 //            }
 
             // Quick fixes and Inspections
-            int qFnumber = 0;
-            int insTypeNumber = 0;
+            var qFnumber = 0;
+            var insTypeNumber = 0;
             var quickFixTable = Shell.Instance.GetComponent<QuickFixTable>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -119,7 +116,7 @@ namespace RsDocGenerator
                 }
                 catch (Exception e)
                 {
-                    MessageBox.ShowError("Cannot load assembly!!!!" + e.ToString());
+                    MessageBox.ShowError("Cannot load assembly!!!!" + e);
                     continue;
                 }
 
@@ -127,37 +124,24 @@ namespace RsDocGenerator
 
                 foreach (var type in types)
                 {
-                    string name = "Unknown";
-                    string description = "Unknown";
-                    string lang = String.Empty;
+                    var name = "Unknown";
+                    var description = "Unknown";
+                    var lang = string.Empty;
                     var attrs = Attribute.GetCustomAttributes(type);
 
                     // Quick fixes
-                    if (typeof(IQuickFix).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
-                    {
-                        //            foreach (var attr in attrs)
-                        //            {
-                        //              if (attr is FeatureDescAttribute)
-                        //              {
-                        //                var a = (FeatureDescAttribute)attr;
-                        //                name = a.Title;
-                        //                description = a.Description;
-                        //              }
-                        //            }
-                       // this.AddFeature(xDocRoot, type.Name, type, "QuickFix", this.version, name, description, lang, cache, null);
-                        qFnumber++;
-                    }
+                    if (typeof(IQuickFix).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract) qFnumber++;
 
                     // Inspections
                     if (typeof(IHighlighting).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
                     {
-                        string id = string.Empty;
-                        string severity = string.Empty;
-                        string group = string.Empty;
-                        string solutionWide = string.Empty;
-                        string allQuickFixes = string.Empty;
-                        string configurable = string.Empty;
-                        string compoundName = string.Empty;
+                        var id = string.Empty;
+                        var severity = string.Empty;
+                        var group = string.Empty;
+                        var solutionWide = string.Empty;
+                        var allQuickFixes = string.Empty;
+                        var configurable = string.Empty;
+                        var compoundName = string.Empty;
                         /// TODO: Make GetHighlightingQuickFixesInfo public
 //                        var quickFixes = quickFixTable.GetHighlightingQuickFixesInfo(type);
 
@@ -171,10 +155,10 @@ namespace RsDocGenerator
                         {
                             if (attr is ConfigurableSeverityHighlightingAttribute)
                             {
-                                var a = (ConfigurableSeverityHighlightingAttribute)attr;
+                                var a = (ConfigurableSeverityHighlightingAttribute) attr;
                                 id = a.ConfigurableSeverityId;
                                 var inpectionInstance = HighlightingSettingsManager.Instance.GetSeverityItem(id);
-                                lang = this.GetLangsForInspection(id);
+                                lang = GetLangsForInspection(id);
                                 if (inpectionInstance != null)
                                 {
                                     name = inpectionInstance.FullTitle;
@@ -191,7 +175,7 @@ namespace RsDocGenerator
                             if (attr is StaticSeverityHighlightingAttribute)
                             {
                                 id = type.Name;
-                                var a = (StaticSeverityHighlightingAttribute)attr;
+                                var a = (StaticSeverityHighlightingAttribute) attr;
                                 name = a.ToolTipFormatString;
                                 group = a.GroupId;
                                 severity = a.Severity.ToString();
@@ -199,17 +183,19 @@ namespace RsDocGenerator
                                 configurable = "no";
                             }
                         }
+
                         if (name != "Unknown")
                         {
                             var details = new XElement("Details",
-                                                 new XAttribute("DefaultSeverity", severity),
-                                                 new XAttribute("Group", group),
-                                                 new XAttribute("SolutionWide", solutionWide),
-                                                 new XAttribute("Configurable", configurable),
-                                                 new XAttribute("CompoundName", compoundName ?? ""),
-                                                 new XAttribute("QuickFixes", allQuickFixes)
-                                                 );
-                            if (string.IsNullOrEmpty(name) && description == "Unknown") name = RsDocExportFeatures.SplitCamelCase(type.Name);
+                                new XAttribute("DefaultSeverity", severity),
+                                new XAttribute("Group", group),
+                                new XAttribute("SolutionWide", solutionWide),
+                                new XAttribute("Configurable", configurable),
+                                new XAttribute("CompoundName", compoundName ?? ""),
+                                new XAttribute("QuickFixes", allQuickFixes)
+                            );
+                            if (string.IsNullOrEmpty(name) && description == "Unknown")
+                                name = SplitCamelCase(type.Name);
                             if (string.IsNullOrEmpty(name)) name = description;
                             //this.AddFeature(xDocRoot, id, type, "Inspection", this.version, name, description, lang, cache, details);
                             insTypeNumber++;
@@ -219,33 +205,34 @@ namespace RsDocGenerator
             }
 
             xDocRoot.Add(new XAttribute("TotalContextActions", cAnumber),
-              new XAttribute("TotalQuickFixes", qFnumber),
-              new XAttribute("TotalInspections", insTypeNumber));
+                new XAttribute("TotalQuickFixes", qFnumber),
+                new XAttribute("TotalInspections", insTypeNumber));
 
             foreach (var ins in HighlightingSettingsManager.Instance.SeverityConfigurations)
             {
                 var inspection = (from nodes in xDocRoot.Elements()
-                                  let xAttribute = nodes.Attribute("Id")
-                                  where xAttribute != null && xAttribute.Value == ins.Id
-                                  select nodes).FirstOrDefault();
+                    let xAttribute = nodes.Attribute("Id")
+                    where xAttribute != null && xAttribute.Value == ins.Id
+                    select nodes).FirstOrDefault();
                 if (inspection == null)
                 {
                     var details = new XElement("Details",
-                                             new XAttribute("DefaultSeverity", ins.DefaultSeverity),
-                                             new XAttribute("Group", ins.GroupId),
-                                             new XAttribute("SolutionWide", ins.SolutionAnalysisRequired ? "yes" : "no"),
-                                             new XAttribute("Configurable", "yes"),
-                                             new XAttribute("CompoundName", ins.CompoundItemName ?? ""),
-                                             new XAttribute("QuickFixes", "")
-                                             );
-                    this.AddFeature(xDocRoot, ins.Id, ins.GetType(), "Inspection", this.version,
-                      ins.FullTitle, ins.Description, this.GetLangsForInspection(ins.Id), null, details);
+                        new XAttribute("DefaultSeverity", ins.DefaultSeverity),
+                        new XAttribute("Group", ins.GroupId),
+                        new XAttribute("SolutionWide", ins.SolutionAnalysisRequired ? "yes" : "no"),
+                        new XAttribute("Configurable", "yes"),
+                        new XAttribute("CompoundName", ins.CompoundItemName ?? ""),
+                        new XAttribute("QuickFixes", "")
+                    );
+                    AddFeature(xDocRoot, ins.Id, ins.GetType(), "Inspection", version,
+                        ins.FullTitle, ins.Description, GetLangsForInspection(ins.Id), null, details);
                 }
+
                 insTypeNumber++;
             }
 
             xDoc.Add(xDocRoot);
-            this.SynchronizeWithStaticDesciription(xDoc);
+            SynchronizeWithStaticDesciription(xDoc);
             xDoc.Save(fileName);
             MessageBox.ShowInfo("ReSharper features exported successfully.");
         }
@@ -254,12 +241,13 @@ namespace RsDocGenerator
         {
             var lang = string.Empty;
             var langs = HighlightingSettingsManager.Instance.GetInspectionImplementations(id);
-      foreach (PsiLanguageType psiLanguageType in langs)
+            foreach (var psiLanguageType in langs)
             {
-                string langName = this.NormalizeLanguage(psiLanguageType.Name);
+                var langName = NormalizeLanguage(psiLanguageType.Name);
                 if (!lang.Contains(langName))
                     lang += langName + ",";
             }
+
             lang = lang == string.Empty ? "all" : lang.TrimEnd(',');
             return lang;
         }
@@ -268,16 +256,15 @@ namespace RsDocGenerator
         {
             var staticDescriptionXml = new XDocument();
             var file =
-              Assembly.GetExecutingAssembly().GetPath().Directory.Directory.Combine("lib/FeatureDescriptionStitic.xml");
+                Assembly.GetExecutingAssembly().GetPath().Directory.Directory
+                    .Combine("lib/FeatureDescriptionStitic.xml");
             if (!file.ExistsFile)
             {
                 staticDescriptionXml.Add(new XElement("Features"));
                 foreach (var featureNode in xDoc.Root.Elements())
-                {
                     staticDescriptionXml.Root.Add(new XElement("Feature",
-                      new XAttribute("Id", featureNode.Attribute("Id").Value),
-                      new XAttribute("SinceVersion", featureNode.Attribute("SinceVersion").Value)));
-                }
+                        new XAttribute("Id", featureNode.Attribute("Id").Value),
+                        new XAttribute("SinceVersion", featureNode.Attribute("SinceVersion").Value)));
             }
             else
             {
@@ -294,13 +281,13 @@ namespace RsDocGenerator
             foreach (var featureNode in xDoc.Root.Elements())
             {
                 var staticFeatureNode = (from nodes in staticDescriptionXml.Root.Elements()
-                                         where nodes.Attribute("Id").Value == featureNode.Attribute("Id").Value
-                                         select nodes).FirstOrDefault();
+                    where nodes.Attribute("Id").Value == featureNode.Attribute("Id").Value
+                    select nodes).FirstOrDefault();
                 if (staticFeatureNode == null)
                 {
                     staticDescriptionXml.Root.Add(new XElement("Feature",
-                      new XAttribute("Id", featureNode.Attribute("Id").Value),
-                      new XAttribute("SinceVersion", featureNode.Attribute("SinceVersion").Value)));
+                        new XAttribute("Id", featureNode.Attribute("Id").Value),
+                        new XAttribute("SinceVersion", featureNode.Attribute("SinceVersion").Value)));
                 }
                 else
                 {
@@ -325,12 +312,12 @@ namespace RsDocGenerator
             foreach (var staticFeature in staticDescriptionXml.Root.Elements())
             {
                 var dynamicFeatureNode = (from nodes in xDoc.Root.Elements()
-                                          where nodes.Attribute("Id").Value == staticFeature.Attribute("Id").Value
-                                          select nodes).FirstOrDefault();
+                    where nodes.Attribute("Id").Value == staticFeature.Attribute("Id").Value
+                    select nodes).FirstOrDefault();
                 if (dynamicFeatureNode == null && staticFeature.Attribute("DeprecatedSince") == null)
-                    staticFeature.Add(new XAttribute("DeprecatedSince", this.version));
-
+                    staticFeature.Add(new XAttribute("DeprecatedSince", version));
             }
+
             staticDescriptionXml.Save(file.FullPath);
         }
 
@@ -396,30 +383,27 @@ namespace RsDocGenerator
         }*/
 
         /// <summary>
-        /// Finds all tests for a feature.
+        ///     Finds all tests for a feature.
         /// </summary>
         /// <param name="examplesNode">Node for all examples</param>
         /// <param name="featureType">Feature type</param>
         /// <param name="cache">Cache </param>
-        private void FindTestsByType(XElement examplesNode, Type featureType, List<KeyValuePair<Type, Object>> cache)
+        private void FindTestsByType(XElement examplesNode, Type featureType, List<KeyValuePair<Type, object>> cache)
         {
             var testFound = false;
             foreach (var cacheEntry in cache)
-            {
                 if (cacheEntry.Key == featureType)
                 {
                     var example = new XElement("Example");
-                    object testTypeInstance = cacheEntry.Value;
-                    this.ExtractExampleFromTest(example, testTypeInstance);
+                    var testTypeInstance = cacheEntry.Value;
+                    ExtractExampleFromTest(example, testTypeInstance);
                     examplesNode.Add(example);
                     if (!example.IsEmpty) testFound = true;
                 }
-            }
 
             // if we failed to find tests with reflection, we try to find something by name....
             if (!testFound)
-            {
-                foreach (var unmatchedTest in this.myUnmatchedTests)
+                foreach (var unmatchedTest in myUnmatchedTests)
                 {
                     var commonNamePart = string.Empty;
 
@@ -435,36 +419,35 @@ namespace RsDocGenerator
                     if (!string.IsNullOrEmpty(commonNamePart) && unmatchedTest.Name.StartsWith(commonNamePart))
                     {
                         var example = new XElement("Example");
-                        object testTypeInstance = Activator.CreateInstance(unmatchedTest);
-                        this.ExtractExampleFromTest(example, testTypeInstance);
+                        var testTypeInstance = Activator.CreateInstance(unmatchedTest);
+                        ExtractExampleFromTest(example, testTypeInstance);
                         examplesNode.Add(example);
                     }
                 }
-            }
         }
 
         /// <summary>
-        /// Adds a single XML node for a feature 
+        ///     Adds a single XML node for a feature
         /// </summary>
         private void AddFeature(XElement xDocRoot,
-          string featureId,
-          Type type,
-          string featureType,
-          string version,
-          string name,
-          string description,
-          string lang,
-          List<KeyValuePair<Type, Object>> cache,
-          XElement details
-          )
+            string featureId,
+            Type type,
+            string featureType,
+            string version,
+            string name,
+            string description,
+            string lang,
+            List<KeyValuePair<Type, object>> cache,
+            XElement details
+        )
         {
-            if (string.IsNullOrEmpty(lang)) lang = this.GetLanguage(type);
-            if (string.IsNullOrEmpty(name) || name == "Unknown") name = RsDocExportFeatures.SplitCamelCase(type.Name);
+            if (string.IsNullOrEmpty(lang)) lang = GetLanguage(type);
+            if (string.IsNullOrEmpty(name) || name == "Unknown") name = SplitCamelCase(type.Name);
 
             var featureNode = (from xml2 in xDocRoot.Descendants("Feature")
-                               let xElement = xml2.Attribute("Id")
-                               where xElement != null && xElement.Value == featureId
-                               select xml2).FirstOrDefault();
+                let xElement = xml2.Attribute("Id")
+                where xElement != null && xElement.Value == featureId
+                select xml2).FirstOrDefault();
 
             XElement eamplesNode = null;
             XAttribute langAttr = null;
@@ -474,18 +457,18 @@ namespace RsDocGenerator
                 langAttr = new XAttribute("Language", lang);
                 eamplesNode = new XElement("Examples");
                 if (featureType != "Inspection")
-                    this.FindTestsByType(eamplesNode, type, cache);
+                    FindTestsByType(eamplesNode, type, cache);
 
                 featureNode = new XElement("Feature",
-                                    new XAttribute("Type", featureType),
-                                    new XAttribute("Id", featureId),
-                                    langAttr,
-                                    new XAttribute("SinceVersion", version),
-                                      new XElement("Title", name),
-                                      new XElement("Description", description),
-                                      eamplesNode,
-                                      details
-                    );
+                    new XAttribute("Type", featureType),
+                    new XAttribute("Id", featureId),
+                    langAttr,
+                    new XAttribute("SinceVersion", version),
+                    new XElement("Title", name),
+                    new XElement("Description", description),
+                    eamplesNode,
+                    details
+                );
                 xDocRoot.Add(featureNode);
             }
             else
@@ -493,9 +476,9 @@ namespace RsDocGenerator
                 eamplesNode = featureNode.Element("Examples");
                 langAttr = featureNode.Attribute("Language");
 
-                if (!langAttr.Value.Contains(this.GetLanguage(type)) && this.GetLanguage(type) != "all")
-                    langAttr.Value = langAttr.Value + "," + this.GetLanguage(type);
-                this.FindTestsByType(eamplesNode, type, cache);
+                if (!langAttr.Value.Contains(GetLanguage(type)) && GetLanguage(type) != "all")
+                    langAttr.Value = langAttr.Value + "," + GetLanguage(type);
+                FindTestsByType(eamplesNode, type, cache);
 
                 var existingDesc = featureNode.Element("Description");
                 if (description.Length > existingDesc.Value.Length)
@@ -503,7 +486,6 @@ namespace RsDocGenerator
             }
 
             if (eamplesNode != null)
-            {
                 foreach (var example in eamplesNode.Elements())
                 {
                     if (example.Attribute("Code") == null)
@@ -511,14 +493,15 @@ namespace RsDocGenerator
                     if (example.Attribute("Code").Value.Contains("+"))
                         continue;
                     if (langAttr.Value == "all")
+                    {
                         langAttr.Value = example.Attribute("Code").Value;
+                    }
                     else
                     {
                         if (!langAttr.Value.Contains(example.Attribute("Code").Value))
                             langAttr.Value = langAttr.Value + "," + example.Attribute("Code").Value;
                     }
                 }
-            }
         }
 
         private string NormalizeLanguage(string input)
@@ -547,6 +530,7 @@ namespace RsDocGenerator
                 case ".config": return "webconfig";
                 case ".cshtml": return "razor";
             }
+
             return input;
         }
 
@@ -555,19 +539,19 @@ namespace RsDocGenerator
             //      if (input.Contains("QuickFix")) input = input.Replace("QuickFix", "");
             //      if (input.Contains("Fix")) input = input.Replace("Fix", "");
             var splitString = Regex.Replace(input, "([A-Z])", " $1",
-              RegexOptions.Compiled).Trim();
+                RegexOptions.Compiled).Trim();
             return splitString.Substring(0, 1) + splitString.Substring(1).ToLower();
         }
 
         /// <summary>
-        /// Tries to find one examples as code extract from test files 
+        ///     Tries to find one examples as code extract from test files
         /// </summary>
         /// <param name="example">Root XML element for the example</param>
         /// <param name="testTypeInstance">Instanciated test type</param>
         private void ExtractExampleFromTest(XElement example, object testTypeInstance)
         {
             var tetstPathProperty = testTypeInstance.GetType().GetProperty("TestDataPath2");
-            string path = tetstPathProperty.GetValue(testTypeInstance, null).ToString();
+            var path = tetstPathProperty.GetValue(testTypeInstance, null).ToString();
             if (!Directory.Exists(path)) return;
 
             var testFiles = Directory.GetFiles(path);
@@ -578,74 +562,68 @@ namespace RsDocGenerator
             var testMethods = testTypeInstance.GetType().GetMethods(BindingFlags.DeclaredOnly |
                                                                     BindingFlags.Public | BindingFlags.Instance);
 
-            foreach (MethodInfo testMethod in testMethods)
+            foreach (var testMethod in testMethods)
             {
                 var attributes = testMethod.GetCustomAttributes(false);
                 foreach (var attribute in attributes)
-                {
                     if (testWithAttribute == string.Empty && attribute.GetType().Name == "TestAttribute")
                         testWithAttribute = testMethod.Name.ToLower();
 
-                    //TODO: This needs to be restored
-                    //          if (attribute.GetType() == typeof(FeatureExampleAttribute))
-                    //            testWithAttribute = testMethod.Name.ToLower();
-                }
+                //TODO: This needs to be restored
+                //          if (attribute.GetType() == typeof(FeatureExampleAttribute))
+                //            testWithAttribute = testMethod.Name.ToLower();
             }
 
-            foreach (string testFile in testFiles)
+            foreach (var testFile in testFiles)
             {
                 var testFileWithoutExtension = Path.GetFileNameWithoutExtension(testFile).ToLower();
                 if (testWithAttribute.Length > 4 &&
-                    (testFileWithoutExtension == testWithAttribute.Remove(0, 4) || testFileWithoutExtension == testWithAttribute))
+                    (testFileWithoutExtension == testWithAttribute.Remove(0, 4) ||
+                     testFileWithoutExtension == testWithAttribute))
                 {
                     targetTestFile = testFile;
                     break;
                 }
+
                 foreach (var resultFile in resultFiles)
-                {
                     if (Path.GetFileName(testFile).ToLower() == Path.GetFileNameWithoutExtension(resultFile).ToLower())
                     {
                         targetTestFile = testFile;
                         break;
                     }
-                }
             }
 
             var targetAdditionalFile = string.Empty;
             if (targetTestFile == string.Empty) return;
-            foreach (string helperTestFile in testFiles)
-            {
-
+            foreach (var helperTestFile in testFiles)
                 if ((Path.GetFileNameWithoutExtension(targetTestFile) == Path.GetFileName(helperTestFile) ||
                      Path.GetFileNameWithoutExtension(helperTestFile) == Path.GetFileName(targetTestFile) ||
-                     Path.GetFileNameWithoutExtension(helperTestFile) == Path.GetFileNameWithoutExtension(targetTestFile)) &&
+                     Path.GetFileNameWithoutExtension(helperTestFile) ==
+                     Path.GetFileNameWithoutExtension(targetTestFile)) &&
                     Path.GetExtension(helperTestFile) != ".gold" &&
                     helperTestFile != targetTestFile)
-                {
                     targetAdditionalFile = helperTestFile;
-                }
-            }
 
-            string addtitionalGoldFile = targetAdditionalFile + ".gold";
-            string goldFile = targetTestFile + ".gold";
+            var addtitionalGoldFile = targetAdditionalFile + ".gold";
+            var goldFile = targetTestFile + ".gold";
             if (!File.Exists(goldFile)) return;
 
-            string before = File.ReadAllText(targetTestFile);
-            string after = File.ReadAllText(goldFile);
+            var before = File.ReadAllText(targetTestFile);
+            var after = File.ReadAllText(goldFile);
 
-            string extension = this.NormalizeLanguage(Path.GetExtension(targetTestFile));
+            var extension = NormalizeLanguage(Path.GetExtension(targetTestFile));
 
-            if ((Path.GetExtension(targetTestFile) == ".cs") && (Path.GetExtension(targetAdditionalFile) == ".vb") ||
-                (Path.GetExtension(targetTestFile) == ".vb") && (Path.GetExtension(targetAdditionalFile) == ".cs"))
+            if (Path.GetExtension(targetTestFile) == ".cs" && Path.GetExtension(targetAdditionalFile) == ".vb" ||
+                Path.GetExtension(targetTestFile) == ".vb" && Path.GetExtension(targetAdditionalFile) == ".cs")
                 targetAdditionalFile = string.Empty;
 
             if (targetAdditionalFile != string.Empty)
             {
-                string separator = Environment.NewLine + Environment.NewLine +
-                                   "//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//" +
-                                   Environment.NewLine + Environment.NewLine;
+                var separator = Environment.NewLine + Environment.NewLine +
+                                "//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//" +
+                                Environment.NewLine + Environment.NewLine;
 
-                extension += " + " + this.NormalizeLanguage(Path.GetExtension(targetAdditionalFile));
+                extension += " + " + NormalizeLanguage(Path.GetExtension(targetAdditionalFile));
                 before += separator + File.ReadAllText(targetAdditionalFile);
                 if (File.Exists(addtitionalGoldFile))
                     after += separator + File.ReadAllText(addtitionalGoldFile);
@@ -658,20 +636,20 @@ namespace RsDocGenerator
             // Debug
             example.Add(new XElement("TestPath", path));
             example.Add(new XElement("TestTypeName", testTypeInstance.GetType().FullName));
-
         }
 
         /// Gets language name for a feature type by the full type name. In lowercase
         private string GetLanguage(Type type)
         {
-            var langNames = new[] {"csharp", "vb", "asp", "javascript", "buildscript", "html", 
-        "xml", "webconfig", "resx", "xaml", "css", "razor"};
+            var langNames = new[]
+            {
+                "csharp", "vb", "asp", "javascript", "buildscript", "html",
+                "xml", "webconfig", "resx", "xaml", "css", "razor"
+            };
 
             foreach (var language in langNames)
-            {
                 if (type.FullName.ToLower().Contains(language))
                     return language;
-            }
             return "all";
         }
     }

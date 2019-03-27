@@ -8,10 +8,6 @@ namespace RsDocGenerator
 {
     public class FeatureCatalog
     {
-        public RsFeatureKind FeatureKind { get; }
-        public List<string> Languages { get; }
-        public List<RsFeature> Features { get; }
-
         public FeatureCatalog(RsFeatureKind featureKind)
         {
             FeatureKind = featureKind;
@@ -19,9 +15,13 @@ namespace RsDocGenerator
             Features = new List<RsFeature>();
         }
 
+        public RsFeatureKind FeatureKind { get; }
+        public List<string> Languages { get; }
+        public List<RsFeature> Features { get; }
+
         public void AddFeature(RsFeature feature, string lang)
         {
-            if(!Languages.Contains(lang))
+            if (!Languages.Contains(lang))
                 Languages.Add(lang);
             Features.Add(feature);
         }
@@ -30,7 +30,7 @@ namespace RsDocGenerator
         {
             var highlightingManager = Shell.Instance.GetComponent<HighlightingSettingsManager>();
             var groups = new Dictionary<string, List<RsFeature>>();
-            var groupIds = 
+            var groupIds =
                 highlightingManager.ConfigurableGroups.OrderBy(g => g.Title).Select(g => g.Key).ToList();
             groupIds.AddRange(highlightingManager.StaticGroups.OrderBy(g => g.Name).Select(g => g.Key));
 
@@ -41,6 +41,7 @@ namespace RsDocGenerator
                 if (!features.IsEmpty())
                     groups[group] = features;
             }
+
             return groups;
         }
 

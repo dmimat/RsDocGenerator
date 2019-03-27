@@ -1,9 +1,7 @@
-﻿using System;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace RsDocGenerator
 {
@@ -24,9 +22,9 @@ namespace RsDocGenerator
         {
             var featureKeeper = new FeatureKeeper(context);
             var featureDigger = new FeatureDigger(context);
-//            var vsFeatureKeeper = new FeatureKeeper(context, true);
-//            var vsFeatureDigger = new VsFeatureDigger(context);
-            
+            var vsFeatureKeeper = new FeatureKeeper(context, true);
+            var vsFeatureDigger = new VsFeatureDigger(context);
+
             var configurableInspections = featureDigger.GetConfigurableInspections();
             var staticInspections = featureDigger.GetStaticInspections();
             var contextActions = featureDigger.GetContextActions();
@@ -34,10 +32,10 @@ namespace RsDocGenerator
             var fixesInScope = featureDigger.GetFixesInScope();
             var actionsInScope = featureDigger.GetContextActionsInScope();
             var inspectionsWithQuickFixes = featureDigger.GetInspectionsWithFixes();
-            
-//            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
-//            var vsConfigurableInspections = vsFeatureDigger.GetConfigurableInspections();
-//            var vsStaticInspections = vsFeatureDigger.GetStaticInspections();
+
+            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
+            var vsConfigurableInspections = vsFeatureDigger.GetConfigurableInspections();
+            var vsStaticInspections = vsFeatureDigger.GetStaticInspections();
 
             featureKeeper.AddFeatures(configurableInspections);
             featureKeeper.AddFeatures(staticInspections);
@@ -46,23 +44,24 @@ namespace RsDocGenerator
             featureKeeper.AddFeatures(fixesInScope);
             featureKeeper.AddFeatures(actionsInScope);
             featureKeeper.AddFeatures(inspectionsWithQuickFixes);
-            
-//            vsFeatureKeeper.AddFeatures(vsConfigurableInspections);
-//            vsFeatureKeeper.AddFeatures(vsQuickFixes);
-//            vsFeatureKeeper.AddFeatures(vsStaticInspections);
+
+            vsFeatureKeeper.AddFeatures(vsConfigurableInspections);
+            vsFeatureKeeper.AddFeatures(vsQuickFixes);
+            vsFeatureKeeper.AddFeatures(vsStaticInspections);
 
             featureKeeper.CloseSession();
-//            vsFeatureKeeper.CloseSession();
-            
+            vsFeatureKeeper.CloseSession();
+
             var featuresByTag = new TagKeeper(context);
             featuresByTag.AddFeatures(configurableInspections, "ReSharper");
-//            featuresByTag.AddFeatures(vsConfigurableInspections, "Visual Studio");
-            
-            featuresByTag.CloseSession();
-            
-            //RsDocUpdateVsFeaturesCatalog.Execute(context, null);
+            featuresByTag.AddFeatures(vsConfigurableInspections, "Visual Studio");
 
-            MessageBox.Show(String.Format("ReSharper Feature Catalog (RsFeatureCatalog.xml) is updated successfully according to version {0}.",
+            featuresByTag.CloseSession();
+
+            RsDocUpdateVsFeaturesCatalog.Execute(context, null);
+
+            MessageBox.Show(string.Format(
+                    "ReSharper Feature Catalog (RsFeatureCatalog.xml) is updated successfully according to version {0}.",
                     GeneralHelpers.GetCurrentVersion()),
                 "Export completed", MessageBoxButtons.OK);
         }

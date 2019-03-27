@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,12 +21,12 @@ namespace RsDocGenerator
         {
             var rootFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
             if (string.IsNullOrEmpty(rootFolder)) return "Nothing";
-            DirectoryInfo dinfo = new DirectoryInfo(rootFolder + "\\nonProject\\third-party");
+            var dinfo = new DirectoryInfo(rootFolder + "\\nonProject\\third-party");
             var files = dinfo.GetFiles("*.txt");
 
             var libraryList = new Dictionary<string, string>();
 
-            foreach (FileInfo file in files)
+            foreach (var file in files)
             {
                 if (file == null) continue;
                 var productId = "";
@@ -54,15 +53,16 @@ namespace RsDocGenerator
                         libraryList[line] += "," + productId;
                         continue;
                     }
+
                     libraryList.Add(line, productId);
                 }
             }
 
             const string thirdPartyTopicId = "Third_Party_Generated";
-            XDocument thirdPartyTopic = XmlHelpers.CreateHmTopic(thirdPartyTopicId, "Third-Party Libraries");
+            var thirdPartyTopic = XmlHelpers.CreateHmTopic(thirdPartyTopicId, "Third-Party Libraries");
 
-            XElement thirdPartyTable = new XElement("table");
-            XElement headerRow = new XElement("tr");
+            var thirdPartyTable = new XElement("table");
+            var headerRow = new XElement("tr");
             headerRow.Add(new XElement("td", "Software"));
             headerRow.Add(new XElement("td", "Version"));
             headerRow.Add(new XElement("td", "License"));
@@ -75,7 +75,7 @@ namespace RsDocGenerator
 
             foreach (var lib in libraryList)
             {
-                XElement libRow = new XElement("tr");
+                var libRow = new XElement("tr");
                 libRow.Add(new XAttribute("filter", lib.Value));
                 var libString = lib.Key;
 
@@ -103,7 +103,7 @@ namespace RsDocGenerator
                 {
                     var cellContent = libString.Substring(splitterPos[i] + 1,
                         splitterPos[i + 1] - splitterPos[i] - 1);
-                    XElement td = new XElement("td", TryGetHyperLink(cellContent));
+                    var td = new XElement("td", TryGetHyperLink(cellContent));
                     if (i > 2)
                         td.Add(new XAttribute(new XAttribute("filter", "dotNet")));
                     libRow.Add(td);
@@ -112,10 +112,10 @@ namespace RsDocGenerator
                 rows.Add(libString.TrimStart('|').TrimStart('['), libRow);
             }
 
-            foreach (XElement libRow in rows.Values)
+            foreach (var libRow in rows.Values)
                 thirdPartyTable.Add(libRow);
 
-            XElement thirdPartyChunk = XmlHelpers.CreateChunk("table");
+            var thirdPartyChunk = XmlHelpers.CreateChunk("table");
             thirdPartyChunk.Add(thirdPartyTable);
             thirdPartyTopic.Root.Add(thirdPartyChunk);
 
@@ -135,16 +135,19 @@ namespace RsDocGenerator
             if (parts.Length == 1)
             {
                 linkUrl = parts[0];
+                if (!linkUrl.Contains("http"))
+                    return linkUrl;
             }
             else
             {
                 linkText = parts[0];
                 linkUrl = parts[1];
             }
+
             if (linkUrl == "https://www.devexpress.com/Products/NET/Controls/WinForms/")
                 linkText = "DevExpress WinForms Controls and Libraries";
 
-            return XmlHelpers.CreateHyperlink(linkText, linkUrl, anchor: null, nullable: false);
+            return XmlHelpers.CreateHyperlink(linkText, linkUrl, null, false);
         }
     }
 }

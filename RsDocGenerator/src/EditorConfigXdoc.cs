@@ -11,7 +11,9 @@ using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Implementation;
 using JetBrains.DataFlow;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle;
 using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle.ViewModels;
@@ -41,7 +43,7 @@ namespace RsDocGenerator
 
             var tableRows = new SortedDictionary<string, XElement>();
 
-            foreach (string propName in map.Keys.OrderBy())
+            foreach (var propName in map.Keys.OrderBy())
             {
                 var propRow = new XElement("tr");
                 propRow.Add(new XElement("td", new XElement("code", propName)));
@@ -85,7 +87,7 @@ namespace RsDocGenerator
                         contentTd.Add(val.SectionDescription == null
                             ? val.Description
                             : val.SectionDescription + " - " + val.Description + ", available for: ");
-                        bool comma = false;
+                        var comma = false;
                         foreach (var val1 in values)
                         {
                             var currentElement = contentTd;
@@ -135,8 +137,7 @@ namespace RsDocGenerator
         }
 
         public static void CreateGeneralizedPropertiesTopic(string path, IApplicationHost host,
-            OneToListMultimap<string, RsDocExportEditorConfigStyles.
-                PropertyDescription> map,
+            OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
             IEditorConfigSchema schema)
         {
             var editorConfigGeneralizedTopic =
@@ -206,7 +207,6 @@ namespace RsDocGenerator
             topic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", true));
 
             foreach (var entry in schema.Entries)
-            {
                 ProcessEntry(
                     null,
                     entry,
@@ -224,7 +224,6 @@ namespace RsDocGenerator
                     language,
                     map,
                     null, topicId);
-            }
 
             topic.Save(Path.Combine(path, topicId + ".xml"));
         }
@@ -275,7 +274,6 @@ namespace RsDocGenerator
             if (settingsEntry != null)
             {
                 foreach (var prop in ecService.GetPropertiesForSettingsEntry(settingsEntry))
-                {
                     map.Add(prop.Alias,
                         new RsDocExportEditorConfigStyles.PropertyDescription
                         {
@@ -286,7 +284,6 @@ namespace RsDocGenerator
                             SectionDescription = parentDescription,
                             IsGeneralized = prop.IsGeneralized
                         });
-                }
 
                 WriteScalarEntry(propertyInfo, entry, chapter, preparator, solution, documentBefore, lifetime,
                     settingsStore,
@@ -306,11 +303,11 @@ namespace RsDocGenerator
             if (text == null)
                 throw new ArgumentNullException("text");
 
-            int nToRemove = 0;
+            var nToRemove = 0;
 
-            for (int a = 0; a < text.Length; a++)
+            for (var a = 0; a < text.Length; a++)
             {
-                char ch = text[a];
+                var ch = text[a];
                 if (!ch.IsIdentifierPart()) nToRemove++;
             }
 
@@ -319,10 +316,10 @@ namespace RsDocGenerator
                 return text;
 
             var sb = new StringBuilder(text.Length);
-            bool afterUnderscore = false;
-            for (int a = 0; a < text.Length; a++)
+            var afterUnderscore = false;
+            for (var a = 0; a < text.Length; a++)
             {
-                char ch = text[a];
+                var ch = text[a];
                 if (ch.IsIdentifierPart())
                 {
                     if (ch == '_')
@@ -331,7 +328,9 @@ namespace RsDocGenerator
                         afterUnderscore = true;
                     }
                     else
+                    {
                         afterUnderscore = false;
+                    }
 
                     sb.Append(ch);
                 }
@@ -377,7 +376,7 @@ namespace RsDocGenerator
             {
                 var chapterExamples = XmlHelpers.CreateChapterWithoutId("Examples:");
 
-                Lifetimes.Using(lifetime, lf =>
+                Lifetime.Using(lf =>
                 {
                     var previewSettings = settingsStore
                         .CreateNestedTransaction(lf, "Code formatter options UpdatePreview")
@@ -417,7 +416,9 @@ namespace RsDocGenerator
                                     XmlHelpers.CreateCodeBlock(codeBefore, language.PresentableName, true)));
                             }
                             else
+                            {
                                 table = XmlHelpers.CreateTable(new[] {pair.Item1}, null);
+                            }
 
                             previewSettings.SetValue(settingsEntry, pair.Item3, null);
                             preparator.PrepareText(
@@ -447,10 +448,9 @@ namespace RsDocGenerator
         {
             var list = aliases.Select(it => it.Alias).ToList();
             foreach (var alias in aliases)
-            {
                 if (!alias.HasResharperPrefix)
                 {
-                    string element = EditorConfigSchema.ReSharperPrefix + alias.Alias;
+                    var element = EditorConfigSchema.ReSharperPrefix + alias.Alias;
                     if (list.Contains(element))
                     {
                         list.Remove(alias.Alias);
@@ -458,12 +458,11 @@ namespace RsDocGenerator
                         list.Add("[{0}]{1}".FormatEx(EditorConfigSchema.ReSharperPrefix, alias.Alias));
                     }
                 }
-            }
 
             var chapter = XmlHelpers.CreateChapterWithoutId(title);
             var paragraph = new XElement("p");
 
-            bool addComma = false;
+            var addComma = false;
             foreach (var alias in list)
             {
                 if (addComma)
@@ -482,47 +481,43 @@ namespace RsDocGenerator
             Tuple<string, string, object>[] possibleValues = null;
             var type = valueType.Bind();
             if (type == typeof(bool))
-            {
                 possibleValues = new[]
                 {
                     new Tuple<string, string, object>("true", null, true),
                     new Tuple<string, string, object>("false", null, false)
                 };
-            }
             else if (type.IsEnum)
-            {
                 possibleValues =
                     enumValues
                         .Select(it =>
                             new Tuple<string, string, object>(it.Alias, it.Description, Enum.Parse(type, it.Value)))
                         .ToArray();
-            }
             else if (type == typeof(int))
-            {
                 possibleValues = new[]
                 {
                     new Tuple<string, string, object>("value: 0", null, 0),
                     new Tuple<string, string, object>("value: 1", null, 1),
                     new Tuple<string, string, object>("value: 2", null, 2)
                 };
-            }
 
             if (possibleValues != null)
             {
                 var chapterPossibleValues = XmlHelpers.CreateChapterWithoutId("Possible values:");
 
                 if (type == typeof(int))
+                {
                     chapterPossibleValues.Add(new XElement("p", "an integer"));
+                }
                 else if (type == typeof(bool))
+                {
                     chapterPossibleValues.Add(new XElement("p", new XElement("code", "true | false")));
+                }
                 else
                 {
                     var list = new XElement("list");
                     foreach (var value in possibleValues)
-                    {
                         list.Add(new XElement("li",
                             new XElement("code", value.Item1), value.Item2 == null ? null : ": " + value.Item2));
-                    }
 
                     chapterPossibleValues.Add(list);
                 }

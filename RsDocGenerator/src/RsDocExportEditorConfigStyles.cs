@@ -10,7 +10,9 @@ using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Implementation;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.DataFlow;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.DataContext;
 using JetBrains.ReSharper.Feature.Services.OptionPages;
@@ -40,8 +42,8 @@ namespace RsDocGenerator
         {
             var solution = context.GetData(ProjectModelDataConstants.SOLUTION);
             if (solution == null) return "Open a solution to enable generation";
-            
-            Lifetimes.Using(lifetime =>
+
+            Lifetime.Using(lifetime =>
             {
                 var ecService = solution.GetComponent<IEditorConfigSchema>();
                 var partsCatalogue = solution.GetComponent<ShellPartCatalogSet>();
@@ -83,14 +85,12 @@ namespace RsDocGenerator
                 var excludedEntries = new HashSet<ICodeStyleEntry>();
                 var excludedSchemas = new HashSet<ICodeStylePageSchema>();
                 foreach (var schema in schemas)
-                {
-                    foreach (var entry in schema.Entries)
-                        FillSettingsToEntryDictionary(entry, schema.Language, settingsToEntry, ecService);
-                }
+                foreach (var entry in schema.Entries)
+                    FillSettingsToEntryDictionary(entry, schema.Language, settingsToEntry, ecService);
 
                 foreach (var schema in schemas)
                 {
-                    bool excludeSchema = true;
+                    var excludeSchema = true;
                     foreach (var entry in schema.Entries)
                         if (!CalculateIfEntryShouldBeExcluded(entry, schema.Language, settingsToEntry, excludedEntries))
                             excludeSchema = false;
@@ -103,18 +103,16 @@ namespace RsDocGenerator
                 foreach (var language in schemas.Select(schema => schema.Language)
                     .Distinct()
                     .OrderBy(it => it.PresentableName))
+                foreach (var schema in schemas.Where(it => ReferenceEquals(it.Language, language)))
                 {
-                    foreach (var schema in schemas.Where(it => ReferenceEquals(it.Language, language)))
-                    {
-                        if (excludedSchemas.Contains(schema)) continue;
+                    if (excludedSchemas.Contains(schema)) continue;
 
-                        var preparator = schema.GetCodePreviewPreparator();
-                        if (preparator == null) continue;
+                    var preparator = schema.GetCodePreviewPreparator();
+                    if (preparator == null) continue;
 
-                        EditorConfigXdoc.ProcessEntries(language, schema, path,
-                            documentBefore, documentAfter, lifetime, settingsStore, contextBoundSettingsStoreLive,
-                            ecService, settingsToEntry, excludedEntries, preparator, solution, map);
-                    }
+                    EditorConfigXdoc.ProcessEntries(language, schema, path,
+                        documentBefore, documentAfter, lifetime, settingsStore, contextBoundSettingsStoreLive,
+                        ecService, settingsToEntry, excludedEntries, preparator, solution, map);
                 }
 
                 EditorConfigXdoc.CreateIndex(path, context, map, ecService);
@@ -161,7 +159,7 @@ namespace RsDocGenerator
             Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
             HashSet<ICodeStyleEntry> excludedEntries)
         {
-            bool excludeEntry = true;
+            var excludeEntry = true;
             var settingsEntry = entry.SettingsEntry;
             if (settingsEntry != null)
             {

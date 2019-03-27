@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
-using System.Xml.Linq;
 using System.Linq;
+using System.Xml.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-
 
 namespace RsDocGenerator
 {
@@ -47,15 +46,14 @@ namespace RsDocGenerator
                 var langList = new XElement("list");
                 foreach (var fixInScope in
                     fixesInScope.GetLangImplementations(lang).GroupBy(x => x.Text).Select(x => x.First()))
-                {
                     langList.Add(new XElement("li", fixInScope.Text + Environment.NewLine,
                         new XComment(fixInScope.Id),
                         XmlHelpers.CreateInclude("Fix_in_Scope_Static_Chunks",
                             fixInScope.Id.NormalizeStringForAttribute(), true)));
-                }
                 langChapter.Add(langList);
                 chunk.Add(langChapter);
             }
+
             return chunk;
         }
     }

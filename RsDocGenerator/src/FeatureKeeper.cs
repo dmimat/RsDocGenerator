@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -12,25 +11,24 @@ namespace RsDocGenerator
 {
     public sealed class FeatureKeeper
     {
-        private readonly string _catalogFile;
-        private readonly XDocument _catalogDocument;
         private const string FileName = "RsFeatureCatalog.xml";
         private const string FileNameVs = "VsFeatureCatalog.xml";
         private const string RootNodeName = "FeatureCatalog";
         private const string VersionElementName = "version";
         private const string Externalwikilinks = "ExternalWikiLinks";
+        private readonly XDocument _catalogDocument;
+        private readonly string _catalogFile;
         private readonly XElement _currentVersionElement;
 
         public FeatureKeeper(IDataContext context, bool isVs = false)
         {
             var rootFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
             var currentFileName = isVs ? FileNameVs : FileName;
-            
+
             if (rootFolder.IsNullOrEmpty()) return;
 
             _catalogFile = Path.Combine(rootFolder + "\\nonProject", currentFileName);
             if (File.Exists(_catalogFile))
-            {
                 try
                 {
                     _catalogDocument = XDocument.Load(_catalogFile);
@@ -38,14 +36,13 @@ namespace RsDocGenerator
                 catch (Exception e)
                 {
                     var result = MessageBox.Show(
-                        String.Format(
+                        string.Format(
                             "ReSharper feature catalog (RsFeatureCatalog.xml) is corrupted and can be neither read nor updated. \n" +
                             "Do you want to overwrite this file?"),
                         "RsFeatureCatalog.xml is corrupted", MessageBoxButtons.YesNo);
                     if (result == DialogResult.No)
                         throw;
                 }
-            }
 
             if (_catalogDocument == null)
             {
@@ -111,19 +108,17 @@ namespace RsDocGenerator
                     select el).Descendants(featureCatalog.FeatureKind.ToString());
 
                 var existingLangFeatures = allLangFeatures.Select(e => e.Attribute("id").Value).ToList();
-                
+
                 var elementsWithTags = allLangFeatures.Where(e => e.Elements("tag").Any()).ToList();
 
                 if (elementsWithTags.Any())
-                {
                     foreach (var element in elementsWithTags)
                     {
-                        var feature = 
+                        var feature =
                             langImplementations.FirstOrDefault(f => f.Id.Equals(element.Attribute("id").Value));
-                        if (feature != null) 
+                        if (feature != null)
                             feature.Tags = element.Elements("tag").Select(el => el.Value).ToList();
                     }
-                }
 
                 var langElement = (from el in _currentVersionElement.Elements("lang")
                                       where (string) el.Attribute("name") == langPresentation
@@ -140,11 +135,9 @@ namespace RsDocGenerator
                     if (existingLangFeatures.Contains(feature.Id)) continue;
 
                     if (featureCatalog.FeatureKind != RsFeatureKind.InspectionWithQuickFix)
-                    {
                         featuresRootElemnt.Add(new XElement(featureCatalog.FeatureKind.ToString(),
                             new XAttribute("id", feature.Id),
                             new XAttribute("text", feature.Text)));
-                    }
 
                     totalLangFeaturesInVersion += 1;
                     totalFeaturesInVersion += 1;

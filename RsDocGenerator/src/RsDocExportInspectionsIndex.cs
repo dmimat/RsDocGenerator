@@ -4,7 +4,6 @@ using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-
 using JetBrains.Util;
 
 namespace RsDocGenerator
@@ -47,11 +46,11 @@ namespace RsDocGenerator
                         new XAttribute("name", "lang"),
                         new XAttribute("value", langPresentable)),
                     new XElement("var",
-                            new XAttribute("name", "count"),
-                            new XAttribute("value", configurableInspections.GetLangImplementations(language).Count)),
-                        new XElement("var",
-                            new XAttribute("name", "errCount"),
-                            new XAttribute("value", errorCount)));
+                        new XAttribute("name", "count"),
+                        new XAttribute("value", configurableInspections.GetLangImplementations(language).Count)),
+                    new XElement("var",
+                        new XAttribute("name", "errCount"),
+                        new XAttribute("value", errorCount)));
 
                 topicRoot.Add(intro);
 
@@ -83,18 +82,20 @@ namespace RsDocGenerator
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
                         if (inspection.SweaRequired)
                             sweaTable.Add(
-                            new XElement("tr",
-                                new XElement("td", 
-                                    XmlHelpers.CreateHyperlink(inspection.Text, inspection.Id, null, true)),
-                                new XElement("td", langPresentable),
-                                new XElement("td", GetSeverityLink(inspection.Severity))));
+                                new XElement("tr",
+                                    new XElement("td",
+                                        XmlHelpers.CreateHyperlink(inspection.Text, inspection.Id, null, true)),
+                                    new XElement("td", langPresentable),
+                                    new XElement("td", GetSeverityLink(inspection.Severity))));
                     }
+
                     chapter.Add(summaryTable);
                     topicRoot.Add(chapter);
                 }
+
                 topic.Save(fileName);
             }
-            
+
             sweaTable.Add(new XAttribute("include-id", "swea_table"));
             sweaTopic.Root.Add(sweaTable);
             sweaTopic.Save(sweaFileName);
@@ -107,13 +108,15 @@ namespace RsDocGenerator
             switch (inspectionDefaultSeverity)
             {
                 case Severity.DO_NOT_SHOW:
-                    return XmlHelpers.CreateHyperlink("Disabled", "Code_Analysis__Configuring_Warnings", "disable", false);
+                    return XmlHelpers.CreateHyperlink("Disabled", "Code_Analysis__Configuring_Warnings", "disable",
+                        false);
                 case Severity.ERROR:
                     return XmlHelpers.CreateHyperlink("Error", "Code_Analysis__Code_Inspections", "errors", false);
                 case Severity.WARNING:
                     return XmlHelpers.CreateHyperlink("Warning", "Code_Analysis__Code_Inspections", "warnings", false);
                 case Severity.SUGGESTION:
-                    return XmlHelpers.CreateHyperlink("Suggestion", "Code_Analysis__Code_Inspections", "suggestions", false);
+                    return XmlHelpers.CreateHyperlink("Suggestion", "Code_Analysis__Code_Inspections", "suggestions",
+                        false);
                 case Severity.HINT:
                     return XmlHelpers.CreateHyperlink("Hint", "Code_Analysis__Code_Inspections", "hints", false);
                 default:
