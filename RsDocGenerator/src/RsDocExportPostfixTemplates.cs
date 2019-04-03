@@ -11,7 +11,7 @@ namespace RsDocGenerator
     [Action("RsDocExportPostfixTemplates", "Export Postfix Templates", Id = 7569)]
     internal class RsDocExportPostfixTemplates : RsDocExportBase
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
@@ -32,7 +32,7 @@ namespace RsDocGenerator
                 AddLangChunk(postfixLibrary, templateInLang, lang.Name);
             }
 
-            postfixLibrary.Save(Path.Combine(outputFolder + "\\CodeTemplates", postfixTopicId + ".xml"));
+            postfixLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder() + "\\CodeTemplates", postfixTopicId + ".xml"));
             return "Postfix templates";
         }
 

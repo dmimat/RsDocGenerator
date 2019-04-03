@@ -23,7 +23,7 @@ namespace RsDocGenerator
             var featureKeeper = new FeatureKeeper(context);
             var featureDigger = new FeatureDigger(context);
             var vsFeatureKeeper = new FeatureKeeper(context, true);
-            var vsFeatureDigger = new VsFeatureDigger(context);
+//            var vsFeatureDigger = new VsFeatureDigger(context);
 
             var configurableInspections = featureDigger.GetConfigurableInspections();
             var staticInspections = featureDigger.GetStaticInspections();
@@ -33,9 +33,9 @@ namespace RsDocGenerator
             var actionsInScope = featureDigger.GetContextActionsInScope();
             var inspectionsWithQuickFixes = featureDigger.GetInspectionsWithFixes();
 
-            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
-            var vsConfigurableInspections = vsFeatureDigger.GetConfigurableInspections();
-            var vsStaticInspections = vsFeatureDigger.GetStaticInspections();
+//            var vsQuickFixes = vsFeatureDigger.GetQuickFixes();
+//            var vsConfigurableInspections = vsFeatureDigger.GetConfigurableInspections();
+//            var vsStaticInspections = vsFeatureDigger.GetStaticInspections();
 
             featureKeeper.AddFeatures(configurableInspections);
             featureKeeper.AddFeatures(staticInspections);
@@ -45,16 +45,16 @@ namespace RsDocGenerator
             featureKeeper.AddFeatures(actionsInScope);
             featureKeeper.AddFeatures(inspectionsWithQuickFixes);
 
-            vsFeatureKeeper.AddFeatures(vsConfigurableInspections);
-            vsFeatureKeeper.AddFeatures(vsQuickFixes);
-            vsFeatureKeeper.AddFeatures(vsStaticInspections);
+//            vsFeatureKeeper.AddFeatures(vsConfigurableInspections);
+//            vsFeatureKeeper.AddFeatures(vsQuickFixes);
+//            vsFeatureKeeper.AddFeatures(vsStaticInspections);
 
             featureKeeper.CloseSession();
             vsFeatureKeeper.CloseSession();
 
             var featuresByTag = new TagKeeper(context);
             featuresByTag.AddFeatures(configurableInspections, "ReSharper");
-            featuresByTag.AddFeatures(vsConfigurableInspections, "Visual Studio");
+//            featuresByTag.AddFeatures(vsConfigurableInspections, "Visual Studio");
 
             featuresByTag.CloseSession();
 

@@ -21,17 +21,15 @@ namespace RsDocGenerator
             RsDocExportShortcuts.StartContentGeneration(context, outputFolder);
             RsDocExportOptions.StartContentGeneration(context, outputFolder);
             RsDocUpdateCatalog.UpdateCatalog(context);
-
-            var generatedFolder = outputFolder + "\\topics\\ReSharper\\Generated";
-
-            RsDocExportTemplates.StartContentGeneration(context, generatedFolder);
-            RsDocExportPostfixTemplates.StartContentGeneration(context, generatedFolder);
-            RsDocExportMacros.StartContentGeneration(context, generatedFolder);
-            RsDocExportInspectionsIndex.StartContentGeneration(context, generatedFolder);
-            RsDocExportContextActions.StartContentGeneration(context, generatedFolder);
-            RsDocExportFixInScope.StartContentGeneration(context, generatedFolder);
-            RsDocExportThirdParty.StartContentGeneration(context, generatedFolder);
-            RsDocExportEditorConfigStyles.StartContentGeneration(context, generatedFolder);
+            
+            RsDocExportTemplates.StartContentGeneration(context, outputFolder);
+            RsDocExportPostfixTemplates.StartContentGeneration(context, outputFolder);
+            RsDocExportMacros.StartContentGeneration(context, outputFolder);
+            RsDocExportInspectionsIndex.StartContentGeneration(context, outputFolder);
+            RsDocExportContextActions.StartContentGeneration(context, outputFolder);
+            RsDocExportFixInScope.StartContentGeneration(context, outputFolder);
+            RsDocExportThirdParty.StartContentGeneration(context, outputFolder);
+            RsDocExportEditorConfigStyles.StartContentGeneration(context, outputFolder);
 
 
             GeneralHelpers.ShowSuccessMessage("Everything", outputFolder);

@@ -13,7 +13,7 @@ namespace RsDocGenerator
     [Action("RsDocExportMacros", "Export Template Macros", Id = 7969)]
     internal class RsDocExportMacros : RsDocExportBase, IAction
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
@@ -79,7 +79,7 @@ namespace RsDocGenerator
                 false));
             macroLibrary.Root.Add(new XElement("p", "Here is the full list of template macros provided by %product%:"));
             macroLibrary.Root.Add(macroChunk);
-            macroLibrary.Save(Path.Combine(outputFolder + "\\CodeTemplates", macroTopicId + ".xml"));
+            macroLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder() + "\\CodeTemplates", macroTopicId + ".xml"));
             return "Template macros";
         }
 

@@ -28,14 +28,14 @@ namespace RsDocGenerator
     [Action("RsDocExportEditorConfigStyles", "Export EditorConfig Styles", Id = 1897)]
     public class RsDocExportEditorConfigStyles : RsDocExportBase
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
-            return StartContentGeneration(context, outputFolder + "\\topics\\ReSharper\\Generated");
+            return StartContentGeneration(context, outputFolder.GetGeneratedDocsFolder());
         }
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            return GenerateDocs(context, outputFolder + "\\EditorConfig");
+            return GenerateDocs(context, outputFolder.GetGeneratedDocsFolder() + "\\EditorConfig");
         }
 
         public static string GenerateDocs(IDataContext context, string path)

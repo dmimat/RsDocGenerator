@@ -9,9 +9,9 @@ namespace RsDocGenerator
     [Action("RsDocExportClangOptions", "Export Clang Options", Id = 195897)]
     public class RsDocExportClangOptions : RsDocExportBase
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
-            return StartContentGeneration(context, outputFolder + "\\topics\\ReSharper\\Generated");
+            return StartContentGeneration(context, outputFolder.GetGeneratedDocsFolder());
         }
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)

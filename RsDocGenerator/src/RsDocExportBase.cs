@@ -19,6 +19,6 @@ namespace RsDocGenerator
             GeneralHelpers.ShowSuccessMessage(what, outputFolder);
         }
 
-        protected abstract string GenerateContent(IDataContext context, string outputFolder);
+        public abstract string GenerateContent(IDataContext context, string outputFolder);
     }
 }

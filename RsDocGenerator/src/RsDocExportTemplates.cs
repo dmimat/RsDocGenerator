@@ -24,14 +24,14 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            _templatesOutputFolder = outputFolder + "\\CodeTemplates";
+            _templatesOutputFolder = outputFolder.GetGeneratedDocsFolder() + "\\CodeTemplates";
             var bound = context.GetComponent<ISettingsStore>().BindToContextTransient(ContextRange.ApplicationWide);
             foreach (TemplateApplicability applicability in Enum.GetValues(typeof(TemplateApplicability)))
                 CreateXml(applicability, bound, GeneralHelpers.GetCurrentVersion(), context);
             return "Code templates";
         }
 
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
@@ -108,6 +108,9 @@ namespace RsDocGenerator
                     foreach (var provider in myScopeCategoryManager.GetCoveredProviders(scopeFilter, point))
                     {
                         var lang = provider.CategoryCaption;
+                        if (scopeString.Contains("C++")) lang = "C++";
+                        if (scopeString.Contains("C#")) lang = "C#";
+                        
                         if (lang == "ASP.NET" && type == "Surround" && !cat.IsNullOrEmpty())
                             lang = lang + "(" + cat + ")";
                         if (!lang.IsNullOrEmpty())

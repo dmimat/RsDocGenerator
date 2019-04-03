@@ -11,13 +11,14 @@ namespace RsDocGenerator
     [Action("RsDocExportInspectionsIndex", "Export Code Inspection Index", Id = 643759)]
     internal class RsDocExportInspectionsIndex : RsDocExportBase, IAction
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
+            outputFolder = outputFolder.GetGeneratedDocsFolder();
             var featureDigger = new FeatureDigger(context);
             var configurableInspections = featureDigger.GetConfigurableInspections();
             var staticInspections = featureDigger.GetStaticInspections();

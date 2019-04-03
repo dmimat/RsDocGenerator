@@ -21,7 +21,7 @@ namespace RsDocGenerator
     [Action("RsDocExportShortcuts", "Export Actions and Shortcuts", Id = 8373)]
     public class RsDocExportShortcuts : RsDocExportBase
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }

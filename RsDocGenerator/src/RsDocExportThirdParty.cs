@@ -12,7 +12,7 @@ namespace RsDocGenerator
     [Action("RsDocExportThirdParty", "Export Third-Party Libraries", Id = 1327)]
     internal class RsDocExportThirdParty : RsDocExportBase
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
@@ -119,7 +119,7 @@ namespace RsDocGenerator
             thirdPartyChunk.Add(thirdPartyTable);
             thirdPartyTopic.Root.Add(thirdPartyChunk);
 
-            thirdPartyTopic.Save(Path.Combine(outputFolder, thirdPartyTopicId + ".xml"));
+            thirdPartyTopic.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder(), thirdPartyTopicId + ".xml"));
             return "Third-Party Libraries";
         }
 

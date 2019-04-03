@@ -10,7 +10,7 @@ namespace RsDocGenerator
     [Action("RsDocExportFixInScope", "Export items supporting Fix in Scope", Id = 4343)]
     internal class RsDocExportFixInScope : RsDocExportBase
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
@@ -33,7 +33,7 @@ namespace RsDocGenerator
             inScopeLibrary.Root.Add(qfChunk);
             inScopeLibrary.Root.Add(caChunk);
 
-            inScopeLibrary.Save(Path.Combine(outputFolder, caTopicId + ".xml"));
+            inScopeLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder(), caTopicId + ".xml"));
             return "Fix in scope actions";
         }
 

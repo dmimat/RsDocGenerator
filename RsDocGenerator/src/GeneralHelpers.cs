@@ -115,7 +115,25 @@ namespace RsDocGenerator
                 return "CPP";
             return "Common";
         }
-
+        
+        public static bool IsLangSupportedInRider(this string lang)
+        {
+            switch (lang)
+            {
+                case "C++" :
+                case "CPP" :
+                case "JavaScript":
+                case "TypeScript":
+                case "HTML":
+                case "XML":
+                case "XMLDOC":
+                case "Css":
+                case "CSS":
+                case "Protobuf":
+                    return false;
+            }
+            return true;
+        }
 
         [NotNull]
         [Pure]
@@ -141,6 +159,13 @@ namespace RsDocGenerator
             return GetPathFromSettings(context, key => key.RsDocDotnetRootFolder,
                 "Choose the dotnet help directory root");
         }
+
+   
+        public static string GetGeneratedDocsFolder(this string outputFolder)
+        {
+            return outputFolder + "\\topics\\ReSharper\\Generated";
+        }
+
 
         [CanBeNull]
         public static string GetCaPath(IDataContext context)

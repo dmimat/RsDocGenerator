@@ -13,7 +13,7 @@ namespace RsDocGenerator
     [Action("RsDocExportContextActions", "Export Context Actions", Id = 8673421)]
     internal class RsDocExportContextActions : RsDocExportBase, IAction
     {
-        protected override string GenerateContent(IDataContext context, string outputFolder)
+        public override string GenerateContent(IDataContext context, string outputFolder)
         {
             return StartContentGeneration(context, outputFolder);
         }
@@ -65,7 +65,7 @@ namespace RsDocGenerator
                 caLibrary.Root.Add(languageChunk);
             }
 
-            caLibrary.Save(Path.Combine(outputFolder, caTopicId + ".xml"));
+            caLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder(), caTopicId + ".xml"));
             return "Context actions";
         }
 
