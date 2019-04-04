@@ -119,7 +119,7 @@ namespace RsDocGenerator
             thirdPartyChunk.Add(thirdPartyTable);
             thirdPartyTopic.Root.Add(thirdPartyChunk);
 
-            thirdPartyTopic.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder(), thirdPartyTopicId + ".xml"));
+            thirdPartyTopic.Save(Path.Combine(outputFolder.AddGeneratedPath(), thirdPartyTopicId + ".xml"));
             return "Third-Party Libraries";
         }
 

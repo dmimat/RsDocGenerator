@@ -11,7 +11,7 @@ namespace RsDocGenerator
     {
         public override string GenerateContent(IDataContext context, string outputFolder)
         {
-            return StartContentGeneration(context, outputFolder.GetGeneratedDocsFolder());
+            return StartContentGeneration(context, outputFolder.AddGeneratedPath());
         }
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)

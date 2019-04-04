@@ -65,7 +65,7 @@ namespace RsDocGenerator
                 caLibrary.Root.Add(languageChunk);
             }
 
-            caLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder(), caTopicId + ".xml"));
+            caLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath(), caTopicId + ".xml"));
             return "Context actions";
         }
 

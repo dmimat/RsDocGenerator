@@ -79,7 +79,7 @@ namespace RsDocGenerator
                 false));
             macroLibrary.Root.Add(new XElement("p", "Here is the full list of template macros provided by %product%:"));
             macroLibrary.Root.Add(macroChunk);
-            macroLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder() + "\\CodeTemplates", macroTopicId + ".xml"));
+            macroLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath() + "\\CodeTemplates", macroTopicId + ".xml"));
             return "Template macros";
         }
 

@@ -30,12 +30,12 @@ namespace RsDocGenerator
     {
         public override string GenerateContent(IDataContext context, string outputFolder)
         {
-            return StartContentGeneration(context, outputFolder.GetGeneratedDocsFolder());
+            return StartContentGeneration(context, outputFolder.AddGeneratedPath());
         }
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            return GenerateDocs(context, outputFolder.GetGeneratedDocsFolder() + "\\EditorConfig");
+            return GenerateDocs(context, outputFolder.AddGeneratedPath() + "\\EditorConfig");
         }
 
         public static string GenerateDocs(IDataContext context, string path)

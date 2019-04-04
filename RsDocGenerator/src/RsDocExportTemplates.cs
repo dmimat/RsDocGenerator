@@ -24,7 +24,7 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            _templatesOutputFolder = outputFolder.GetGeneratedDocsFolder() + "\\CodeTemplates";
+            _templatesOutputFolder = outputFolder.AddGeneratedPath() + "\\CodeTemplates";
             var bound = context.GetComponent<ISettingsStore>().BindToContextTransient(ContextRange.ApplicationWide);
             foreach (TemplateApplicability applicability in Enum.GetValues(typeof(TemplateApplicability)))
                 CreateXml(applicability, bound, GeneralHelpers.GetCurrentVersion(), context);

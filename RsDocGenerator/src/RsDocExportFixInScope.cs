@@ -33,7 +33,7 @@ namespace RsDocGenerator
             inScopeLibrary.Root.Add(qfChunk);
             inScopeLibrary.Root.Add(caChunk);
 
-            inScopeLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder(), caTopicId + ".xml"));
+            inScopeLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath(), caTopicId + ".xml"));
             return "Fix in scope actions";
         }
 

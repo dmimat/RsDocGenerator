@@ -32,7 +32,7 @@ namespace RsDocGenerator
                 AddLangChunk(postfixLibrary, templateInLang, lang.Name);
             }
 
-            postfixLibrary.Save(Path.Combine(outputFolder.GetGeneratedDocsFolder() + "\\CodeTemplates", postfixTopicId + ".xml"));
+            postfixLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath() + "\\CodeTemplates", postfixTopicId + ".xml"));
             return "Postfix templates";
         }
 

@@ -161,7 +161,7 @@ namespace RsDocGenerator
         }
 
    
-        public static string GetGeneratedDocsFolder(this string outputFolder)
+        public static string AddGeneratedPath(this string outputFolder)
         {
             return outputFolder + "\\topics\\ReSharper\\Generated";
         }

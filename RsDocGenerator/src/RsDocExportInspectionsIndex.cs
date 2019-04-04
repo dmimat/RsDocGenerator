@@ -18,7 +18,7 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            outputFolder = outputFolder.GetGeneratedDocsFolder();
+            outputFolder = outputFolder.AddGeneratedPath();
             var featureDigger = new FeatureDigger(context);
             var configurableInspections = featureDigger.GetConfigurableInspections();
             var staticInspections = featureDigger.GetStaticInspections();

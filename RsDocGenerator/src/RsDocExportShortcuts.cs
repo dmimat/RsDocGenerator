@@ -141,7 +141,7 @@ namespace RsDocGenerator
                 actionMapElement.Add(actionElement);
             }
 
-            var generatedFolder = outputFolder + "\\topics\\ReSharper\\Generated";
+            var generatedFolder = outputFolder.AddGeneratedPath();
             shortcutsXmlDoc.Save(Path.Combine(outputFolder, "keymap.xml"));
             menuPathLibrary.Save(Path.Combine(generatedFolder, menuPathLibId + ".xml"));
             accessIntroLibrary.Save(Path.Combine(generatedFolder, accessIntroLibId + ".xml"));
