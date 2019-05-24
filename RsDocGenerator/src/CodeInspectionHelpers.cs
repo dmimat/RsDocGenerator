@@ -61,13 +61,18 @@ namespace RsDocGenerator
                 {"CSharpWarnings::CS0108,CS0114", "CSharpWarnings_CS0108_CS0114"},
                 {"CSharpWarnings::CS0660,CS0661", "CSharpWarnings_CS0660_CS0661"},
                 {"CSharpWarnings::CS0252,CS0253", "CSharpWarnings_CS0252_CS0253"},
+                {"VBWarnings::BC42105,BC42106,BC42107", "VBWarnings_BC42105_BC42106_BC42107"},
+                {"VBWarnings::BC42353,BC42354,BC42355", "VBWarnings_BC42353_BC42354_BC42355"},
                 {"VBWarnings::BC400005", "https://msdn.microsoft.com/en-us/library/fs06ef5d.aspx"},
                 {"VBWarnings::BC42358", "https://msdn.microsoft.com/en-us/library/hh965065.aspx"},
                 {"VBWarnings::BC42025", "https://msdn.microsoft.com/en-us/library/y6t76186.aspx"},
                 {"VBWarnings::BC40056", "https://msdn.microsoft.com/en-us/library/ms234657.aspx"},
                 {"VBWarnings::BC42016", "https://msdn.microsoft.com/en-us/library/56k670kt.aspx"},
                 {"VBWarnings::BC40008", "https://msdn.microsoft.com/en-us/library/s5f0ewa6.aspx"},
-                {"VBWarnings::BC42104", "https://msdn.microsoft.com/en-us/library/3fdk625a.aspx"}
+                {"VBWarnings::BC42104", "https://msdn.microsoft.com/en-us/library/3fdk625a.aspx"},
+                {"VBWarnings::BC42304", "https://docs.microsoft.com/en-us/dotnet/visual-basic/misc/bc42304"},
+                {"VBWarnings::BC42309", "https://docs.microsoft.com/en-us/dotnet/visual-basic/misc/bc42309"},
+                {"VBWarnings::BC42322", "https://docs.microsoft.com/en-us/dotnet/visual-basic/misc/bc42322"}
             };
 
             PsiLanguagesByCategoryNames = new Dictionary<string, string>
