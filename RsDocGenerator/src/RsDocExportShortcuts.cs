@@ -155,35 +155,35 @@ namespace RsDocGenerator
                 var previousKeystroke = "UNDEFINED";
                 foreach (var keystroke in currentShortcutsSet)
                 {
-                    var curretnKeystroke = keystroke.ToString();
+                    var currentKeystroke = keystroke.ToString();
                     // replace shortcuts like Control+K, Control+Z with Control+K Z
                     const string control = "Control+";
-                    if (curretnKeystroke.Split('+').Count(x => x.Contains("Control")) == 2)
+                    if (currentKeystroke.Split('+').Count(x => x.Contains("Control")) == 2)
                     {
-                        var place = curretnKeystroke.LastIndexOf(control);
-                        curretnKeystroke = curretnKeystroke.Remove(place, control.Length).Insert(place, "");
+                        var place = currentKeystroke.LastIndexOf(control);
+                        currentKeystroke = currentKeystroke.Remove(place, control.Length).Insert(place, "");
                     }
 
                     const string alt = "Alt+";
-                    if (curretnKeystroke.Split('+').Count(x => x.Contains("Alt")) == 2)
+                    if (currentKeystroke.Split('+').Count(x => x.Contains("Alt")) == 2)
                     {
-                        var place = curretnKeystroke.LastIndexOf(alt);
-                        curretnKeystroke = curretnKeystroke.Remove(place, alt.Length).Insert(place, "");
+                        var place = currentKeystroke.LastIndexOf(alt);
+                        currentKeystroke = currentKeystroke.Remove(place, alt.Length).Insert(place, "");
                     }
 
-                    curretnKeystroke = curretnKeystroke.Replace("D1", "1");
-                    curretnKeystroke = curretnKeystroke.Replace("D2", "2");
-                    curretnKeystroke = curretnKeystroke.Replace("D3", "3");
-                    curretnKeystroke = curretnKeystroke.Replace("D4", "4");
-                    curretnKeystroke = curretnKeystroke.Replace("D5", "5");
+                    currentKeystroke = currentKeystroke.Replace("D1", "1");
+                    currentKeystroke = currentKeystroke.Replace("D2", "2");
+                    currentKeystroke = currentKeystroke.Replace("D3", "3");
+                    currentKeystroke = currentKeystroke.Replace("D4", "4");
+                    currentKeystroke = currentKeystroke.Replace("D5", "5");
                     // drop same shortcuts
                     //                    var exists = (from nodes in actionElement.Elements()
                     //                        where nodes.Value == curretnKeystroke
                     //                        select nodes).FirstOrDefault();
-                    if (!previousKeystroke.Equals(curretnKeystroke))
-                        actionElement.Add(new XElement("Shortcut", curretnKeystroke,
+                    if (!previousKeystroke.Equals(currentKeystroke))
+                        actionElement.Add(new XElement("Shortcut", currentKeystroke,
                             new XAttribute("layout", keymapName)));
-                    previousKeystroke = curretnKeystroke;
+                    previousKeystroke = currentKeystroke;
                 }
             }
         }
