@@ -22,7 +22,7 @@ namespace RsDocGenerator
             if (solution == null) return "Open a solution to enable generation";
             //CppClangFormatConverter.myConverters.Keys
 
-            var clangFormatConverter = solution.GetComponent<CppClangFormatConverter>();
+            //var clangFormatConverter = solution.GetComponent<CppClangFormatConverter>();
 
             return "Clang options";
         }

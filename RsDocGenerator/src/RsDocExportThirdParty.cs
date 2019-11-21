@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.Util.Extension;
+using JetBrains.Util;
 
 namespace RsDocGenerator
 {
@@ -38,7 +37,7 @@ namespace RsDocGenerator
                 if (file.Name.Contains("ReSharper.")) productId = "rs";
                 if (file.Name.Contains("ReSharperCpp.")) productId = "rcpp";
                 if (file.Name.Contains("ReSharperCli.")) productId = "cli";
-                if (file.Name.Contains("ReSharperHost.")) productId = "rshost";
+                //if (file.Name.Contains("ReSharperHost.")) productId = "rshost";
                 if (file.Name.Contains("teamCityAddin.")) productId = "tca";
 //                if (file.Name.Contains("manual_additions")) productId = "man";
                 if (file.Name.Contains("Rider")) productId = "rdr";

@@ -48,7 +48,7 @@ namespace RsDocGenerator
                 lt =>
                 {
                     var optionsDialogOwner = context.GetComponent<OptionsDialogOwner>();
-                    var dialog = optionsDialogOwner.Create(lt, null);
+                    var dialog = optionsDialogOwner.Create(lt, null, null);
                     var dialogOptionsAutomation = dialog.OptionsAutomation;
 
                     var state = new OptionsPagesTraverseState();

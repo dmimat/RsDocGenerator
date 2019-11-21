@@ -97,7 +97,7 @@ namespace RsDocGenerator
                 topic.Save(fileName);
             }
 
-            sweaTable.Add(new XAttribute("include-id", "swea_table"));
+            sweaTable.Add(new XAttribute("id", "swea_table"));
             sweaTopic.Root.Add(sweaTable);
             sweaTopic.Save(sweaFileName);
 

@@ -46,7 +46,7 @@ namespace RsDocGenerator
 
         public static XElement CreateChunk(string includeId)
         {
-            return new XElement("chunk", new XAttribute("include-id", includeId));
+            return new XElement("chunk", new XAttribute("id", includeId));
         }
 
         public static XElement CreateInclude(string src, string id, bool nullable = false)
