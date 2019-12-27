@@ -44,44 +44,44 @@ namespace RsDocGenerator
             _catalogDocument.Add(new XElement("Options"));
             _currentParent = _catalogDocument.Root;
 
-            Lifetime.Using(
-                lt =>
-                {
-                    var optionsDialogOwner = context.GetComponent<OptionsDialogOwner>();
-                    var dialog = optionsDialogOwner.Create(lt, null, null);
-                    var dialogOptionsAutomation = dialog.OptionsAutomation;
-
-                    var state = new OptionsPagesTraverseState();
-
-                    dialogOptionsAutomation.Pages.View(lt,
-                        (_, page) => { HandlePage(page, state, _currentParent); });
-
-                    TraverseChildren(
-                        dialog.Model.Options.OptionPagesTree.RootElement,
-                        state,
-                        descriptor => { dialog.OptionsAutomation.SelectPage(descriptor.Id); });
-                });
+//            Lifetime.Using(
+//                lt =>
+//                {
+//                    var optionsDialogOwner = context.GetComponent<OptionsDialogOwner>();
+//                    var dialog = optionsDialogOwner.Create(lt, null, null);
+//                    var dialogOptionsAutomation = dialog.OptionsAutomation;
+//
+//                    var state = new OptionsPagesTraverseState();
+//
+//                    dialogOptionsAutomation.Pages.View(lt,
+//                        (_, page) => { HandlePage(page, state, _currentParent); });
+//
+//                    TraverseChildren(
+//                        dialog.Model.Options.OptionPagesTree.RootElement,
+//                        state,
+//                        descriptor => { dialog.OptionsAutomation.SelectPage(descriptor.Id); });
+//                });
             _catalogDocument.Save(_optionsFile);
         }
 
-        private static void HandlePage(WrappedOptionPage page, OptionsPagesTraverseState state, XElement parent)
-        {
-            if (page?.Page == null)
-            {
-                WriteMessage(page.Id, state, $"Page is null. comment={page.Comment}", parent);
-                return;
-            }
-
-            var contentPage = page.Page;
-            var optionsPageAttribute = contentPage.GetType().GetAttribute<OptionsPageAttribute>();
-            if (optionsPageAttribute == null)
-            {
-                WriteMessage(page.Id, state, "Can't find OptionsPageAttribute", parent);
-                return;
-            }
-
-            TryDumpPage(contentPage, state, parent, optionsPageAttribute);
-        }
+//        private static void HandlePage(WrappedOptionPage page, OptionsPagesTraverseState state, XElement parent)
+//        {
+//            if (page?.Page == null)
+//            {
+//                WriteMessage(page.Id, state, $"Page is null. comment={page.Comment}", parent);
+//                return;
+//            }
+//
+//            var contentPage = page.Page;
+//            var optionsPageAttribute = contentPage.GetType().GetAttribute<OptionsPageAttribute>();
+//            if (optionsPageAttribute == null)
+//            {
+//                WriteMessage(page.Id, state, "Can't find OptionsPageAttribute", parent);
+//                return;
+//            }
+//
+//            TryDumpPage(contentPage, state, parent, optionsPageAttribute);
+//        }
 
         private static void TryDumpPage(IOptionsPage page, OptionsPagesTraverseState state, XElement parent,
             OptionsPageAttribute optionsPageAttribute)
@@ -201,7 +201,8 @@ namespace RsDocGenerator
 
             private static string Dump(StringOptionViewModel vm)
             {
-                return vm.Text;
+//                return vm.Text;
+                return null;
             }
 
             private static string Dump(BoolOptionViewModel vm)

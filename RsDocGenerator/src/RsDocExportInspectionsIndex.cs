@@ -78,8 +78,8 @@ namespace RsDocGenerator
                                     XmlHelpers.CreateHyperlink(inspection.Text,
                                         CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null, true),
                                     new XComment(compoundName)),
-                                new XElement("td", new XElement("code", inspection.Id)),
-                                new XElement("td", new XElement("code", inspection.EditorConfigId)),
+                                new XElement("td", new XAttribute("filter", "inspection_id"), new XElement("code", inspection.Id)),
+                                new XElement("td", new XAttribute("filter", "editorconfig_id"), new XElement("code", inspection.EditorConfigId)),
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
                         if (inspection.SweaRequired)
                             sweaTable.Add(
