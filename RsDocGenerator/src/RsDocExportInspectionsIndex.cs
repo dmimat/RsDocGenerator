@@ -53,10 +53,10 @@ namespace RsDocGenerator
                         new XAttribute("name", "errCount"),
                         new XAttribute("value", errorCount)));
 
-                topicRoot.Add(intro);
-
                 if (langPresentable.Equals("C++"))
-                    topicRoot.Add(XmlHelpers.CreateInclude("Code_Analysis_in_CPP", "cpp_support_note"));
+                    topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
+                
+                topicRoot.Add(intro);
 
                 foreach (var category in configCategories)
                 {

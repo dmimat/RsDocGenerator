@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.DataContext;
@@ -227,6 +228,11 @@ namespace RsDocGenerator
             input = input.Replace(" ReSharper ", " %product% ");
             input = input.Replace(" options", " %settingsLower%");
             return input;
+        }
+
+        public static XElement CppSupportNoteElement()
+        {
+            return new XElement("available-only-for", "ReSharper Ultimate or ReSharper C++");
         }
     }
 }
