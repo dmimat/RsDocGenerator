@@ -164,13 +164,13 @@ namespace RsDocGenerator
                         new XElement("code", "END"), " - The caret position after the template is applied."));
 
                 var processedLangs = new List<string>();
+                var knownTemplateIds = new List<string>();
 
                 foreach (var lang in currentTemplateLangs)
                     if (!processedLangs.Contains(lang))
                     {
                         AddTemplateRow(tables, summaryItems, lang, templateIdPresentable, template, scopeString,
-                            paramElement, type,
-                            imported);
+                            paramElement, type, imported, knownTemplateIds);
                         processedLangs.Add(lang);
                     }
             }
@@ -263,12 +263,15 @@ namespace RsDocGenerator
         private static void AddTemplateRow(Dictionary<string, XElement> tables,
             List<Tuple<string, XElement>> summaryItems,
             string lang, string templateId, Template template,
-            string scopeString, XElement paramElement, string type, string imported)
+            string scopeString, XElement paramElement, string type, string imported, List<string> knownTemplateIds)
         {
             if (!imported.IsNullOrEmpty())
                 imported = string.Format(" ({0})", imported);
             var templateIdFull = (type + "_" + templateId + "_" + lang).NormalizeStringForAttribute();
-
+            if (!knownTemplateIds.Contains(templateIdFull))
+                knownTemplateIds.Add(templateIdFull);
+            else
+                return;
 
             var noDescriptionFallback =
                 (template.Description.IsNullOrEmpty() || type == "File" || type == "Surround") &&
