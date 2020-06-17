@@ -80,7 +80,8 @@ namespace RsDocGenerator
                 .EnumerateTemplates(bound, applicability, false);
 
             var myScopeCategoryManager = context.GetComponent<ScopeCategoryManager>();
-
+            var knownTemplateIds = new List<string>();
+            
             foreach (var template in defaultTemplates)
             {
                 var templateIdPresentable =
@@ -164,7 +165,6 @@ namespace RsDocGenerator
                         new XElement("code", "END"), " - The caret position after the template is applied."));
 
                 var processedLangs = new List<string>();
-                var knownTemplateIds = new List<string>();
 
                 foreach (var lang in currentTemplateLangs)
                     if (!processedLangs.Contains(lang))

@@ -7,6 +7,8 @@ using JetBrains.Application.DataContext;
 using JetBrains.Application.Environment;
 using JetBrains.Application.Extensibility;
 using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.Calculated.Implementation;
+using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Settings.Implementation;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.DataFlow;
@@ -81,7 +83,7 @@ namespace RsDocGenerator
 //                });
 
                 // To filter out duplicate entries for one setting
-                var settingsToEntry = new Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>>();
+                var settingsToEntry = new Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>>();
                 var excludedEntries = new HashSet<ICodeStyleEntry>();
                 var excludedSchemas = new HashSet<ICodeStylePageSchema>();
                 foreach (var schema in schemas)
@@ -123,13 +125,13 @@ namespace RsDocGenerator
 
         private static void FillSettingsToEntryDictionary(
             ICodeStyleEntry entry, KnownLanguage schemaLanguage,
-            Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
+            Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
             IEditorConfigSchema ecService)
         {
-            var settingsEntry = entry.SettingsEntry;
+            var settingsEntry = entry.SettingsEntry as IStoredScalarSetting;
             if (settingsEntry != null)
             {
-                var propertyInfo = ecService.GetPropertiesForSettingsEntry(settingsEntry).FirstOrDefault();
+                var propertyInfo = ecService.GetPropertiesForSettingsEntry(settingsEntry.SettingIndex).FirstOrDefault();
                 if (propertyInfo != null && !propertyInfo.HideThisProperty)
                 {
                     var pair = settingsToEntry.GetValueSafe(settingsEntry);
@@ -156,7 +158,7 @@ namespace RsDocGenerator
 
         private static bool CalculateIfEntryShouldBeExcluded(
             ICodeStyleEntry entry, KnownLanguage schemaLanguage,
-            Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
+            Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
             HashSet<ICodeStyleEntry> excludedEntries)
         {
             var excludeEntry = true;

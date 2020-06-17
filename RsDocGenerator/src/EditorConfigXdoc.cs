@@ -9,6 +9,8 @@ using JetBrains.Application;
 using JetBrains.Application.Catalogs;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.Calculated.Implementation;
+using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Settings.Implementation;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
@@ -184,7 +186,7 @@ namespace RsDocGenerator
                 chapterAllows.Add(list);
                 chapterTopLevel.Add(chapterAllows);
 
-                DescribePossibleValues(chapterTopLevel, propInfo.ValueTypeInfo.ValueType,
+                DescribePossibleValues(chapterTopLevel, propInfo.ValueTypeInfo.ValueType.Bind(),
                     propInfo.ValueTypeInfo.Values);
 
                 editorConfigGeneralizedTopic.Root.Add(chapterTopLevel);
@@ -197,7 +199,7 @@ namespace RsDocGenerator
             IDocument documentBefore, IDocument documentAfter, Lifetime lifetime,
             SettingsStore settingsStore, IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
             IEditorConfigSchema ecService,
-            Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
+            Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
             HashSet<ICodeStyleEntry> excludedEntries, CodePreviewPreparator preparator, ISolution solution,
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map)
         {
@@ -234,7 +236,7 @@ namespace RsDocGenerator
             SettingsStore settingsStore,
             IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
             IDocument documentAfter, IEditorConfigSchema ecService,
-            Dictionary<SettingsEntry, Pair<ICodeStyleEntry, KnownLanguage>>
+            Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>>
                 settingsToEntry,
             HashSet<ICodeStyleEntry> excludedEntries, KnownLanguage language,
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
@@ -243,7 +245,7 @@ namespace RsDocGenerator
             if (excludedEntries.Contains(entry)) return;
 
             string settingsName = null;
-            var settingsEntry = entry.SettingsEntry;
+            var settingsEntry = entry.SettingsEntry as IStoredScalarSetting;
             if (settingsEntry != null)
                 if (settingsToEntry.GetValueSafe(settingsEntry).First != entry)
                     settingsEntry = null;
@@ -253,7 +255,7 @@ namespace RsDocGenerator
             var description = entry.Description;
             if (settingsEntry != null)
             {
-                propertyInfo = ecService.GetPropertiesForSettingsEntry(settingsEntry)
+                propertyInfo = ecService.GetPropertiesForSettingsEntry(settingsEntry.SettingIndex)
                     .OrderByDescending(it => it.Priority)
                     .FirstOrDefault();
 
@@ -273,7 +275,7 @@ namespace RsDocGenerator
 
             if (settingsEntry != null)
             {
-                foreach (var prop in ecService.GetPropertiesForSettingsEntry(settingsEntry))
+                foreach (var prop in ecService.GetPropertiesForSettingsEntry(settingsEntry.SettingIndex))
                     map.Add(prop.Alias,
                         new RsDocExportEditorConfigStyles.PropertyDescription
                         {
@@ -351,10 +353,10 @@ namespace RsDocGenerator
             CodePreviewPreparator preparator,
             ISolution solution, IDocument documentBefore, Lifetime lifetime, SettingsStore settingsStore,
             IContextBoundSettingsStoreLive contextBoundSettingsStoreLive, IDocument documentAfter,
-            SettingsScalarEntry settingsEntry, IEditorConfigSchema ecService,
+            IStoredScalarSetting settingsEntry, IEditorConfigSchema ecService,
             KnownLanguage language)
         {
-            var aliases = ecService.GetPropertiesForSettingsEntry(settingsEntry)
+            var aliases = ecService.GetPropertiesForSettingsEntry(settingsEntry.SettingIndex)
                 .OrderByDescending(it => it.Priority)
                 .ToArray();
 
@@ -368,7 +370,7 @@ namespace RsDocGenerator
             if (previewType == PreviewType.Description)
                 container.Add(XmlHelpers.CreateCodeBlock(previewData.Text, language.Name, true));
 
-            var valueType = settingsEntry.ValueClrType;
+            var valueType = settingsEntry.ResultType;
             var enumValues = propertyInfo.ValueTypeInfo.Values;
             var possibleValues = DescribePossibleValues(container, valueType, enumValues);
 
@@ -398,8 +400,10 @@ namespace RsDocGenerator
 
                         codeBefore = documentBefore.GetText();
                     }
-
-                    var oldValue = previewSettings.GetValue(settingsEntry, null);
+                    
+                    if(codeBefore == null) return;
+                    
+                    var oldValue = settingsEntry.GetValueUntyped(previewSettings);
 
                     try
                     {
@@ -420,7 +424,7 @@ namespace RsDocGenerator
                                 table = XmlHelpers.CreateTable(new[] {pair.Item1}, null);
                             }
 
-                            previewSettings.SetValue(settingsEntry, pair.Item3, null);
+                            settingsEntry.SetValueUntyped(pair.Item3, previewSettings);
                             preparator.PrepareText(
                                 solution,
                                 documentAfter,
@@ -436,7 +440,7 @@ namespace RsDocGenerator
                     }
                     finally
                     {
-                        previewSettings.SetValue(settingsEntry, oldValue, null);
+                        settingsEntry.SetValueUntyped(oldValue, previewSettings);
                     }
 
                     container.Add(chapterExamples);
@@ -476,10 +480,9 @@ namespace RsDocGenerator
         }
 
         private static Tuple<string, string, object>[] DescribePossibleValues(
-            XElement container, PartCatalogType valueType, IReadOnlyCollection<IEditorConfigValueInfo> enumValues)
+            XElement container, Type type, IReadOnlyCollection<IEditorConfigValueInfo> enumValues)
         {
             Tuple<string, string, object>[] possibleValues = null;
-            var type = valueType.Bind();
             if (type == typeof(bool))
                 possibleValues = new[]
                 {

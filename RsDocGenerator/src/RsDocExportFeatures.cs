@@ -157,16 +157,16 @@ namespace RsDocGenerator
                             {
                                 var a = (ConfigurableSeverityHighlightingAttribute) attr;
                                 id = a.ConfigurableSeverityId;
-                                var inpectionInstance = HighlightingSettingsManager.Instance.GetSeverityItem(id);
+                                var inspectionInstance = HighlightingSettingsManager.Instance.TryGetSeverityItem(id);
                                 lang = GetLangsForInspection(id);
-                                if (inpectionInstance != null)
+                                if (inspectionInstance != null)
                                 {
-                                    name = inpectionInstance.FullTitle;
-                                    description = inpectionInstance.Description;
-                                    severity = inpectionInstance.DefaultSeverity.ToString();
-                                    solutionWide = inpectionInstance.SolutionAnalysisRequired ? "yes" : "no";
-                                    group = inpectionInstance.GroupId;
-                                    compoundName = inpectionInstance.CompoundItemName;
+                                    name = inspectionInstance.FullTitle;
+                                    description = inspectionInstance.Description;
+                                    severity = inspectionInstance.DefaultSeverity.ToString();
+                                    solutionWide = inspectionInstance.SolutionAnalysisRequired ? "yes" : "no";
+                                    group = inspectionInstance.GroupId;
+                                    compoundName = inspectionInstance.CompoundItemName;
                                     configurable = "yes";
                                     break;
                                 }

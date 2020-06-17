@@ -78,8 +78,8 @@ namespace RsDocGenerator
             PsiLanguagesByCategoryNames = new Dictionary<string, string>
             {
                 {"CSharpErrors", "CSHARP"},
-                {WebConfigStaticHighlightingsGroups.WEB_CONFIG_ERRORS_GROUP, "Web.Config"},
-                {XamlStaticHighlightingsGroups.XAML_ERRORS_GROUP, "XAML"},
+                {"WebConfig Errors", "Web.Config"},
+                {"XAML Errors", "XAML"},
                 {"HtmlErrors", "HTML"},
                 {"XMLErrors", "XML"},
                 {"AsxxErrors", "ASXX"},
@@ -87,7 +87,9 @@ namespace RsDocGenerator
                 {"CppCompilerErrors", "CPP"},
                 {"VBErrors", "VBASIC"},
                 {"JScriptErrors", "JAVA_SCRIPT"},
-                {RazorStaticHighlightingsGroups.RazorErrorsGroup, "Razor"}
+                {"Razor Errors", "Razor"},
+                {"Razor Warnings", "Razor"},
+                {"Razor Info", "Razor"},
             };
         }
 
