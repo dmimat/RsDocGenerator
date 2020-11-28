@@ -53,9 +53,9 @@ namespace RsDocGenerator
                         new XAttribute("name", "errCount"),
                         new XAttribute("value", errorCount)));
 
-                if (langPresentable.Equals("C++"))
-                    topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
-                
+                // if (langPresentable.Equals("C++"))
+                //     topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
+
                 topicRoot.Add(intro);
 
                 foreach (var category in configCategories)
@@ -77,9 +77,13 @@ namespace RsDocGenerator
                                 new XElement("td",
                                     XmlHelpers.CreateHyperlink(inspection.Text,
                                         CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null, true),
-                                    new XComment(compoundName)),
-                                new XElement("td", new XAttribute("filter", "inspection_id"), new XElement("code", inspection.Id)),
-                                new XElement("td", new XAttribute("filter", "editorconfig_id"), new XElement("code", inspection.EditorConfigId)),
+                                    new XComment(compoundName),
+                                    new XElement("for", new XAttribute("filter", "inspection_id"),
+                                        new XElement("br"),
+                                        new XElement("code", inspection.Id)),
+                                    new XElement("for", new XAttribute("filter", "editorconfig_id"),
+                                        new XElement("br"),
+                                        new XElement("code", inspection.EditorConfigId))),
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
                         if (inspection.SweaRequired)
                             sweaTable.Add(

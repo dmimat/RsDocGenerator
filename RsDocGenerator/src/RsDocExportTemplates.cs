@@ -214,8 +214,8 @@ namespace RsDocGenerator
             var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
             var topicRoot = topic.Root;
             
-            if (lang.Equals("C++"))
-                topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
+            // if (lang.Equals("C++"))
+            //     topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
 
             // TODO: templates explorer path for Rider
             topicRoot.Add(new XElement("p",
