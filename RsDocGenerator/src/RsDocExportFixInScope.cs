@@ -42,7 +42,7 @@ namespace RsDocGenerator
             var chunk = XmlHelpers.CreateChunk(chunkName);
             foreach (var lang in fixesInScope.Languages.OrderBy())
             {
-                var langChapter = XmlHelpers.CreateChapter(GeneralHelpers.GetPsiLanguagePresentation(lang), lang);
+                var langChapter = XmlHelpers.CreateChapter(GeneralHelpers.GetPsiLanguagePresentation(lang), chunkName + "_" + lang);
                 var langList = new XElement("list");
                 foreach (var fixInScope in
                     fixesInScope.GetLangImplementations(lang).GroupBy(x => x.Text).Select(x => x.First()))

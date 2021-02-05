@@ -400,9 +400,7 @@ namespace RsDocGenerator
 
                         codeBefore = documentBefore.GetText();
                     }
-                    
-                    if(codeBefore == null) return;
-                    
+
                     var oldValue = settingsEntry.GetValueUntyped(previewSettings);
 
                     try
@@ -432,8 +430,13 @@ namespace RsDocGenerator
                                 previewData.Parse,
                                 previewSettings);
 
+                            var docAfterText = documentAfter.GetText();
+
+                            if (docAfterText.IsNullOrWhitespace())
+                                return;
+
                             tr.Add(new XElement("td",
-                                XmlHelpers.CreateCodeBlock(documentAfter.GetText(), language.PresentableName, true)));
+                                XmlHelpers.CreateCodeBlock(docAfterText, language.PresentableName, true)));
                             table.Add(tr);
                             chapterExamples.Add(table);
                         }

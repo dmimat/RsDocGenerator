@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains;
 using JetBrains.Application;
@@ -10,7 +11,9 @@ using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Implementation;
 using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.Application.Settings.Implementation;
+using JetBrains.Application.Threading;
 using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
@@ -22,6 +25,7 @@ using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle;
 using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle.ViewModels;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.EditorConfig;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 
@@ -47,14 +51,16 @@ namespace RsDocGenerator
 
             Lifetime.Using(lifetime =>
             {
-                var ecService = solution.GetComponent<IEditorConfigSchema>();
+                var threading = solution.GetComponent<IThreading>();
+                if (threading == null) throw new InvalidOperationException("Threading is not available");
+
+                var ecService = Shell.Instance.GetComponent<IEditorConfigSchema>();
                 var partsCatalogue = solution.GetComponent<ShellPartCatalogSet>();
                 var container = new ComponentContainer(lifetime, "Inplace Format Container");
                 var settingsStore = solution.GetComponent<SettingsStore>();
                 var host = solution.GetComponent<IApplicationHost>();
 
-                var contextBoundSettingsStoreLive =
-                    settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide);
+                var contextBoundSettingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide);
                 var documentFactory = solution.GetComponent<IInMemoryDocumentFactory>();
                 var documentBefore = documentFactory.CreateSimpleDocumentFromText(string.Empty, "Preview doc before");
                 var documentAfter = documentFactory.CreateSimpleDocumentFromText(string.Empty, "Preview doc after");
@@ -64,14 +70,15 @@ namespace RsDocGenerator
                     .RegisterCatalog<CodePreviewPreparatorComponentAttribute>(partsCatalogue)
                     //.RegisterCatalog<OptionsComponentAttribute>(partsCatalogue)
                     .Register(lifetime)
+                    .Register(threading)
                     .Register(contextBoundSettingsStoreLive)
                     .Register<ValueEditorViewModelFactory>()
                     .Register<SettingsToHide>()
-                    //.Register<IndentStyleSettingsAvailabilityChecker>()
+                    .ChainTo(SolutionInstance.GetContainer(solution))
                     .Compose();
 
-                var schemas = container.GetComponents<ICodeStylePageSchema>()
-                    .OrderBy(schema => schema.GetType().FullName).ToList();
+                var schemas = container.GetComponents<ICodeStylePageSchema>().OrderBy(schema => schema.GetType().FullName).ToList();
+
 
 //                FileSystemPath.Parse(path).Combine("debug.log").WriteTextStreamDenyWrite(writer =>
 //                {
@@ -87,18 +94,28 @@ namespace RsDocGenerator
                 var excludedEntries = new HashSet<ICodeStyleEntry>();
                 var excludedSchemas = new HashSet<ICodeStylePageSchema>();
                 foreach (var schema in schemas)
-                foreach (var entry in schema.Entries)
-                    FillSettingsToEntryDictionary(entry, schema.Language, settingsToEntry, ecService);
+                {
+                    foreach (var entry in schema.Entries)
+                    {
+                        FillSettingsToEntryDictionary(entry, schema.Language, settingsToEntry, ecService);
+                    }
+                }
 
                 foreach (var schema in schemas)
                 {
-                    var excludeSchema = true;
+                    bool excludeSchema = true;
                     foreach (var entry in schema.Entries)
+                    {
                         if (!CalculateIfEntryShouldBeExcluded(entry, schema.Language, settingsToEntry, excludedEntries))
+                        {
                             excludeSchema = false;
+                        }
+                    }
 
                     if (excludeSchema)
+                    {
                         excludedSchemas.Add(schema);
+                    }
                 }
 
                 var map = new OneToListMultimap<string, PropertyDescription>();
