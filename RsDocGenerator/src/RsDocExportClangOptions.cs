@@ -1,8 +1,6 @@
 ﻿using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.DataContext;
-using JetBrains.ReSharper.Feature.Services.Cpp.CodeStyle;
 
 namespace RsDocGenerator
 {
