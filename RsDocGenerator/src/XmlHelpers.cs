@@ -14,7 +14,7 @@ namespace RsDocGenerator
             XNamespace xsiNs = "http://www.w3.org/2001/XMLSchema-instance";
             topicDocument.Root.Add(
                 new XAttribute(xsiNs + "noNamespaceSchemaLocation",
-                    "https://helpserver.labs.jb.gg/help/topic.v2.xsd"),
+                    "https://resources.jetbrains.com/stardust/topic.v2.xsd"),
                 new XAttribute(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
                 new XAttribute("id", topicId),
                 new XAttribute("title", title));

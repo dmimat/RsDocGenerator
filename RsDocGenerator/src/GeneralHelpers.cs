@@ -230,9 +230,24 @@ namespace RsDocGenerator
             return input;
         }
 
-        public static XElement CppSupportNoteElement()
+        public static bool TemplateAvailableInRider(string lang)
         {
-            return new XElement("available-only-for", "ReSharper Ultimate or ReSharper C++");
+            switch (lang)
+            {
+                case "C++":
+                case "Angular 2 HTML":
+                case "Global":
+                case "XML":
+                case "JavaScript":
+                case "TypeScript":
+                case "CSS":
+                case "HTML-Like":
+                case "HTML":
+                case "Resx":
+                    return false;
+                default:
+                    return true;
+            }
         }
     }
 }

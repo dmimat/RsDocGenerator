@@ -69,7 +69,7 @@ namespace RsDocGenerator
                 new XAttribute("product", "rs")));
 
             topicRoot.Add(new XElement("p",
-                "This section lists all predefined " + type + " templates in %product% %currentVersion%."));
+                "This topic lists all predefined " + type + " templates in %product% %currentVersion%."));
 
             topicRoot.Add(new XElement("p",
                 XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Types", type, false)));
@@ -88,18 +88,11 @@ namespace RsDocGenerator
                     !template.Shortcut.IsNullOrEmpty() ? template.Shortcut : template.Description;
                 templateIdPresentable = Regex.Replace(templateIdPresentable, "&Enum", "Enum");
                 var currentTemplateLangs = new List<string>();
-                var imported = string.Empty;
                 var scopeString = string.Empty;
                 var cat = string.Empty;
 
                 foreach (var category in template.Categories)
                 {
-                    if (category.Contains("Imported"))
-                    {
-                        imported = category;
-                        break;
-                    }
-
                     if (category.Contains("C#")) cat = "C#";
                     if (category.Contains("VB.NET")) cat = "VB.NET";
                 }
@@ -170,7 +163,7 @@ namespace RsDocGenerator
                     if (!processedLangs.Contains(lang))
                     {
                         AddTemplateRow(tables, summaryItems, lang, templateIdPresentable, template, scopeString,
-                            paramElement, type, imported, knownTemplateIds);
+                            paramElement, type, knownTemplateIds);
                         processedLangs.Add(lang);
                     }
             }
@@ -183,7 +176,7 @@ namespace RsDocGenerator
                         new XAttribute("colspan", "2"),
                         new XElement("b", lang)));
 
-                if (lang == "C++" || lang == "Angular 2 HTML")
+                if (!GeneralHelpers.TemplateAvailableInRider(lang))
                     XmlHelpers.AddRsOnlyAttribute(langHeaderRow);
 
                 summaryTable.Add(langHeaderRow);
@@ -263,10 +256,8 @@ namespace RsDocGenerator
         private static void AddTemplateRow(Dictionary<string, XElement> tables,
             List<Tuple<string, XElement>> summaryItems,
             string lang, string templateId, Template template,
-            string scopeString, XElement paramElement, string type, string imported, List<string> knownTemplateIds)
+            string scopeString, XElement paramElement, string type, List<string> knownTemplateIds)
         {
-            if (!imported.IsNullOrEmpty())
-                imported = string.Format(" ({0})", imported);
             var templateIdFull = (type + "_" + templateId + "_" + lang).NormalizeStringForAttribute();
             if (!knownTemplateIds.Contains(templateIdFull))
                 knownTemplateIds.Add(templateIdFull);
@@ -286,7 +277,7 @@ namespace RsDocGenerator
 
             tables[lang].Add(new XElement("tr",
                 new XElement("td",
-                    new XElement("code", templateId), imported,
+                    new XElement("code", templateId), 
                     new XAttribute("id", templateIdFull)),
                 new XElement("td",
                     new XElement("p", noDescriptionFallback),
@@ -299,13 +290,12 @@ namespace RsDocGenerator
 
             var summaryItemRow = new XElement("tr",
                 new XElement("td",
-                    XmlHelpers.CreateHyperlink(templateId, CreateTopicIdForTypeAndLang(lang, type), templateIdFull,
-                        false),
-                    imported),
+                    XmlHelpers.CreateHyperlink(templateId, 
+                        CreateTopicIdForTypeAndLang(lang, type), templateIdFull)),
                 new XElement("td", noDescriptionFallback));
-            if (lang == "C++" || lang == "Angular 2 HTML")
+            
+            if (!GeneralHelpers.TemplateAvailableInRider(lang))
                 XmlHelpers.AddRsOnlyAttribute(summaryItemRow);
-
 
             summaryItems.Add(
                 new Tuple<string, XElement>(lang, summaryItemRow));

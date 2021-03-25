@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-using JetBrains.ReSharper.Daemon.Razor.Highlightings;
-using JetBrains.ReSharper.Daemon.WebConfig.Highlightings;
-using JetBrains.ReSharper.Daemon.Xaml.Highlightings;
 
 namespace RsDocGenerator
 {

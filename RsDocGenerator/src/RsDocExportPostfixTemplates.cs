@@ -21,7 +21,7 @@ namespace RsDocGenerator
             var allTemplates = context.GetComponent<PostfixTemplatesManager>().AllRegisteredPostfixTemplates.ToList();
             const string postfixTopicId = "Postfix_Templates_Generated";
             var postfixLibrary = XmlHelpers.CreateHmTopic(postfixTopicId, "Postfix templates chunks");
-            postfixLibrary.Root.Add(new XComment("Total postifix templates in ReSharper " +
+            postfixLibrary.Root.Add(new XComment("Total postfix templates in ReSharper " +
                                                  GeneralHelpers.GetCurrentVersion() + ": " + allTemplates.Count));
 
             var langs = allTemplates.Select(x => x.Template.Language).Distinct();
