@@ -7,7 +7,8 @@ namespace RsDocGenerator
     {
         public static XDocument CreateHmTopic(string topicId, string title)
         {
-            var topicDocument = new XDocument();
+            var topicDocument = new XDocument(
+                new XDocumentType("topic", null, "https://resources.jetbrains.com/stardust/html-entities.dtd", null));
             //topicDocument.Add(new XComment("suppress AttributeValueVerifier"));
             topicDocument.Add(new XElement("topic"));
 

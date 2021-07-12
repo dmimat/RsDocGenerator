@@ -36,7 +36,8 @@ namespace RsDocGenerator
             {"ASXX", "HttpHandler or WebService"},
             {"Razor", "Razor"},
             {"TYPE_SCRIPT", "TypeScript"},
-            {"REGULAR_EXPRESSION", "Regular expressions"}
+            {"REGULAR_EXPRESSION", "Regular expressions"},
+            {"RouteTemplate", "Route templates"},
         };
 
         public static string GetCurrentVersion()
