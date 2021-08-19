@@ -262,7 +262,8 @@ namespace RsDocGenerator
                 if (propertyInfo != null)
                 {
                     settingsName = propertyInfo.Alias;
-                    description = propertyInfo.Description;
+                    if(propertyInfo.Description != null) 
+                        description = propertyInfo.Description;
                 }
             }
 
