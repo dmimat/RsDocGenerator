@@ -424,12 +424,19 @@ namespace RsDocGenerator
                             }
 
                             settingsEntry.SetValueUntyped(pair.Item3, previewSettings);
-                            preparator.PrepareText(
-                                solution,
-                                documentAfter,
-                                previewData.Text,
-                                previewData.Parse,
-                                previewSettings);
+                            try
+                            {
+                                preparator.PrepareText(
+                                    solution,
+                                    documentAfter,
+                                    previewData.Text,
+                                    previewData.Parse,
+                                    previewSettings);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e);
+                            }
 
                             var docAfterText = documentAfter.GetText();
 
