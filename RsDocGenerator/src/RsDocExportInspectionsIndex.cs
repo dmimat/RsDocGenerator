@@ -38,14 +38,14 @@ namespace RsDocGenerator
                 var fileName = Path.Combine(outputFolder + "\\CodeInspectionIndex", topicId + ".xml");
                 var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
                 var topicRoot = topic.Root;
+                topicRoot.Add(new XElement("var",
+                    new XAttribute("name", "lang"),
+                    new XAttribute("value", langPresentable)));
                 var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
                 var errorCount = staticInspections.GetLangImplementations(language).Count;
                 if (staticInspections.GetLangImplementations(language).Count < 2)
                     intro.Add(new XAttribute("filter", "empty"));
                 intro.Add(
-                    new XElement("var",
-                        new XAttribute("name", "lang"),
-                        new XAttribute("value", langPresentable)),
                     new XElement("var",
                         new XAttribute("name", "count"),
                         new XAttribute("value", configurableInspections.GetLangImplementations(language).Count)),

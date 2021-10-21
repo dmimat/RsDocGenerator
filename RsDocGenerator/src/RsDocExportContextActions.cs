@@ -39,12 +39,12 @@ namespace RsDocGenerator
                         XmlHelpers.CreateTwoColumnTable("Name",
                             "Description", "40%"));
 
-                var exampleTable = ExtractExamples(ca, caPath, lang);
+                //var exampleTable = ExtractExamples(ca, caPath, lang);
 
                 tablesByLanguage[lang].Add(new XElement("tr",
                     new XElement("td", new XElement("b", ca.Name)),
-                    new XElement("td",
-                        ca.Description ?? "", exampleTable,
+                    new XElement("td", 
+                        new XElement("p", ca.Description),
                         XmlHelpers.CreateInclude("CA_Static_Chunks", ca.ActionKey.NormalizeStringForAttribute(),
                             true))));
             }

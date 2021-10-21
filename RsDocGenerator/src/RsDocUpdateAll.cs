@@ -26,9 +26,9 @@ namespace RsDocGenerator
             RsDocExportPostfixTemplates.StartContentGeneration(context, outputFolder);
             RsDocExportMacros.StartContentGeneration(context, outputFolder);
             RsDocExportInspectionsIndex.StartContentGeneration(context, outputFolder);
-            //RsDocExportContextActions.StartContentGeneration(context, outputFolder);
+            RsDocExportContextActions.StartContentGeneration(context, outputFolder);
             RsDocExportFixInScope.StartContentGeneration(context, outputFolder);
-            RsDocExportThirdParty.StartContentGeneration(context, outputFolder);
+            //RsDocExportThirdParty.StartContentGeneration(context, outputFolder);
             RsDocExportEditorConfigStyles.StartContentGeneration(context, outputFolder);
 
 

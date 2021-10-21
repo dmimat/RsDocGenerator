@@ -171,16 +171,23 @@ namespace RsDocGenerator
                 var chapterAllows = XmlHelpers.CreateChapterWithoutId("Allows setting the following properties:");
                 var list = new XElement("list");
 
-                foreach (var val1 in map[propInfo.Alias])
+                try
                 {
-                    var lang = val1.Language.PresentableName;
-                    var content = val1.SectionDescription == null
-                        ? val1.Description
-                        : val1.SectionDescription + " - " + val1.Description + " (" + lang + ")";
-                    var li = new XElement("li", XmlHelpers.CreateHyperlink(content, val1.FileName, val1.Id, false));
-                    if (!lang.IsLangSupportedInRider())
-                        li.Add(new XAttribute("product", "!rdr"));
-                    list.Add(li);
+                    foreach (var val1 in map[propInfo.Alias])
+                    {
+                        var lang = val1.Language.PresentableName;
+                        var content = val1.SectionDescription == null
+                            ? val1.Description
+                            : val1.SectionDescription + " - " + val1.Description + " (" + lang + ")";
+                        var li = new XElement("li", XmlHelpers.CreateHyperlink(content, val1.FileName, val1.Id, false));
+                        if (!lang.IsLangSupportedInRider())
+                            li.Add(new XAttribute("product", "!rdr"));
+                        list.Add(li);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
                 }
 
                 chapterAllows.Add(list);

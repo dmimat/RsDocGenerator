@@ -101,27 +101,33 @@ namespace RsDocGenerator
                     new XAttribute("title", actionText),
                     new XAttribute("menupath", pathToTheRoot));
                 var accessIntroChunk = XmlHelpers.CreateChunk(actionId);
-                var accessIntroWrapper = new XElement("p");
+                var accessIntroWrapper = new XElement("microformat");
                 if (!pathToTheRoot.IsNullOrEmpty())
                 {
-                    var menupPathChunk = XmlHelpers.CreateChunk(actionId);
+                    var menuPathChunk = XmlHelpers.CreateChunk(actionId);
                     pathToTheRoot =
                         pathToTheRoot.Replace("ReSharper | Navigate ", "%navigateMenu%")
                             .Replace("ReSharper | Windows ", "%windowsMenu%");
-                    menupPathChunk.Add(new XElement("menupath", pathToTheRoot));
-                    accessIntroWrapper.Add(new XElement("menupath", pathToTheRoot));
-                    accessIntroWrapper.Add(new XElement("br"));
-                    menuPathLibrary.Root.Add(menupPathChunk);
+                    menuPathChunk.Add(new XElement("menupath", pathToTheRoot));
+                    accessIntroWrapper.Add(new XElement("p", new XElement("menupath", pathToTheRoot)));
+                    menuPathLibrary.Root.Add(menuPathChunk);
                 }
-
+                
+                var shortcutWrapper = new XElement("p");
+                
                 if (ideaShortcuts != null || vsShortcuts != null)
                 {
-                    accessIntroWrapper.Add(new XElement("shortcut", new XAttribute("key", actionId)));
-                    accessIntroWrapper.Add(new XElement("br"));
+                    shortcutWrapper.Add(new XElement("shortcut", new XAttribute("key", actionId)));
+                    shortcutWrapper.Add(XElement.Parse($"<for product=\"rs,dcv\">(<code>ReSharper_{actionId}</code>)</for>"));
+                }
+                else
+                {
+                    shortcutWrapper.Add(
+                        new XElement("code", $"ReSharper_{actionId}"),
+                        new XAttribute("product", "rs,dcv"));
                 }
 
-                accessIntroWrapper.Add(new XElement("code", $"ReSharper_{actionId}",
-                    new XAttribute("product", "rs,dcv")));
+                accessIntroWrapper.Add(shortcutWrapper);
                 accessIntroChunk.Add(accessIntroWrapper);
                 accessIntroLibrary.Root.Add(accessIntroChunk);
 
