@@ -47,7 +47,7 @@ namespace RsDocGenerator
 
         public static XElement CreateChunk(string includeId)
         {
-            return new XElement("chunk", new XAttribute("id", includeId));
+            return new XElement("chunk", new XAttribute("id", includeId.NormalizeStringForAttribute()));
         }
 
         public static XElement CreateInclude(string src, string id, bool nullable = false)
@@ -70,7 +70,7 @@ namespace RsDocGenerator
 
         public static XElement CreateChapter(string title, string id)
         {
-            return CreateChapter(title, id, true);
+            return CreateChapter(title, id.NormalizeStringForAttribute(), true);
         }
 
         private static XElement CreateChapter(string title, string id, bool needId)

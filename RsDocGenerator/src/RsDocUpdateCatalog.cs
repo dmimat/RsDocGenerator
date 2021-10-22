@@ -58,7 +58,7 @@ namespace RsDocGenerator
 
             featuresByTag.CloseSession();
 
-            RsDocUpdateVsFeaturesCatalog.Execute(context, null);
+            //RsDocUpdateVsFeaturesCatalog.Execute(context, null);
 
             MessageBox.Show(string.Format(
                     "ReSharper Feature Catalog (RsFeatureCatalog.xml) is updated successfully according to version {0}.",

@@ -4,11 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Application.DataContext;
+using JetBrains.Platform.VisualStudio.SinceVs10.Interop.Shim;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.Util;
 using JetBrains.VsIntegration.Shell;
 using Microsoft.CodeAnalysis.CodeFixes;
-using Mono.Cecil;
+
 
 namespace RsDocGenerator
 {
@@ -25,14 +26,14 @@ namespace RsDocGenerator
 
         public VsFeatureDigger(IDataContext context)
         {
-            _quickFixCatalog = DigQuickFixes(context);
+            /*_quickFixCatalog = DigQuickFixes(context);
             _configurableInspectionCatalog = new FeatureCatalog(RsFeatureKind.ConfigInspection);
             _contexActionsCatalog = null;
             _fixInScopeCatalog = new FeatureCatalog(RsFeatureKind.FixInScope);
             _staticInspectionCatalog = new FeatureCatalog(RsFeatureKind.StaticInspection);
             _contexActionInScopeCatalog = new FeatureCatalog(RsFeatureKind.ContextActionInScope);
             _inspectionWithQuickFixCatalog = new FeatureCatalog(RsFeatureKind.InspectionWithQuickFix);
-            DigInspections();
+            DigInspections();*/
         }
 
         public FeatureCatalog GetQuickFixes()
@@ -70,6 +71,7 @@ namespace RsDocGenerator
             return _inspectionWithQuickFixCatalog;
         }
 
+        /*
         private FeatureCatalog DigQuickFixes(IDataContext context)
         {
             var quickFixCatalog = new FeatureCatalog(RsFeatureKind.QuickFix);
@@ -134,7 +136,9 @@ namespace RsDocGenerator
 
             return quickFixCatalog;
         }
+        */
 
+        /*
         private void DigInspections()
         {
             var path = @"C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview";
@@ -208,11 +212,14 @@ namespace RsDocGenerator
                     Console.WriteLine("EXCEPTION:" + e);
                 }
         }
+        */
 
+        /*
         private string GetIdFromConstant(FieldDefinition field)
         {
             return "CS" + ((int) field.Constant).ToString("D4", CultureInfo.InvariantCulture);
         }
+        */
 
         private void AddInspection(string id, string text, string language, FeatureCatalog catalog)
         {

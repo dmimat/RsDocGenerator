@@ -132,6 +132,7 @@ namespace RsDocGenerator
                 case "Css":
                 case "CSS":
                 case "Protobuf":
+                case "Unreal Engine":
                     return false;
             }
             return true;

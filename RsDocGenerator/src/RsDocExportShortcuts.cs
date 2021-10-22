@@ -42,8 +42,7 @@ namespace RsDocGenerator
 
             var productcatalogs = context.GetComponent<IPartCatalogSet>();
             var actionParts = PartSelector.LeafsAndHides.SelectParts(
-                    productcatalogs.Catalogs.SelectMany(catalog =>
-                        catalog.GetPartsWithAttribute<ActionAttribute>().ToEnumerable().OrderBy(x => x.LocalName)))
+                    productcatalogs.Catalog.GetPartsWithAttribute<ActionAttribute>().ToEnumerable().OrderBy(x => x.LocalName))
                 .ToList();
 
             foreach (var actionPart in actionParts)

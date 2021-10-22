@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Diagnostics;
 using JetBrains.Application.UI.Actions;
+using JetBrains.Platform.VisualStudio.SinceVs10.Interop.Shim;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 using JetBrains.VsIntegration.Shell;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CodeRefactorings;
-using Mono.Cecil;
-using Mono.Cecil.Cil;
-using Mono.Cecil.Rocks;
+
 
 namespace RsDocGenerator
 {
@@ -25,6 +25,7 @@ namespace RsDocGenerator
             return true;
         }
 
+        /*
         public static void Execute(IDataContext context, DelegateExecute nextExecute)
         {
             Dumper.DumpToNotepad(writer => Logger.Catch(() =>
@@ -94,7 +95,9 @@ namespace RsDocGenerator
                 }
             }));
         }
+        */
 
+        /*
         private static void GetVsConfigurableInspections()
         {
             var path = @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\";
@@ -187,5 +190,6 @@ namespace RsDocGenerator
             Console.WriteLine(warnings.Count);
             Console.WriteLine(strings.Count);
         }
+    */
     }
 }
