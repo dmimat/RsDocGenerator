@@ -38,6 +38,7 @@ namespace RsDocGenerator
             {"TYPE_SCRIPT", "TypeScript"},
             {"REGULAR_EXPRESSION", "Regular expressions"},
             {"RouteTemplate", "Route templates"},
+            {"Unreal_Engine", "Unreal Engine"},
         };
 
         public static string GetCurrentVersion()
@@ -132,7 +133,7 @@ namespace RsDocGenerator
                 case "Css":
                 case "CSS":
                 case "Protobuf":
-                case "Unreal Engine":
+                case "Unreal_Engine":
                     return false;
             }
             return true;

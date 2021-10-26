@@ -44,7 +44,7 @@ namespace RsDocGenerator
                 var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
                 var errorCount = staticInspections.GetLangImplementations(language).Count;
                 if (staticInspections.GetLangImplementations(language).Count < 2)
-                    intro.Add(new XAttribute("filter", "empty"));
+                    intro.Add(new XAttribute("use-filter", "empty"));
                 intro.Add(
                     new XElement("var",
                         new XAttribute("name", "count"),

@@ -16,6 +16,8 @@ namespace RsDocGenerator
         }
 
         public RsFeatureKind FeatureKind { get; }
+        
+        //Languages in PsiLanguage format
         public List<string> Languages { get; }
         public List<RsFeature> Features { get; }
 

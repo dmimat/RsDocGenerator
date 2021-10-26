@@ -110,7 +110,7 @@ namespace RsDocGenerator
                 if (overriddenLanguage != null)
                 {
                     langs.Clear();
-                    langs.Add(overriddenLanguage);
+                    langs.Add(overriddenLanguage.NormalizeStringForAttribute());
                 }
 
                 foreach (var language in langs)

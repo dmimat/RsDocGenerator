@@ -16,7 +16,7 @@ namespace RsDocGenerator
             topicDocument.Root.Add(
                 new XAttribute(xsiNs + "noNamespaceSchemaLocation",
                     "https://resources.jetbrains.com/stardust/topic.v2.xsd"),
-                new XAttribute(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
+                new XAttribute(XNamespace.Xmlns + "xsi", xsiNs),
                 new XAttribute("id", topicId),
                 new XAttribute("title", title));
 
