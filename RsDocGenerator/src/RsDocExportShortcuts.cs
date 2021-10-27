@@ -104,9 +104,10 @@ namespace RsDocGenerator
                 if (!pathToTheRoot.IsNullOrEmpty())
                 {
                     var menuPathChunk = XmlHelpers.CreateChunk(actionId);
-                    pathToTheRoot =
-                        pathToTheRoot.Replace("ReSharper | Navigate ", "%navigateMenu%")
-                            .Replace("ReSharper | Windows ", "%windowsMenu%");
+                    pathToTheRoot = pathToTheRoot
+                            .Replace("ReSharper | Navigate ", "%navigateMenu%")
+                            .Replace("ReSharper | Windows ", "%windowsMenu%")
+                            .Replace("ReSharper | Edit ", "%editMenu%");
                     menuPathChunk.Add(new XElement("menupath", pathToTheRoot));
                     accessIntroWrapper.Add(new XElement("p", new XElement("menupath", pathToTheRoot)));
                     menuPathLibrary.Root.Add(menuPathChunk);
