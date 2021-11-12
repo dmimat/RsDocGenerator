@@ -45,20 +45,20 @@ namespace RsDocGenerator
             switch (applicability)
             {
                 case TemplateApplicability.Live:
-                    type = "Live";
+                    type = "live";
                     break;
                 case TemplateApplicability.Surround:
-                    type = "Surround";
+                    type = "surround";
                     break;
                 case TemplateApplicability.File:
-                    type = "File";
+                    type = "file";
                     scopeFilter = ScopeFilter.Project;
                     break;
                 default: return;
             }
 
             var topicId = "Reference__Templates_Explorer__" + type + "_Templates";
-            var topicTitle = "Predefined " + type + " Templates";
+            var topicTitle = "Predefined " + type + " templates";
             var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
             var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
             var topicRoot = topic.Root;

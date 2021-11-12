@@ -25,7 +25,7 @@ namespace RsDocGenerator
 
             const string sweaTopicId = "Solution_Wide_Inspections_Generated";
             var sweaFileName = Path.Combine(outputFolder, sweaTopicId + ".xml");
-            var sweaTopic = XmlHelpers.CreateHmTopic(sweaTopicId, "Solution-Wide Inspections");
+            var sweaTopic = XmlHelpers.CreateHmTopic(sweaTopicId, "Solution-wide inspections");
             var sweaTable = XmlHelpers.CreateTable(new[] {"Inspection", "Language", "Default Severity"});
 
             foreach (var language in configurableInspections.Languages)

@@ -22,7 +22,7 @@ namespace RsDocGenerator
         {
             const string macroTopicId = "Template_Macros";
 
-            var macroLibrary = XmlHelpers.CreateHmTopic(macroTopicId, "List of Template Macros");
+            var macroLibrary = XmlHelpers.CreateHmTopic(macroTopicId, "List of template macros");
             var macroChunk = XmlHelpers.CreateChunk("macro_table");
             var macroTable = XmlHelpers.CreateTable(new[] {"Expression", "Description", "Details"}, null);
             var macros = Shell.Instance.GetComponent<MacroManager>().Definitions;
