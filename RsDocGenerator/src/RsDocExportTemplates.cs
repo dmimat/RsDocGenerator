@@ -275,6 +275,8 @@ namespace RsDocGenerator
             if (paramElement.HasElements)
                 paramHeader.Add(new XElement("b", "Parameters "));
 
+            var templateTextClean = template.Text.Replace("%Next%", "%\\Next%");
+
             tables[lang].Add(new XElement("tr",
                 new XElement("td",
                     new XElement("code", templateId), 
@@ -283,7 +285,7 @@ namespace RsDocGenerator
                     new XElement("p", noDescriptionFallback),
                     new XElement("p", new XElement("b", "Scope "), scopeString),
                     new XElement("p", new XElement("b", "Body ")),
-                    XmlHelpers.CreateCodeBlock(template.Text, lang, false),
+                    XmlHelpers.CreateCodeBlock(templateTextClean, lang, false),
                     paramHeader,
                     paramElement,
                     XmlHelpers.CreateInclude("TR", templateIdFull, true))));
