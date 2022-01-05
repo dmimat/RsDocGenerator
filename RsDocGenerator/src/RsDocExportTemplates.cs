@@ -45,20 +45,20 @@ namespace RsDocGenerator
             switch (applicability)
             {
                 case TemplateApplicability.Live:
-                    type = "live";
+                    type = "Live";
                     break;
                 case TemplateApplicability.Surround:
-                    type = "surround";
+                    type = "Surround";
                     break;
                 case TemplateApplicability.File:
-                    type = "file";
+                    type = "File";
                     scopeFilter = ScopeFilter.Project;
                     break;
                 default: return;
             }
 
             var topicId = "Reference__Templates_Explorer__" + type + "_Templates";
-            var topicTitle = "Predefined " + type + " templates";
+            var topicTitle = "Predefined " + type.ToLower() + " templates";
             var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
             var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
             var topicRoot = topic.Root;
@@ -69,7 +69,7 @@ namespace RsDocGenerator
                 new XAttribute("product", "rs")));
 
             topicRoot.Add(new XElement("p",
-                "This topic lists all predefined " + type + " templates in %product% %currentVersion%."));
+                "This topic lists all predefined " + type.ToLower() + " templates in %product% %currentVersion%."));
 
             topicRoot.Add(new XElement("p",
                 XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Types", type, false)));
@@ -275,8 +275,6 @@ namespace RsDocGenerator
             if (paramElement.HasElements)
                 paramHeader.Add(new XElement("b", "Parameters "));
 
-            var templateTextClean = template.Text.Replace("%Next%", "%\\Next%");
-
             tables[lang].Add(new XElement("tr",
                 new XElement("td",
                     new XElement("code", templateId), 
@@ -285,7 +283,7 @@ namespace RsDocGenerator
                     new XElement("p", noDescriptionFallback),
                     new XElement("p", new XElement("b", "Scope "), scopeString),
                     new XElement("p", new XElement("b", "Body ")),
-                    XmlHelpers.CreateCodeBlock(templateTextClean, lang, false),
+                    XmlHelpers.CreateCodeBlock(template.Text, lang, false),
                     paramHeader,
                     paramElement,
                     XmlHelpers.CreateInclude("TR", templateIdFull, true))));

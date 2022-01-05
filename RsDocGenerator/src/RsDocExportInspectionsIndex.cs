@@ -63,8 +63,7 @@ namespace RsDocGenerator
                     var count = category.Value.Count;
                     var chapter =
                         XmlHelpers.CreateChapter(
-                            string.Format("{0} ({1} {2})", FeatureCatalog.GetGroupTitle(category.Key), count,
-                                NounUtil.ToPluralOrSingular("inspection", count)),
+                            $"{FeatureCatalog.GetGroupTitle(category.Key)} ({count} {NounUtil.ToPluralOrSingular("inspection", count)})",
                             category.Key);
                     chapter.Add(XmlHelpers.CreateInclude("Code_Analysis__Code_Inspections", category.Key));
                     var summaryTable = new XElement("table");

@@ -106,12 +106,19 @@ namespace RsDocGenerator
                 var langs = _highlightingSettingsManager.GetInspectionImplementations(inspection.Id)
                     .Select(l => l.Name)
                     .ToList();
-                var overriddenLanguage = inspection.OverridenDisplayedLanguage;
-                if (overriddenLanguage != null)
+                /*try
                 {
-                    langs.Clear();
-                    langs.Add(overriddenLanguage.NormalizeStringForAttribute());
+                    var overriddenLanguage = inspection.OverridenDisplayedLanguage;
+                    if (overriddenLanguage != null)
+                    {
+                        langs.Clear();
+                        langs.Add(overriddenLanguage.NormalizeStringForAttribute());
+                    }
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }*/
 
                 foreach (var language in langs)
                 {

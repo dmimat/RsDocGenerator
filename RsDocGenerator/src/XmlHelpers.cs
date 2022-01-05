@@ -103,7 +103,9 @@ namespace RsDocGenerator
         public static XElement CreateCodeBlock([NotNull] string content, [CanBeNull] string lang, bool showSpaces)
         {
             var codeElement = new XElement("code", content.CleanCodeSample(),
-                new XAttribute("style", "block"));
+                new XAttribute("style", "block"),
+                new XAttribute("interpolate-variables", "false")
+                );
 
             if (lang == null || lang == "Global")
             {
