@@ -138,6 +138,7 @@
     <Compile Include="src\RsDocExportInspectionsIndex.cs" />
     <Compile Include="src\RsDocExportMacros.cs" />
     <Compile Include="src\RsDocExportOptions.cs" />
+    <Compile Include="src\RsDocExportOptionsPages.cs" />
     <Compile Include="src\RsDocExportPostfixTemplates.cs" />
     <Compile Include="src\RsDocExportShortcuts.cs" />
     <Compile Include="src\RsDocExportTemplates.cs" />

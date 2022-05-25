@@ -19,6 +19,7 @@ namespace RsDocGenerator
             if (outputFolder.IsNullOrEmpty()) return;
 
             RsDocExportShortcuts.StartContentGeneration(context, outputFolder);
+            RsDocExportOptionsPages.StartContentGeneration(context, outputFolder);
             RsDocExportOptions.StartContentGeneration(context, outputFolder);
             RsDocUpdateCatalog.UpdateCatalog(context);
             

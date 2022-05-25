@@ -12,7 +12,7 @@ namespace RsDocGenerator
             RsDocExportFixInScope scope,
             RsDocExportCodeInspections inspections, RsDocExportInspectionsIndex inspIndex,
             RsDocExportPostfixTemplates postfix, RsDocUpdateCatalog catalog,
-            RsDocExportEditorConfigStyles editorConf,
+            RsDocExportEditorConfigStyles editorConf, RsDocExportOptionsPages optionsPages,
             RsDocUpdateAll all)
         {
         }
