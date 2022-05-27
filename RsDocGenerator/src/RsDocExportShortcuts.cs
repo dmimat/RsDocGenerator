@@ -62,12 +62,19 @@ namespace RsDocGenerator
                      StringSource.Empty).ToRuntimeString();
                 if (actionId.IsEmpty())
                     actionId = ActionDefines.GetIdFromName(actionPart.LocalName);
-                var actionText =
-                    (attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_Text].GetStringValueIfDefined() ??
-                     StringSource.Empty).ToRuntimeString();
+                var actionText = string.Empty;
+                try
+                {
+                    actionText = actionManager.Defs.GetActionDefById(actionId).Text.Replace("&", string.Empty);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                    /*(attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_Text].GetStringValueIfDefined() ??
+                     StringSource.Empty).ToRuntimeString();*/
                 if (actionText.IsEmpty())
                     actionText = actionId;
-                actionText = actionText.Replace("&", string.Empty);
                 var vsShortcuts =
                     attribute.ArgumentsOptional[ActionAttribute.ActionAttribute_VsShortcuts].GetArrayValueIfDefined();
                 var ideaShortcuts =
