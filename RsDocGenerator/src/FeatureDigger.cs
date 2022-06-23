@@ -7,6 +7,7 @@ using JetBrains.Application.DataContext;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.DataContext;
 using JetBrains.ReSharper.Daemon.CSharp.EditorConfig;
+using JetBrains.ReSharper.Daemon.CSharp.StyleCop;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Feature.Services.Intentions.Scoped;

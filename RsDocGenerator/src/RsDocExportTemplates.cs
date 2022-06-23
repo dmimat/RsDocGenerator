@@ -8,6 +8,7 @@ using JetBrains;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
 using JetBrains.Application.UI.ActionsRevised.Menu;
+using JetBrains.Interop.WinApi;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Macros;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Settings;
@@ -238,6 +239,8 @@ namespace RsDocGenerator
                     "This topic lists all predefined {0} templates for {1} in %product% %currentVersion%. For more information about {0} templates, see ",
                     type.ToLower(), lang),
                 XmlHelpers.CreateHyperlink(null, learnMoreTopic, null, false)));
+            if (lang.ToLower().Contains("unity"))
+                topicRoot.Add(XmlHelpers.CreateInclude("BL", "Unity_support_note", true));
             topicRoot.Add(table);
             topic.Save(fileName);
         }
