@@ -8,7 +8,6 @@ using JetBrains;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.Interop.WinApi;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Macros;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Settings;
@@ -73,6 +72,7 @@ namespace RsDocGenerator
                 "This topic lists all predefined " + type.ToLower() + " templates in %product% %currentVersion%."));
 
             topicRoot.Add(new XElement("p",
+                // ReSharper disable once RedundantArgumentDefaultValue
                 XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Types", type, false)));
             var summaryTable = XmlHelpers.CreateTable(new[] {"Template", "Description"}, new[] {"20%", "80%"});
             var summaryItems = new List<Tuple<string, XElement>>();
@@ -113,7 +113,10 @@ namespace RsDocGenerator
                             currentTemplateLangs.Add(lang);
                             if (!tables.ContainsKey(lang))
                                 tables.Add(lang,
-                                    XmlHelpers.CreateTable(new[] {"Template", "Details"}, new[] {"20%", "80%"}));
+                                    XmlHelpers.CreateTable(
+                                        new[] {"Template", "Details"}, 
+                                        new[] {"20%", "80%"},
+                                        "template_table"));
                         }
                     }
 
@@ -135,11 +138,11 @@ namespace RsDocGenerator
                     {
                         var macro = MacroDescriptionFormatter.GetMacroAttribute(expr.Definition);
                         paramItemElement.Add(" - " + macro.LongDescription.CleanProductName());
-                        paramItemElement.Add(new XElement("for",
-                            " (",
-                            XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
-                            ")",
-                            new XAttribute("product", "!rdr")));
+                        // paramItemElement.Add(new XElement("for",
+                        //     " (",
+                        //     XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
+                        //     ")",
+                        //     new XAttribute("product", "!rdr")));
                     }
                     else
                     {
@@ -211,34 +214,15 @@ namespace RsDocGenerator
             // if (lang.Equals("C++"))
             //     topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
 
-            // TODO: templates explorer path for Rider
-            topicRoot.Add(new XElement("p",
-                new XElement("menupath",
-                    string.Format("ReSharper | Templates Explorer | {0} Templates | {1}", type, lang)),
-                new XAttribute("product", "rs")));
-
-            var learnMoreTopic = "Templates__Applying_Templates";
-
-            switch (type)
-            {
-                case "Live":
-                    learnMoreTopic = "Templates__Applying_Templates__Creating_Source_Code_Using_Live_Templates";
-                    break;
-                case "Surround":
-                    learnMoreTopic = "Templates__Applying_Templates__Surrounding_Code_Fragments_with_Templates";
-                    break;
-                case "File":
-                    learnMoreTopic = "Templates__Applying_Templates__Creating_Files_from_Templates";
-                    break;
-            }
-
             topicRoot.Add(new XComment("Total: " + table.Elements().Count()));
 
-            topicRoot.Add(new XElement("p",
-                string.Format(
-                    "This topic lists all predefined {0} templates for {1} in %product% %currentVersion%. For more information about {0} templates, see ",
-                    type.ToLower(), lang),
-                XmlHelpers.CreateHyperlink(null, learnMoreTopic, null, false)));
+            var introInclude = XmlHelpers.CreateInclude("TC", "template_lang_list_intro");
+            introInclude.Add(XmlHelpers.CreateVariable("type", type));
+            introInclude.Add(XmlHelpers.CreateVariable("typeLower", type.ToLower()));
+            introInclude.Add(XmlHelpers.CreateVariable("lang", lang));
+            introInclude.Add(new XAttribute("use-filter", "empty," + type.ToLower()));
+            
+            topicRoot.Add(introInclude);
             if (lang.ToLower().Contains("unity"))
                 topicRoot.Add(XmlHelpers.CreateInclude("BL", "Unity_support_note", true));
             topicRoot.Add(table);
@@ -277,6 +261,11 @@ namespace RsDocGenerator
 
             if (paramElement.HasElements)
                 paramHeader.Add(new XElement("b", "Parameters "));
+
+            if (noDescriptionFallback.ToString().ToLower().Contains("unity"))
+            {
+                lang = "Unity";
+            }
 
             tables[lang].Add(new XElement("tr",
                 new XElement("td",

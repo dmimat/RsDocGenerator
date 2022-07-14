@@ -82,10 +82,8 @@ namespace RsDocGenerator
                 var optionsPageChunk = XmlHelpers.CreateChunk(id);
                 optionsPageChunk.Add(new XElement("menupath", pagePath));
 
-                var varPagePathElement = new XElement("var",
-                    new XAttribute("product", "rs,dcv,dt,tca,dm"),
-                    new XAttribute("name", "page_path"),
-                    new XAttribute("value", pagePath));
+                var varPagePathElement = XmlHelpers.CreateVariable("page_path", pagePath);
+                varPagePathElement.Add(new XAttribute("product", "rs,dcv,dt,tca,dm"));
 
                 var theOptionsPageChunk = XmlHelpers.CreateChunk("the_" + id + "_page");
                 theOptionsPageChunk.Add(new XElement("include", 

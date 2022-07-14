@@ -45,13 +45,9 @@ namespace RsDocGenerator
                 var errorCount = staticInspections.GetLangImplementations(language).Count;
                 if (staticInspections.GetLangImplementations(language).Count < 2)
                     intro.Add(new XAttribute("use-filter", "empty"));
-                intro.Add(
-                    new XElement("var",
-                        new XAttribute("name", "count"),
-                        new XAttribute("value", configurableInspections.GetLangImplementations(language).Count)),
-                    new XElement("var",
-                        new XAttribute("name", "errCount"),
-                        new XAttribute("value", errorCount)));
+                intro.Add(XmlHelpers.CreateVariable("count",
+                    configurableInspections.GetLangImplementations(language).Count.ToString()),
+                    XmlHelpers.CreateVariable("errCount", errorCount.ToString()));
 
                 // if (langPresentable.Equals("C++"))
                 //     topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
@@ -65,7 +61,7 @@ namespace RsDocGenerator
                         XmlHelpers.CreateChapter(
                             $"{FeatureCatalog.GetGroupTitle(category.Key)} ({count} {NounUtil.ToPluralOrSingular("inspection", count)})",
                             category.Key);
-                    chapter.Add(XmlHelpers.CreateInclude("Code_Analysis__Code_Inspections", category.Key));
+                    chapter.Add(XmlHelpers.CreateInclude("CA", "Category_" + category.Key));
                     var summaryTable = new XElement("table");
                     summaryTable.Add(XmlHelpers.CreateInclude("CA", "tr_code_inspection_index_header"));
                     foreach (var inspection in category.Value)
@@ -113,7 +109,7 @@ namespace RsDocGenerator
             {
                 case Severity.DO_NOT_SHOW:
                     return XmlHelpers.CreateHyperlink("Disabled", "Code_Analysis__Configuring_Warnings", "disable",
-                        false);
+                        true);
                 case Severity.ERROR:
                     return XmlHelpers.CreateHyperlink("Error", "Code_Analysis__Code_Inspections", "errors", false);
                 case Severity.WARNING:

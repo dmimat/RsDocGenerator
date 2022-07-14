@@ -29,9 +29,14 @@ namespace RsDocGenerator
             return CreateTable(new[] {firstColName, secondColName}, new[] {firstColWidth});
         }
 
-        public static XElement CreateTable([NotNull] string[] colNames, [CanBeNull] string[] colWidths = null)
+        public static XElement CreateTable(
+            [NotNull] string[] colNames, 
+            [CanBeNull] string[] colWidths = null,
+            [CanBeNull] string id = null)
         {
             var table = new XElement("table");
+            if (id != null) 
+                table.Add(new XAttribute("id", id));
             var headerRow = new XElement("tr");
             for (var index = 0; index < colNames.Length; index++)
             {
@@ -56,6 +61,13 @@ namespace RsDocGenerator
                 new XAttribute("nullable", nullable ? "true" : "false"),
                 new XAttribute("src", src + ".xml"),
                 new XAttribute("include-id", id.NormalizeStringForAttribute()));
+        }
+        
+        public static XElement CreateVariable(string name, string value)
+        {
+            return new XElement("var",
+                new XAttribute("name", name),
+                new XAttribute("value", value));
         }
 
         public static XElement CreateChapter(string title)

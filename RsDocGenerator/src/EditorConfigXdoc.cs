@@ -212,8 +212,8 @@ namespace RsDocGenerator
         {
             var topicId = "EditorConfig_" + language.Name.Replace(" ", "_") + "_" + schema.GetType().Name;
             var topic = XmlHelpers.CreateHmTopic(topicId,
-                "{0} - {1}".FormatEx(language.PresentableName, schema.PageName));
-            topic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%", true));
+                "EditorConfig properties for {0}: {1}".FormatEx(language.PresentableName, schema.PageName));
+            topic.Root.Add(XmlHelpers.CreateInclude("FC", topicId, true));
 
             foreach (var entry in schema.Entries)
                 ProcessEntry(

@@ -130,10 +130,7 @@ namespace RsDocGenerator
                 else
                 {
                     var assignTip = XmlHelpers.CreateInclude("Tips", "assign_shortcut_raw");
-                    assignTip.Add(
-                        new XElement("var",
-                            new XAttribute("name", "actionId"),
-                            new XAttribute("value", actionId)));
+                    assignTip.Add(XmlHelpers.CreateVariable("actionId",actionId));
                     shortcutWrapper.Add(
                         assignTip,
                         new XAttribute("product", "rs,dcv"));
