@@ -213,7 +213,13 @@ namespace RsDocGenerator
             var topicId = "EditorConfig_" + language.Name.Replace(" ", "_") + "_" + schema.GetType().Name;
             var topic = XmlHelpers.CreateHmTopic(topicId,
                 "EditorConfig properties for {0}: {1}".FormatEx(language.PresentableName, schema.PageName));
+            
+            var includeTipOptions = XmlHelpers.CreateInclude("FC", "tip_configure_in_options", true);
+            includeTipOptions.Add(XmlHelpers.CreateVariable("lang", language.PresentableName));
+            includeTipOptions.Add(XmlHelpers.CreateVariable("pageName", schema.PageName));
+            
             topic.Root.Add(XmlHelpers.CreateInclude("FC", topicId, true));
+            topic.Root.Add(includeTipOptions);
 
             foreach (var entry in schema.Entries)
                 ProcessEntry(
