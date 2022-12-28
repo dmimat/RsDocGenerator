@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.I18n;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Macros;
@@ -29,8 +30,9 @@ namespace RsDocGenerator
             foreach (var macroDefinition in macros)
             {
                 var macroRow = new XElement("tr");
-                var longDescription = MacroDescriptionFormatter.GetMacroAttribute(macroDefinition).LongDescription;
-                var shortDescription = MacroDescriptionFormatter.GetMacroAttribute(macroDefinition).ShortDescription;
+                var customAttribute = MacroDescriptionFormatter.GetMacroAttribute(macroDefinition);
+                var longDescription = JetResourceManager.GetString(customAttribute.ResourceType, customAttribute.LongDescriptionResourceName);
+                var shortDescription = JetResourceManager.GetString(customAttribute.ResourceType, customAttribute.DescriptionResourceName);
                 var macroId = MacroDescriptionFormatter.GetMacroAttribute(macroDefinition).Name;
 
                 const string paramMatch = @"{#0:(.*)}";

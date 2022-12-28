@@ -95,9 +95,11 @@ namespace RsDocGenerator
 
         public static string TryGetStaticHref(string inspectionId)
         {
-            return ExternalInspectionLinks.ContainsKey(inspectionId)
-                ? ExternalInspectionLinks[inspectionId]
-                : inspectionId;
+            if (ExternalInspectionLinks.ContainsKey(inspectionId))
+                return ExternalInspectionLinks[inspectionId];
+            if (inspectionId.Contains("::"))
+                return "NO_LINK";
+            return inspectionId;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using JetBrains;
 using JetBrains.Application.DataContext;
+using JetBrains.Application.I18n;
 using JetBrains.Application.Settings;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.ReSharper.Feature.Services.LiveTemplates.Macros;
@@ -137,7 +138,10 @@ namespace RsDocGenerator
                     if (expr != null)
                     {
                         var macro = MacroDescriptionFormatter.GetMacroAttribute(expr.Definition);
-                        paramItemElement.Add(" - " + macro.LongDescription.CleanProductName());
+                        paramItemElement.Add(" - " + 
+                                             JetResourceManager.GetString(macro.ResourceType, 
+                                                 macro.LongDescriptionResourceName).
+                                                 CleanProductName());
                         // paramItemElement.Add(new XElement("for",
                         //     " (",
                         //     XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),

@@ -8,9 +8,9 @@ using JetBrains.Application.Catalogs;
 using JetBrains.Application.Catalogs.Filtering;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions.ActionManager;
-using JetBrains.Application.UI.Actions.Utils;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Application.UI.ActionSystem.ActionsRevised.Loader;
+using JetBrains.Application.UI.ActionSystem.UserPresentation;
 using JetBrains.Diagnostics;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.Sources;
@@ -87,8 +87,8 @@ namespace RsDocGenerator
                 try
                 {
                     pathToTheRoot =
-                        context.GetComponent<ActionPresentationHelper>()
-                            .GetPathPresentationToRoot(actionManager.Defs.GetActionDefById(actionId));
+                        context.GetComponent<IActionPresentableTexts>().
+                            GetPathToMenuRoot(actionManager.Defs.GetActionDefById(actionId));
                 }
                 catch (Exception e)
                 {

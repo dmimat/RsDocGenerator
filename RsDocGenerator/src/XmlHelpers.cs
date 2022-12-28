@@ -127,22 +127,31 @@ namespace RsDocGenerator
             {
                 switch (lang)
                 {
+                    case "HTML-Like":
+                    case "Razor (C#)":
+                    case "Razor CSharp":
+                    case "Angular 2 HTML":
+                        lang = "HTML";
+                        break;
+                    case "CPP":
+                        lang = "C++";
+                        break;
+                    case "VBASIC":
+                        lang = "VB.NET";
+                        break;
+                    case "Resx":
+                    case "ASP.NET":
                     case "ASP.NET (C#)":
                     case "ASP.NET(C#)":
                     case "ASP.NET (VB)":
                     case "ASP.NET(VB.NET)":
-                    case "Razor CSharp":
-                        lang = "ASP.NET";
-                        break;
+                    case "XAML":
                     case "XAML (C#)":
                     case "XAML (VB)":
-                    case "HTML-Like":
-                    case "Razor (C#)":
-                    case "Angular 2 HTML":
-                        lang = "HTML";
-                        break;
-                    case "Resx":
                         lang = "XML";
+                        break;
+                    case "Unity":
+                        lang = "C#";
                         break;
                 }
 
