@@ -119,7 +119,7 @@ namespace RsDocGenerator
                 new XAttribute("interpolate-variables", "false")
                 );
 
-            if (lang == null || lang == "Global")
+            if (lang == null || lang == "Global" || lang == "Protobuf")
             {
                 codeElement.Add(new XAttribute("highlight", "none"));
             }
@@ -136,6 +136,9 @@ namespace RsDocGenerator
                     case "CPP":
                         lang = "C++";
                         break;
+                    case "JAVA_SCRIPT":
+                        lang = "JavaScript";
+                        break;
                     case "VBASIC":
                         lang = "VB.NET";
                         break;
@@ -151,6 +154,7 @@ namespace RsDocGenerator
                         lang = "XML";
                         break;
                     case "Unity":
+                    case "XMLDOC":
                         lang = "C#";
                         break;
                 }

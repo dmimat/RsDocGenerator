@@ -10,11 +10,8 @@ using JetBrains.Application.Extensibility;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Implementation;
 using JetBrains.Application.Settings.Calculated.Interface;
-using JetBrains.Application.Settings.Implementation;
 using JetBrains.Application.Threading;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.Application.UI.Options.OptionsDialog;
-using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
@@ -57,7 +54,7 @@ namespace RsDocGenerator
                 var ecService = Shell.Instance.GetComponent<IEditorConfigSchema>();
                 var partsCatalogue = solution.GetComponent<ShellPartCatalogSet>();
                 var container = new ComponentContainer(lifetime, "Inplace Format Container");
-                var settingsStore = solution.GetComponent<SettingsStore>();
+                var settingsStore = solution.GetComponent<ISettingsStore>();
                 var host = solution.GetComponent<IApplicationHost>();
 
                 var contextBoundSettingsStoreLive = settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide);

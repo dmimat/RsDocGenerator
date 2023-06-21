@@ -6,13 +6,10 @@ using System.Text;
 using System.Xml.Linq;
 using JetBrains;
 using JetBrains.Application;
-using JetBrains.Application.Catalogs;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Implementation;
 using JetBrains.Application.Settings.Calculated.Interface;
-using JetBrains.Application.Settings.Implementation;
-using JetBrains.DataFlow;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
@@ -204,7 +201,7 @@ namespace RsDocGenerator
 
         public static void ProcessEntries(KnownLanguage language, ICodeStylePageSchema schema, string path,
             IDocument documentBefore, IDocument documentAfter, Lifetime lifetime,
-            SettingsStore settingsStore, IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
+            ISettingsStore settingsStore, IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
             IEditorConfigSchema ecService,
             Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>> settingsToEntry,
             HashSet<ICodeStyleEntry> excludedEntries, CodePreviewPreparator preparator, ISolution solution,
@@ -246,7 +243,7 @@ namespace RsDocGenerator
         private static void ProcessEntry(string parentId, ICodeStyleEntry entry, XElement container,
             CodePreviewPreparator preparator, ISolution solution, IDocument documentBefore,
             Lifetime lifetime,
-            SettingsStore settingsStore,
+            ISettingsStore settingsStore,
             IContextBoundSettingsStoreLive contextBoundSettingsStoreLive,
             IDocument documentAfter, IEditorConfigSchema ecService,
             Dictionary<IScalarSetting, Pair<ICodeStyleEntry, KnownLanguage>>
@@ -365,7 +362,7 @@ namespace RsDocGenerator
             IEditorConfigPropertyInfo propertyInfo,
             ICodeStyleEntry entry, XElement container,
             CodePreviewPreparator preparator,
-            ISolution solution, IDocument documentBefore, Lifetime lifetime, SettingsStore settingsStore,
+            ISolution solution, IDocument documentBefore, Lifetime lifetime, ISettingsStore settingsStore,
             IContextBoundSettingsStoreLive contextBoundSettingsStoreLive, IDocument documentAfter,
             IStoredScalarSetting settingsEntry, IEditorConfigSchema ecService,
             KnownLanguage language)
