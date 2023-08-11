@@ -8,6 +8,7 @@ namespace RsDocGenerator
         {
             ExternalInspectionLinks = new Dictionary<string, string>
             {
+                {"CSharpWarnings::CS0282", "https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs0282"},
                 {"CSharpWarnings::CS0108", "https://msdn.microsoft.com/en-us/library/3s8070fc.aspx"},
                 {"CSharpWarnings::CS0109", "https://msdn.microsoft.com/en-us/library/css4y2c4.aspx"},
                 {"CSharpWarnings::CS0162", "https://msdn.microsoft.com/en-us/library/c0h4st1x.aspx"},

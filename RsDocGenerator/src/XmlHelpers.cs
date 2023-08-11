@@ -134,6 +134,7 @@ namespace RsDocGenerator
                         lang = "HTML";
                         break;
                     case "CPP":
+                    case "Unreal Engine":
                         lang = "C++";
                         break;
                     case "JAVA_SCRIPT":
@@ -155,6 +156,7 @@ namespace RsDocGenerator
                         break;
                     case "Unity":
                     case "XMLDOC":
+                    case "Test":
                         lang = "C#";
                         break;
                 }

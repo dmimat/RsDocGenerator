@@ -29,9 +29,20 @@ namespace RsDocGenerator
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
             var shortcutsXmlDoc = new XDocument();
-            var actionMapElement = new XElement("Keymap");
+            var actionMapElement = new XElement("keymap", 
+                new XAttribute("id", "keymap"), 
+                new XElement("layouts", 
+                    new XElement("layout", 
+                        new XAttribute("name", "rs"),
+                        new XAttribute("platform", "PC")),
+                    new XElement("layout", 
+                        new XAttribute("name", "vs"),
+                        new XAttribute("platform", "PC"))
+                    ));
             shortcutsXmlDoc.Add(actionMapElement);
             XmlHelpers.AddAutoGenComment(shortcutsXmlDoc.Root);
+            var actionsElement = new XElement("actions");
+            actionMapElement.Add(actionsElement);
 
             const string menuPathLibId = "Menupath_by_ID";
             var menuPathLibrary = XmlHelpers.CreateHmTopic(menuPathLibId, "Menupath_by_ID Chunks");
@@ -97,15 +108,16 @@ namespace RsDocGenerator
 
                 if (!pathToTheRoot.IsEmpty() && !actionText.IsEmpty())
                     pathToTheRoot = pathToTheRoot.Replace('→', '|') + " | " + actionText;
-                var actionElement = new XElement("Action");
+                var actionElement = new XElement("action");
                 var pattern = new Regex("[_.]");
 
                 actionId = pattern.Replace(actionId, string.Empty);
 
                 actionElement.Add(
                     new XAttribute("id", actionId),
-                    new XAttribute("title", actionText),
-                    new XAttribute("menupath", pathToTheRoot));
+                    new XElement("description", actionText)
+                    // new XAttribute("menupath", pathToTheRoot)
+                    );
                 var accessIntroChunk = XmlHelpers.CreateChunk(actionId);
                 var accessIntroWrapper = new XElement("microformat");
                 if (!pathToTheRoot.IsNullOrEmpty())
@@ -146,14 +158,14 @@ namespace RsDocGenerator
                     AddShortcuts(new object[] {"Ctrl+F12"}, actionElement, "vs");
 
                 if (actionId == "ParameterInfoShow")
-                    actionElement.Add(new XElement("Shortcut", "Control+Shift+Space", new XAttribute("layout", "vs")));
+                    actionElement.Add(new XElement("shortcut", "Control+Shift+Space", new XAttribute("layout", "vs")));
                 if (actionId == "GotoDeclaration")
-                    actionElement.Add(new XElement("Shortcut", "F12", new XAttribute("layout", "vs")));
+                    actionElement.Add(new XElement("shortcut", "F12", new XAttribute("layout", "vs")));
                 if (actionId == "GotoImplementation")
-                    actionElement.Add(new XElement("Shortcut", "Ctrl+F12", new XAttribute("layout", "vs")));
+                    actionElement.Add(new XElement("shortcut", "Ctrl+F12", new XAttribute("layout", "vs")));
                 // TODO: check if this hack works 
 
-                actionMapElement.Add(actionElement);
+                actionsElement.Add(actionElement);
             }
 
             var generatedFolder = outputFolder.AddGeneratedPath();
@@ -191,12 +203,13 @@ namespace RsDocGenerator
                     currentKeystroke = currentKeystroke.Replace("D3", "3");
                     currentKeystroke = currentKeystroke.Replace("D4", "4");
                     currentKeystroke = currentKeystroke.Replace("D5", "5");
+                    currentKeystroke = currentKeystroke.Replace("Oemtilde", "`");
                     // drop same shortcuts
                     //                    var exists = (from nodes in actionElement.Elements()
                     //                        where nodes.Value == curretnKeystroke
                     //                        select nodes).FirstOrDefault();
                     if (!previousKeystroke.Equals(currentKeystroke))
-                        actionElement.Add(new XElement("Shortcut", currentKeystroke,
+                        actionElement.Add(new XElement("shortcut", currentKeystroke,
                             new XAttribute("layout", keymapName)));
                     previousKeystroke = currentKeystroke;
                 }
@@ -279,7 +292,7 @@ namespace RsDocGenerator
         //                        curretnKeystroke = curretnKeystroke.Replace("D3", "3");
         //                        curretnKeystroke = curretnKeystroke.Replace("D4", "4");
         //                        curretnKeystroke = curretnKeystroke.Replace("D5", "5");
-        //                        actionElement.Add(new XElement("Shortcut", curretnKeystroke));
+        //                        actionElement.Add(new XElement("shortcut", curretnKeystroke));
         //                    }
         //                }
         //
