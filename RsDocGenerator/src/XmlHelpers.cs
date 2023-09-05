@@ -21,6 +21,7 @@ namespace RsDocGenerator
                 new XAttribute("title", title));
 
             AddAutoGenComment(topicDocument.Root);
+            topicDocument.Root.Add(CreateInclude("GEN", topicId + "_start", true));
             return topicDocument;
         }
 
