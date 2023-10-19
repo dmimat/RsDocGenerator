@@ -158,6 +158,8 @@ namespace RsDocGenerator
                     case "Unity":
                     case "XMLDOC":
                     case "Test":
+                    case "ShaderLab":
+                    case "SHADERLAB":
                         lang = "C#";
                         break;
                 }
