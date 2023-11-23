@@ -62,7 +62,7 @@ namespace RsDocGenerator
                             $"{FeatureCatalog.GetGroupTitle(category.Key)} ({count} {NounUtil.ToPluralOrSingular("inspection", count)})",
                             category.Key);
                     chapter.Add(XmlHelpers.CreateInclude("CA", "Category_" + category.Key));
-                    var summaryTable = new XElement("table");
+                    var summaryTable = new XElement("table", new XAttribute("id", "tbl_" + category.Key));
                     summaryTable.Add(XmlHelpers.CreateInclude("CA", "tr_code_inspection_index_header"));
                     foreach (var inspection in category.Value)
                     {
