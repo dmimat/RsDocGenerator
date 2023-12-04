@@ -57,12 +57,13 @@ namespace RsDocGenerator
                 foreach (var category in configCategories)
                 {
                     var count = category.Value.Count;
+                    var categoryIdNormalized = category.Key.NormalizeStringForAttribute();
                     var chapter =
                         XmlHelpers.CreateChapter(
                             $"{FeatureCatalog.GetGroupTitle(category.Key)} ({count} {NounUtil.ToPluralOrSingular("inspection", count)})",
                             category.Key);
-                    chapter.Add(XmlHelpers.CreateInclude("CA", "Category_" + category.Key));
-                    var summaryTable = new XElement("table", new XAttribute("id", "tbl_" + category.Key));
+                    chapter.Add(XmlHelpers.CreateInclude("CA", "Category_" + categoryIdNormalized));
+                    var summaryTable = new XElement("table", new XAttribute("id", "tbl_" + categoryIdNormalized));
                     summaryTable.Add(XmlHelpers.CreateInclude("CA", "tr_code_inspection_index_header"));
                     foreach (var inspection in category.Value)
                     {
