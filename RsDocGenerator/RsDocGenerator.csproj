@@ -549,7 +549,7 @@
       <Version>2023.1.2</Version>
     </PackageReference>
     <PackageReference Include="JetBrains.ReSharper.SDK">
-      <Version>2023.3.0-rc01</Version>
+      <Version>2024.1.0-eap03</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

@@ -204,6 +204,11 @@ namespace RsDocGenerator
                     currentKeystroke = currentKeystroke.Replace("D4", "4");
                     currentKeystroke = currentKeystroke.Replace("D5", "5");
                     currentKeystroke = currentKeystroke.Replace("Oemtilde", "`");
+                    currentKeystroke = currentKeystroke.Replace("OemQuestion", "/");
+                    currentKeystroke = currentKeystroke.Replace("OemOpenBrackets", "[");
+                    currentKeystroke = currentKeystroke.Replace("OemPipe", "\\");
+                    currentKeystroke = currentKeystroke.Replace("Oemcomma", ",");
+                    currentKeystroke = currentKeystroke.Replace("OemPeriod", ".");
                     // drop same shortcuts
                     //                    var exists = (from nodes in actionElement.Elements()
                     //                        where nodes.Value == curretnKeystroke

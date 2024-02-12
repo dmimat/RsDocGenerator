@@ -17,7 +17,6 @@ using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.DataContext;
-using JetBrains.ReSharper.Feature.Services.OptionPages;
 using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle;
 using JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle.ViewModels;
 using JetBrains.ReSharper.Psi;
@@ -66,11 +65,11 @@ namespace RsDocGenerator
                     .RegisterCatalog<FormattingSettingsPresentationComponentAttribute>(partsCatalogue)
                     .RegisterCatalog<CodePreviewPreparatorComponentAttribute>(partsCatalogue)
                     //.RegisterCatalog<OptionsComponentAttribute>(partsCatalogue)
-                    .Register(lifetime)
-                    .Register(threading)
-                    .Register(contextBoundSettingsStoreLive)
-                    .Register<ValueEditorViewModelFactory>()
-                    .Register<SettingsToHide>()
+                    //.Register(lifetime)
+                    //.Register(threading)
+                    //.Register(contextBoundSettingsStoreLive)
+                    //.Register<ValueEditorViewModelFactory>()
+                    //.Register<SettingsToHide>()
                     .ChainTo(SolutionInstance.GetContainer(solution))
                     .Compose();
 

@@ -51,9 +51,11 @@ namespace RsDocGenerator
             return table;
         }
 
-        public static XElement CreateChunk(string includeId)
+        public static XElement CreateChunk(string includeId, bool normalize = true)
         {
-            return new XElement("chunk", new XAttribute("id", includeId.NormalizeStringForAttribute()));
+            if (normalize)
+                includeId = includeId.NormalizeStringForAttribute();
+            return new XElement("chunk", new XAttribute("id", includeId));
         }
 
         public static XElement CreateInclude(string src, string id, bool nullable = false)
