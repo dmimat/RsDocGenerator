@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
@@ -19,9 +18,9 @@ namespace RsDocGenerator
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
             var allTemplates = context.GetComponent<PostfixTemplatesManager>().AllRegisteredPostfixTemplates.ToList();
-            const string postfixTopicId = "Postfix_Templates_Generated";
-            var postfixLibrary = XmlHelpers.CreateHmTopic(postfixTopicId, "Postfix templates chunks");
-            postfixLibrary.Root.Add(new XComment("Total postfix templates in ReSharper " +
+            
+            var postfixLibrary = new HelpTopic("Postfix_Templates_Generated", "Postfix templates chunks", outputFolder.AddGeneratedPath() + "\\CodeTemplates");
+            postfixLibrary.Add(new XComment("Total postfix templates in ReSharper " +
                                                  GeneralHelpers.GetCurrentVersion() + ": " + allTemplates.Count));
 
             var langs = allTemplates.Select(x => x.Template.Language).Distinct();
@@ -32,11 +31,11 @@ namespace RsDocGenerator
                 AddLangChunk(postfixLibrary, templateInLang, lang.Name);
             }
 
-            postfixLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath() + "\\CodeTemplates", postfixTopicId + ".xml"));
+            postfixLibrary.Save();
             return "Postfix templates";
         }
 
-        private static void AddLangChunk(XDocument library, IEnumerable<PostfixTemplateMetadata> templates, string lang)
+        private static void AddLangChunk(HelpTopic library, IEnumerable<PostfixTemplateMetadata> templates, string lang)
         {
             var postfixChunk = XmlHelpers.CreateChunk("postfix_table_" + lang);
             var macroTable = XmlHelpers.CreateTable(new[] {"Shortcut", "Description", "Example"}, null);
@@ -58,7 +57,7 @@ namespace RsDocGenerator
 
             postfixChunk.Add(macroTable);
 
-            library.Root.Add(postfixChunk);
+            library.Add(postfixChunk);
         }
     }
 }

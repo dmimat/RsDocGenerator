@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
@@ -57,22 +56,20 @@ namespace RsDocGenerator
                     break;
                 default: return;
             }
-
-            var topicId = "Reference__Templates_Explorer__" + type + "_Templates";
-            var topicTitle = "Predefined " + type.ToLower() + " templates";
-            var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
-            var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
-            var topicRoot = topic.Root;
-
+            
+            
+            var topic = new HelpTopic("Reference__Templates_Explorer__" + type + "_Templates",
+                "Predefined " + type.ToLower() + " templates", _templatesOutputFolder);
+            
             // TODO: template explorer path for Rider
-            topicRoot.Add(new XElement("p",
-                new XElement("menupath", "ReSharper | Tools | Templates Explorer | " + type + " Templates"),
-                new XAttribute("product", "rs")));
+            topic.Add(new XElement("p",
+                new XElement("ui-path", "ReSharper | Tools | Templates Explorer | " + type + " Templates"),
+                new XAttribute("instance", "rs")));
 
-            topicRoot.Add(new XElement("p",
-                "This topic lists all predefined " + type.ToLower() + " templates in %product% %currentVersion%."));
+            topic.Add(new XElement("p",
+                "This topic lists all predefined " + type.ToLower() + " templates in %instance% %currentVersion%."));
 
-            topicRoot.Add(new XElement("p",
+            topic.Add(new XElement("p",
                 // ReSharper disable once RedundantArgumentDefaultValue
                 XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Types", type, false)));
             var summaryTable = XmlHelpers.CreateTable(new[] {"Template", "Description"}, new[] {"20%", "80%"});
@@ -142,11 +139,11 @@ namespace RsDocGenerator
                                              JetResourceManager.GetString(macro.ResourceType, 
                                                  macro.LongDescriptionResourceName).
                                                  CleanProductName());
-                        // paramItemElement.Add(new XElement("for",
+                        // paramItemElement.Add(new XElement("if",
                         //     " (",
                         //     XmlHelpers.CreateHyperlink(macro.Name, "Template_Macros", macro.Name, false),
                         //     ")",
-                        //     new XAttribute("product", "!rdr")));
+                        //     new XAttribute("instance", "!rdr")));
                     }
                     else
                     {
@@ -200,25 +197,23 @@ namespace RsDocGenerator
             }
 
             var indexChapter = XmlHelpers.CreateChapter(string.Format("Index of {0} Templates", type));
-            topicRoot.Add(new XComment("Total " + type + " templates: " + summaryItems.Count));
+            topic.Add(new XComment("Total " + type + " templates: " + summaryItems.Count));
             indexChapter.Add(summaryTable);
-            topicRoot.Add(indexChapter);
-            topic.Save(fileName);
+            topic.Add(indexChapter);
+            topic.Save();
         }
 
         private static void CreateTopicForLang(string lang, string langForHeading, string type, XElement table,
             string version)
         {
-            var topicId = CreateTopicIdForTypeAndLang(lang, type);
-            var topicTitle = CreateTopicTitleForTypeAndLang(langForHeading, type);
-            var fileName = Path.Combine(_templatesOutputFolder, topicId + ".xml");
-            var topic = XmlHelpers.CreateHmTopic(topicId, topicTitle);
-            var topicRoot = topic.Root;
+            var topic = new HelpTopic(CreateTopicIdForTypeAndLang(lang, type), 
+                CreateTopicTitleForTypeAndLang(langForHeading, type), 
+                _templatesOutputFolder);
             
             // if (lang.Equals("C++"))
             //     topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
 
-            topicRoot.Add(new XComment("Total: " + table.Elements().Count()));
+            topic.Add(new XComment("Total: " + table.Elements().Count()));
 
             var introInclude = XmlHelpers.CreateInclude("TC", "template_lang_list_intro");
             introInclude.Add(XmlHelpers.CreateVariable("type", type));
@@ -226,11 +221,11 @@ namespace RsDocGenerator
             introInclude.Add(XmlHelpers.CreateVariable("lang", lang));
             introInclude.Add(new XAttribute("use-filter", "empty," + type.ToLower()));
             
-            topicRoot.Add(introInclude);
+            topic.Add(introInclude);
             if (lang.ToLower().Contains("unity"))
-                topicRoot.Add(XmlHelpers.CreateInclude("BL", "Unity_support_note", true));
-            topicRoot.Add(table);
-            topic.Save(fileName);
+                topic.Add(XmlHelpers.CreateInclude("BL", "Unity_support_note", true));
+            topic.Add(table);
+            topic.Save();
         }
 
         private static string CreateTopicIdForTypeAndLang(string lang, string type)

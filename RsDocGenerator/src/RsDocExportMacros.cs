@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.I18n;
@@ -21,9 +20,7 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            const string macroTopicId = "Template_Macros";
-
-            var macroLibrary = XmlHelpers.CreateHmTopic(macroTopicId, "List of template macros");
+            var macroLibrary = new HelpTopic("Template_Macros", "List of template macros", outputFolder.AddGeneratedPath() + "\\CodeTemplates");
             var macroChunk = XmlHelpers.CreateChunk("macro_table");
             var macroTable = XmlHelpers.CreateTable(new[] {"Expression", "Description", "Details"}, null);
             var macros = Shell.Instance.GetComponent<MacroManager>().Definitions;
@@ -77,11 +74,11 @@ namespace RsDocGenerator
             }
 
             macroChunk.Add(macroTable);
-            macroLibrary.Root.Add(XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Macros", "intro",
+            macroLibrary.Add(XmlHelpers.CreateInclude("Templates__Template_Basics__Template_Macros", "intro",
                 false));
-            macroLibrary.Root.Add(new XElement("p", "Here is the full list of template macros provided by %product%:"));
-            macroLibrary.Root.Add(macroChunk);
-            macroLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath() + "\\CodeTemplates", macroTopicId + ".xml"));
+            macroLibrary.Add(new XElement("p", "Here is the full list of template macros provided by %product%:"));
+            macroLibrary.Add(macroChunk);
+            macroLibrary.Save();
             return "Template macros";
         }
 

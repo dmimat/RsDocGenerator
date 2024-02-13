@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.ActionsRevised.Menu;
 using JetBrains.Application.UI.ActionSystem.ActionsRevised.Menu;
@@ -22,28 +21,21 @@ namespace RsDocGenerator
             var featureDigger = new FeatureDigger(context);
             var configurableInspections = featureDigger.GetConfigurableInspections();
             var staticInspections = featureDigger.GetStaticInspections();
-
-            const string sweaTopicId = "Solution_Wide_Inspections_Generated";
-            var sweaFileName = Path.Combine(outputFolder, sweaTopicId + ".xml");
-            var sweaTopic = XmlHelpers.CreateHmTopic(sweaTopicId, "Solution-wide inspections");
+            
+            var sweaTopic = new HelpTopic("Solution_Wide_Inspections_Generated", "Solution-wide inspections", outputFolder);
             var sweaTable = XmlHelpers.CreateTable(new[] {"Inspection", "Language", "Default Severity"});
             
-
             foreach (var language in configurableInspections.Languages)
             {
                 var configCategories = configurableInspections.GetFeaturesByCategories(language);
                 if (configCategories.IsEmpty())
                     continue;
                 var langPresentable = GeneralHelpers.GetPsiLanguagePresentation(language);
-                var topicId = $"Reference__Code_Inspections_{language}";
-                var iChunksTopicId = $"Inspection_chunks_{language}";
-                var fileName = Path.Combine(outputFolder + "\\CodeInspectionIndex", topicId + ".xml");
-                var iChunksFileName = Path.Combine(outputFolder + "\\CodeInspectionIndex", iChunksTopicId + ".xml");
-                var topic = XmlHelpers.CreateHmTopic(topicId, "Code Inspections in " + langPresentable);
-                var iChunksTopic = XmlHelpers.CreateHmTopic(iChunksTopicId, "Inspection chunks for " + langPresentable);
-                var topicRoot = topic.Root;
-                var iChunksTopicRoot = iChunksTopic.Root;
-                topicRoot.Add(new XElement("var",
+  
+                var topic = new HelpTopic($"Reference__Code_Inspections_{language}", "Code Inspections in " + langPresentable, outputFolder + "\\CodeInspectionIndex");
+                var iChunksTopic = new HelpTopic($"Inspection_chunks_{language}", "Inspection chunks for " + langPresentable, outputFolder + "\\CodeInspectionIndex");
+    
+                topic.Add(new XElement("var",
                     new XAttribute("name", "lang"),
                     new XAttribute("value", langPresentable)));
                 var intro = XmlHelpers.CreateInclude("CA", "CodeInspectionIndexIntro");
@@ -57,7 +49,7 @@ namespace RsDocGenerator
                 // if (langPresentable.Equals("C++"))
                 //     topicRoot.Add(GeneralHelpers.CppSupportNoteElement());
 
-                topicRoot.Add(intro);
+                topic.Add(intro);
 
                 foreach (var category in configCategories)
                 {
@@ -74,7 +66,7 @@ namespace RsDocGenerator
                     {
                         var compoundName = inspection.CompoundName ?? "not compound";
                         var iChunk = XmlHelpers.CreateChunk(inspection.Id, false);
-                        var iChunkHeaderTable = new XElement("table", new XAttribute("header-style", "none"));
+                        var iChunkHeaderTable = new XElement("table", new XAttribute("style", "none"));
                         iChunkHeaderTable.Add(new XComment("Name: " + inspection.Text));
                         iChunkHeaderTable.Add(new XComment("Compound name: " + compoundName));
                         iChunkHeaderTable.Add(new XElement("tr", 
@@ -113,7 +105,7 @@ namespace RsDocGenerator
                                     inspection.SweaRequired ? "Yes" : "No")));
                         iChunk.Add(iChunkHeaderTable);
                         iChunk.Add(XmlHelpers.CreateInclude("CA", "tip_disable"));
-                        iChunksTopicRoot.Add(iChunk);
+                        iChunksTopic.Add(iChunk);
                         
                         summaryTable.Add(
                             new XElement("tr",
@@ -121,10 +113,10 @@ namespace RsDocGenerator
                                     XmlHelpers.CreateHyperlink(inspection.Text,
                                         CodeInspectionHelpers.TryGetStaticHref(inspection.Id), null, true),
                                     new XComment(compoundName),
-                                    new XElement("for", new XAttribute("filter", "inspection_id"),
+                                    new XElement("if", new XAttribute("filter", "inspection_id"),
                                         new XElement("br"),
                                         new XElement("code", inspection.Id)),
-                                    new XElement("for", new XAttribute("filter", "editorconfig_id"),
+                                    new XElement("if", new XAttribute("filter", "editorconfig_id"),
                                         new XElement("br"),
                                         new XElement("code", inspection.EditorConfigId))),
                                 new XElement("td", GetSeverityLink(inspection.Severity))));
@@ -138,16 +130,15 @@ namespace RsDocGenerator
                     }
 
                     chapter.Add(summaryTable);
-                    topicRoot.Add(chapter);
+                    topic.Add(chapter);
                 }
-
-                topic.Save(fileName);
-                iChunksTopic.Save(iChunksFileName);
+                topic.Save();
+                iChunksTopic.Save();
             }
 
             sweaTable.Add(new XAttribute("id", "swea_table"));
-            sweaTopic.Root.Add(sweaTable);
-            sweaTopic.Save(sweaFileName);
+            sweaTopic.Add(sweaTable);
+            sweaTopic.Save();
 
             return "Code inspections index";
         }

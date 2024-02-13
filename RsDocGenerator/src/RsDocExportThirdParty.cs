@@ -56,9 +56,8 @@ namespace RsDocGenerator
                     libraryList.Add(line, productId);
                 }
             }
-
-            const string thirdPartyTopicId = "Third_Party_Generated";
-            var thirdPartyTopic = XmlHelpers.CreateHmTopic(thirdPartyTopicId, "Third-Party Libraries");
+            
+            var thirdPartyTopic = new HelpTopic("Third_Party_Generated", "Third-Party Libraries", outputFolder.AddGeneratedPath());
 
             var thirdPartyTable = new XElement("table");
             var headerRow = new XElement("tr");
@@ -116,9 +115,9 @@ namespace RsDocGenerator
 
             var thirdPartyChunk = XmlHelpers.CreateChunk("table");
             thirdPartyChunk.Add(thirdPartyTable);
-            thirdPartyTopic.Root.Add(thirdPartyChunk);
+            thirdPartyTopic.Add(thirdPartyChunk);
 
-            thirdPartyTopic.Save(Path.Combine(outputFolder.AddGeneratedPath(), thirdPartyTopicId + ".xml"));
+            thirdPartyTopic.Save();
             return "Third-Party Libraries";
         }
 

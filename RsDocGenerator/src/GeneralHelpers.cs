@@ -5,7 +5,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using System.Xml.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.DataContext;
@@ -228,7 +227,7 @@ namespace RsDocGenerator
         public static string CleanProductName(this string input)
         {
             if (input == null) return input;
-            input = input.Replace(" ReSharper ", " %product% ");
+            input = input.Replace(" ReSharper ", " %instance% ");
             input = input.Replace(" options", " %settingsLower%");
             return input;
         }

@@ -43,11 +43,11 @@ namespace RsDocGenerator
             XmlHelpers.AddAutoGenComment(shortcutsXmlDoc.Root);
             var actionsElement = new XElement("actions");
             actionMapElement.Add(actionsElement);
-
-            const string menuPathLibId = "Menupath_by_ID";
-            var menuPathLibrary = XmlHelpers.CreateHmTopic(menuPathLibId, "Menupath_by_ID Chunks");
-            const string accessIntroLibId = "AccessIntro_by_ID";
-            var accessIntroLibrary = XmlHelpers.CreateHmTopic(accessIntroLibId, "AccessIntro_by_ID Chunks");
+            
+            var generatedFolder = outputFolder.AddGeneratedPath();
+            
+            var menuPathLibrary = new HelpTopic("Menupath_by_ID", "Menupath_by_ID Chunks", generatedFolder);
+            var accessIntroLibrary = new HelpTopic("AccessIntro_by_ID", "AccessIntro_by_ID Chunks", generatedFolder);
 
             var actionManager = context.GetComponent<IActionManager>();
 
@@ -116,10 +116,10 @@ namespace RsDocGenerator
                 actionElement.Add(
                     new XAttribute("id", actionId),
                     new XElement("description", actionText)
-                    // new XAttribute("menupath", pathToTheRoot)
+                    // new XAttribute("ui-path", pathToTheRoot)
                     );
                 var accessIntroChunk = XmlHelpers.CreateChunk(actionId);
-                var accessIntroWrapper = new XElement("microformat");
+                var accessIntroWrapper = new XElement("tldr");
                 if (!pathToTheRoot.IsNullOrEmpty())
                 {
                     var menuPathChunk = XmlHelpers.CreateChunk(actionId);
@@ -127,9 +127,9 @@ namespace RsDocGenerator
                             .Replace("ReSharper | Navigate ", "%navigateMenu%")
                             .Replace("ReSharper | Windows ", "%windowsMenu%")
                             .Replace("ReSharper | Edit ", "%editMenu%");
-                    menuPathChunk.Add(new XElement("menupath", pathToTheRoot));
-                    accessIntroWrapper.Add(new XElement("p", new XElement("menupath", pathToTheRoot)));
-                    menuPathLibrary.Root.Add(menuPathChunk);
+                    menuPathChunk.Add(new XElement("ui-path", pathToTheRoot));
+                    accessIntroWrapper.Add(new XElement("p", new XElement("ui-path", pathToTheRoot)));
+                    menuPathLibrary.Add(menuPathChunk);
                 }
                 
                 var shortcutWrapper = new XElement("p");
@@ -137,7 +137,7 @@ namespace RsDocGenerator
                 if (ideaShortcuts != null || vsShortcuts != null)
                 {
                     shortcutWrapper.Add(new XElement("shortcut", new XAttribute("key", actionId)));
-                    shortcutWrapper.Add(XElement.Parse($"<for product=\"rs,dcv\">(<code>ReSharper_{actionId}</code>)</for>"));
+                    shortcutWrapper.Add(XElement.Parse($"<if instance=\"rs,dcv\">(<code>ReSharper_{actionId}</code>)</if>"));
                 }
                 else
                 {
@@ -145,12 +145,12 @@ namespace RsDocGenerator
                     assignTip.Add(XmlHelpers.CreateVariable("actionId",actionId));
                     shortcutWrapper.Add(
                         assignTip,
-                        new XAttribute("product", "rs,dcv"));
+                        new XAttribute("instance", "rs,dcv"));
                 }
 
                 accessIntroWrapper.Add(shortcutWrapper);
                 accessIntroChunk.Add(accessIntroWrapper);
-                accessIntroLibrary.Root.Add(accessIntroChunk);
+                accessIntroLibrary.Add(accessIntroChunk);
 
                 AddShortcuts(ideaShortcuts, actionElement, "rs");
                 AddShortcuts(vsShortcuts, actionElement, "vs");
@@ -168,10 +168,10 @@ namespace RsDocGenerator
                 actionsElement.Add(actionElement);
             }
 
-            var generatedFolder = outputFolder.AddGeneratedPath();
+            
             shortcutsXmlDoc.Save(Path.Combine(outputFolder, "keymap.xml"));
-            menuPathLibrary.Save(Path.Combine(generatedFolder, menuPathLibId + ".xml"));
-            accessIntroLibrary.Save(Path.Combine(generatedFolder, accessIntroLibId + ".xml"));
+            menuPathLibrary.Save();
+            accessIntroLibrary.Save();
             return "Shortcuts and actions";
         }
 
@@ -268,7 +268,7 @@ namespace RsDocGenerator
         //                actionElement.Add(
         //                    new XAttribute("id", pattern.Replace(actionId, "")),
         //                    new XAttribute("title", actionText),
-        //                    new XAttribute("menupath", pathToTheRoot));
+        //                    new XAttribute("ui-path", pathToTheRoot));
         //                if (vsShortcuts != null)
         //                    foreach (var keystroke in vsShortcuts)
         //                {

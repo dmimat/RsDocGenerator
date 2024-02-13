@@ -38,6 +38,7 @@
     <Compile Include="src\FeatureDigger.cs" />
     <Compile Include="src\FeatureKeeper.cs" />
     <Compile Include="src\GeneralHelpers.cs" />
+    <Compile Include="src\HelpTopic.cs" />
     <Compile Include="src\HollowNamesCheck.cs" />
     <Compile Include="src\HollowTypeNameHighlighting.cs" />
     <Compile Include="src\RsDocExportBase.cs" />

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -32,13 +31,11 @@ namespace RsDocGenerator
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
             IEditorConfigSchema ecService)
         {
-            const string editorConfigIndexTopicId = "EditorConfig_Index";
-            var editorConfigIndexTopic =
-                XmlHelpers.CreateHmTopic(editorConfigIndexTopicId, "Index of EditorConfig properties");
-
-            editorConfigIndexTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%"));
-
-            var table = XmlHelpers.CreateTwoColumnTable("Property name", "Description", "50%");
+            var editorConfigIndexTopic = 
+                new HelpTopic("EditorConfig_Index", "Index of EditorConfig properties", path);
+            
+            var table = 
+                XmlHelpers.CreateTwoColumnTable("Property name", "Description", "50%");
 
             var tableRows = new SortedDictionary<string, XElement>();
 
@@ -55,7 +52,7 @@ namespace RsDocGenerator
                     var lang = val.Language.PresentableName;
 
                     if (!lang.IsLangSupportedInRider())
-                        propRow.Add(new XAttribute("product", "!rdr"));
+                        propRow.Add(new XAttribute("instance", "!rdr"));
 
                     var content = (val.SectionDescription == null
                                       ? val.Description
@@ -93,7 +90,7 @@ namespace RsDocGenerator
                             var lang = val1.Language.PresentableName;
                             if (!lang.IsLangSupportedInRider())
                             {
-                                currentElement = new XElement("for", new XAttribute("product", "!rdr"));
+                                currentElement = new XElement("if", new XAttribute("instance", "!rdr"));
                                 contentTd.Add(currentElement);
                             }
 
@@ -118,7 +115,7 @@ namespace RsDocGenerator
                 var propName = inspection.EditorConfigId;
                 var propRow = new XElement("tr");
                 if (!inspection.Lang.IsLangSupportedInRider())
-                    propRow.Add(new XAttribute("product", "!rdr"));
+                    propRow.Add(new XAttribute("instance", "!rdr"));
                 propRow.Add(new XElement("td", new XElement("code", propName)));
                 propRow.Add(new XElement("td",
                     XmlHelpers.CreateHyperlink("Code Inspection", "Code_Analysis__Code_Inspections"),
@@ -131,17 +128,17 @@ namespace RsDocGenerator
 
             foreach (var row in tableRows)
                 table.Add(row.Value);
-            editorConfigIndexTopic.Root.Add(table);
-            editorConfigIndexTopic.Save(Path.Combine(path, editorConfigIndexTopicId + ".xml"));
+            editorConfigIndexTopic.Add(table);
+            editorConfigIndexTopic.Save();
         }
 
         public static void CreateGeneralizedPropertiesTopic(string path, IApplicationHost host,
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map,
             IEditorConfigSchema schema)
         {
-            var editorConfigGeneralizedTopic =
-                XmlHelpers.CreateHmTopic(GeneralizedPropsFileName, "Generalized EditorConfig properties");
-            editorConfigGeneralizedTopic.Root.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%"));
+            var editorConfigGeneralizedTopic = 
+                new HelpTopic(GeneralizedPropsFileName, "Generalized EditorConfig properties", path);
+            editorConfigGeneralizedTopic.Add(XmlHelpers.CreateInclude("FC", "%thisTopic%"));
 
             foreach (var propInfo in schema.GetAllProperties())
             {
@@ -178,7 +175,7 @@ namespace RsDocGenerator
                             : val1.SectionDescription + " - " + val1.Description + " (" + lang + ")";
                         var li = new XElement("li", XmlHelpers.CreateHyperlink(content, val1.FileName, val1.Id, false));
                         if (!lang.IsLangSupportedInRider())
-                            li.Add(new XAttribute("product", "!rdr"));
+                            li.Add(new XAttribute("instance", "!rdr"));
                         list.Add(li);
                     }
                 }
@@ -193,10 +190,10 @@ namespace RsDocGenerator
                 DescribePossibleValues(chapterTopLevel, propInfo.ValueTypeInfo.ValueType.Bind(),
                     propInfo.ValueTypeInfo.Values);
 
-                editorConfigGeneralizedTopic.Root.Add(chapterTopLevel);
+                editorConfigGeneralizedTopic.Add(chapterTopLevel);
             }
 
-            editorConfigGeneralizedTopic.Save(Path.Combine(path, GeneralizedPropsFileName + ".xml"));
+            editorConfigGeneralizedTopic.Save();
         }
 
         public static void ProcessEntries(KnownLanguage language, ICodeStylePageSchema schema, string path,
@@ -208,21 +205,20 @@ namespace RsDocGenerator
             OneToListMultimap<string, RsDocExportEditorConfigStyles.PropertyDescription> map)
         {
             var topicId = "EditorConfig_" + language.Name.Replace(" ", "_") + "_" + schema.GetType().Name;
-            var topic = XmlHelpers.CreateHmTopic(topicId,
-                "EditorConfig properties for {0}: {1}".FormatEx(language.PresentableName, schema.PageName));
+            var topic = new HelpTopic(topicId,
+                "EditorConfig properties for {0}: {1}".FormatEx(language.PresentableName, schema.PageName), path);
             
             var includeTipOptions = XmlHelpers.CreateInclude("FC", "tip_configure_in_options", true);
             includeTipOptions.Add(XmlHelpers.CreateVariable("lang", language.PresentableName));
             includeTipOptions.Add(XmlHelpers.CreateVariable("pageName", schema.PageName));
             
-            topic.Root.Add(XmlHelpers.CreateInclude("FC", topicId, true));
-            topic.Root.Add(includeTipOptions);
+            topic.Add(includeTipOptions);
 
             foreach (var entry in schema.Entries)
                 ProcessEntry(
                     null,
                     entry,
-                    topic.Root,
+                    topic.GetRoot(),
                     preparator,
                     solution,
                     documentBefore,
@@ -237,7 +233,7 @@ namespace RsDocGenerator
                     map,
                     null, topicId);
 
-            topic.Save(Path.Combine(path, topicId + ".xml"));
+            topic.Save();
         }
 
         private static void ProcessEntry(string parentId, ICodeStyleEntry entry, XElement container,

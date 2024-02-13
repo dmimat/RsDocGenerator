@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Application.DataContext;
@@ -20,20 +19,18 @@ namespace RsDocGenerator
             var featureDigger = new FeatureDigger(context);
             var fixesInScope = featureDigger.GetFixesInScope();
             var actionsInScope = featureDigger.GetContextActionsInScope();
-
-            const string caTopicId = "Fix_in_Scope_Chunks";
-            var inScopeLibrary = XmlHelpers.CreateHmTopic(caTopicId, "Fix in scope chunks");
+            
+            var inScopeLibrary = new HelpTopic("Fix_in_Scope_Chunks", "Fix in scope chunks", outputFolder.AddGeneratedPath());
 
             var qfChunk = CreateScopeChunk(fixesInScope, "qf_list");
             var caChunk = CreateScopeChunk(actionsInScope, "ca_list");
 
-            inScopeLibrary.Root.Add(new XComment("Total quick-fix in scope: " + fixesInScope.Features.Count));
-            inScopeLibrary.Root.Add(new XComment("Total context actions in scope: " + actionsInScope.Features.Count));
+            inScopeLibrary.Add(new XComment("Total quick-fix in scope: " + fixesInScope.Features.Count));
+            inScopeLibrary.Add(new XComment("Total context actions in scope: " + actionsInScope.Features.Count));
 
-            inScopeLibrary.Root.Add(qfChunk);
-            inScopeLibrary.Root.Add(caChunk);
-
-            inScopeLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath(), caTopicId + ".xml"));
+            inScopeLibrary.Add(qfChunk);
+            inScopeLibrary.Add(caChunk);
+            inScopeLibrary.Save();
             return "Fix in scope actions";
         }
 

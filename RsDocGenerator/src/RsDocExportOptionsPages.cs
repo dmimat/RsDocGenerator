@@ -1,10 +1,6 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Windows.Forms.VisualStyles;
 using System.Xml.Linq;
-using JetBrains;
 using JetBrains.Application;
 using JetBrains.Application.Catalogs;
 using JetBrains.Application.Catalogs.Filtering;
@@ -64,8 +60,7 @@ namespace RsDocGenerator
                 pages.Add(id, new MyOptionsPage(name, id, parentId));
             }
             
-            const string optionsPagesLibId = "Options_Page_Paths";
-            var optionsPagesLib = XmlHelpers.CreateHmTopic(optionsPagesLibId, "Options pages paths");
+            var optionsPagesLib = new HelpTopic("Options_Page_Paths", "Options pages paths", outputFolder.AddGeneratedPath());
 
             foreach (var optionsPage in pages.Values)
             {
@@ -80,31 +75,31 @@ namespace RsDocGenerator
                 }
                 
                 var optionsPageChunk = XmlHelpers.CreateChunk(id);
-                optionsPageChunk.Add(new XElement("menupath", pagePath));
+                optionsPageChunk.Add(new XElement("ui-path", pagePath));
 
                 var varPagePathElement = XmlHelpers.CreateVariable("page_path", pagePath);
-                varPagePathElement.Add(new XAttribute("product", "rs,dcv,dt,tca,dm"));
+                varPagePathElement.Add(new XAttribute("instance", "rs,dcv,dt,tca,dm"));
 
                 var theOptionsPageChunk = XmlHelpers.CreateChunk("the_" + id + "_page");
                 theOptionsPageChunk.Add(new XElement("include", 
-                    new XAttribute("src", "GC.xml"),
-                    new XAttribute("include-id", "the_options_page"),
+                    new XAttribute("from", "GC.topic"),
+                    new XAttribute("element-id", "the_options_page"),
                     new XAttribute("origin", "dotnet"), varPagePathElement)); 
                 
                 var stepOpenPageChunk = XmlHelpers.CreateChunk("step_open_" + id + "_page");
                 stepOpenPageChunk.Add(new XElement("include", 
-                    new XAttribute("src", "GC.xml"),
-                    new XAttribute("include-id", "step_open_options_and_choose_page"),
+                    new XAttribute("from", "GC.topic"),
+                    new XAttribute("element-id", "step_open_options_and_choose_page"),
                     new XAttribute("origin", "dotnet"), varPagePathElement));
 
 
-                optionsPagesLib.Root.Add(optionsPageChunk);
-                optionsPagesLib.Root.Add(theOptionsPageChunk);
-                optionsPagesLib.Root.Add(stepOpenPageChunk);
+                optionsPagesLib.Add(optionsPageChunk);
+                optionsPagesLib.Add(theOptionsPageChunk);
+                optionsPagesLib.Add(stepOpenPageChunk);
             }
             
-            var generatedFolder = outputFolder.AddGeneratedPath();
-            optionsPagesLib.Save(Path.Combine(generatedFolder, optionsPagesLibId + ".xml"));
+            ;
+            optionsPagesLib.Save();
 
             return "Options Pages";
         }

@@ -55,15 +55,15 @@ namespace RsDocGenerator
         {
             if (normalize)
                 includeId = includeId.NormalizeStringForAttribute();
-            return new XElement("chunk", new XAttribute("id", includeId));
+            return new XElement("snippet", new XAttribute("id", includeId));
         }
 
         public static XElement CreateInclude(string src, string id, bool nullable = false)
         {
             return new XElement("include",
                 new XAttribute("nullable", nullable ? "true" : "false"),
-                new XAttribute("src", src + ".xml"),
-                new XAttribute("include-id", id.NormalizeStringForAttribute()));
+                new XAttribute("from", src + ".topic"),
+                new XAttribute("element-id", id.NormalizeStringForAttribute()));
         }
         
         public static XElement CreateVariable(string name, string value)
@@ -109,7 +109,7 @@ namespace RsDocGenerator
             if (nullable)
                 link.Add(new XAttribute("nullable", "true"));
             if (href != null)
-                link.Add(new XAttribute("href", href.Contains("http") ? href : href + ".xml"));
+                link.Add(new XAttribute("href", href.Contains("http") ? href : href + ".topic"));
             if (anchor != null)
                 link.Add(new XAttribute("anchor", anchor.NormalizeStringForAttribute()));
             return link;
@@ -117,9 +117,8 @@ namespace RsDocGenerator
 
         public static XElement CreateCodeBlock([NotNull] string content, [CanBeNull] string lang, bool showSpaces)
         {
-            var codeElement = new XElement("code", content.CleanCodeSample(),
-                new XAttribute("style", "block"),
-                new XAttribute("interpolate-variables", "false")
+            var codeElement = new XElement("code-block", content.CleanCodeSample(),
+                new XAttribute("ignore-vars", "true")
                 );
 
             if (lang == null || lang == "Global" || lang == "Protobuf")
@@ -185,7 +184,7 @@ namespace RsDocGenerator
 
         public static void AddRsOnlyAttribute(XElement element)
         {
-            element.Add(new XAttribute("product", "rs"));
+            element.Add(new XAttribute("instance", "rs"));
         }
     }
 }

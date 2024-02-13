@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using JetBrains.Annotations;
@@ -20,13 +19,12 @@ namespace RsDocGenerator
 
         public static string StartContentGeneration(IDataContext context, string outputFolder)
         {
-            const string caTopicId = "CA_Chunks";
-            var caLibrary = XmlHelpers.CreateHmTopic(caTopicId, "Context Actions chunks");
+            var caLibrary = new HelpTopic("CA_Chunks", "Context Actions chunks", outputFolder.AddGeneratedPath());
             var tablesByLanguage = new Dictionary<string, XElement>();
             var sortedActions = context.GetComponent<IContextActionTable>().AllActions.OrderBy(ca => ca.Name);
             var caPath = GeneralHelpers.GetCaPath(context);
 
-            caLibrary.Root.Add(
+            caLibrary.Add(
                 new XComment("Total context actions in ReSharper " +
                              GeneralHelpers.GetCurrentVersion() + ": " +
                              sortedActions.Count()));
@@ -59,13 +57,13 @@ namespace RsDocGenerator
                     ? "common use"
                     : table.Key;
                 languageChunk.Add(new XElement("p",
-                    "%product% provides the following context actions for " +
+                    "%instance% provides the following context actions for " +
                     langText + ":"));
                 languageChunk.Add(table.Value);
-                caLibrary.Root.Add(languageChunk);
+                caLibrary.Add(languageChunk);
             }
 
-            caLibrary.Save(Path.Combine(outputFolder.AddGeneratedPath(), caTopicId + ".xml"));
+            caLibrary.Save();
             return "Context actions";
         }
 
