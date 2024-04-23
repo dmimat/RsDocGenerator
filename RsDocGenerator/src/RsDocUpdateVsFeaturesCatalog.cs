@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection.Metadata;
-using JetBrains.Application.DataContext;
-using JetBrains.Application.Diagnostics;
+﻿using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
-using JetBrains.Platform.VisualStudio.SinceVs10.Interop.Shim;
-using JetBrains.Util;
-using JetBrains.Util.Logging;
-using JetBrains.VsIntegration.Shell;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.CodeRefactorings;
+// using System.Reflection.Metadata;
+
+// using Microsoft.CodeAnalysis.CodeFixes;
+// using Microsoft.CodeAnalysis.CodeRefactorings;
 
 
 namespace RsDocGenerator

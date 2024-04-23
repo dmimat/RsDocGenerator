@@ -66,8 +66,9 @@ namespace RsDocGenerator
                     {
                         var compoundName = inspection.CompoundName ?? "not compound";
                         var iChunk = XmlHelpers.CreateChunk(inspection.Id, false);
+                        iChunk.Add(new XElement("title", "Code inspection: " + inspection.Text));
                         var iChunkHeaderTable = new XElement("table", new XAttribute("style", "none"));
-                        iChunkHeaderTable.Add(new XComment("Name: " + inspection.Text));
+                        //iChunkHeaderTable.Add(new XComment("Name: " + inspection.Text));
                         iChunkHeaderTable.Add(new XComment("Compound name: " + compoundName));
                         iChunkHeaderTable.Add(new XElement("tr", 
                             XmlHelpers.CreateInclude("CA", "iChunks_category"),
@@ -86,16 +87,30 @@ namespace RsDocGenerator
                             new XElement("td",
                                 GetSeverityLink(inspection.Severity))));
                         var supportedLangs = "";
+                        var supportedLangsRdr = "";
                         foreach (var supportedLang in inspection.Multilang)
                         {
                             var supportedLangPresentable = GeneralHelpers.GetPsiLanguagePresentation(supportedLang);
+                            bool langForRider = supportedLangPresentable.IsLangSupportedInRider();
                             if (!supportedLangs.IsEmpty())
+                            {
                                 supportedLangs += ", ";
+                                if (langForRider)
+                                {
+                                    supportedLangsRdr += ", ";
+                                }
+                            }
                             supportedLangs += supportedLangPresentable;
+                            if (langForRider)
+                            {
+                                supportedLangsRdr += supportedLangPresentable;
+                            }
                         }
                         iChunkHeaderTable.Add(new XElement("tr",
-                            new XElement("td", "Language"),
-                            new XElement("td", supportedLangs)));
+                            XmlHelpers.CreateInclude("CA", "iChunks_language"),
+                            new XElement("td", new XAttribute("instance", "!rdr"), supportedLangs),
+                            new XElement("td", new XAttribute("instance", "rdr"), supportedLangsRdr)
+                            ));
                         
                         if (language == "CSHARP" || language == "ASPX" || language == "ASXX" ||
                             language == "JAVA_SCRIPT" || language == "VBASIC" || language == "XAML")

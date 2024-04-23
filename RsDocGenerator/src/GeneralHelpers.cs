@@ -122,17 +122,22 @@ namespace RsDocGenerator
         {
             switch (lang)
             {
-                case "C++" :
-                case "CPP" :
+                // case "C++" :
+                // case "CPP" :
                 case "JavaScript":
                 case "TypeScript":
                 case "HTML":
                 case "XML":
+                case "XAML":
                 case "XMLDOC":
                 case "Css":
                 case "CSS":
                 case "Protobuf":
-                case "Unreal_Engine":
+                case "ASP.NET":
+                case "Razor":
+                case "HttpHandler or WebService":
+                case "Resource files":
+                // case "Unreal_Engine":
                     return false;
             }
             return true;

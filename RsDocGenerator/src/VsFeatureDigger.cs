@@ -1,14 +1,10 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Text.RegularExpressions;
 using JetBrains.Application.DataContext;
-using JetBrains.Platform.VisualStudio.SinceVs10.Interop.Shim;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.Util;
-using JetBrains.VsIntegration.Shell;
-using Microsoft.CodeAnalysis.CodeFixes;
+
+// using Microsoft.CodeAnalysis.CodeFixes;
 
 
 namespace RsDocGenerator

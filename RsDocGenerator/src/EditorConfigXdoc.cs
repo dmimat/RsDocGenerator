@@ -90,7 +90,7 @@ namespace RsDocGenerator
                             var lang = val1.Language.PresentableName;
                             if (!lang.IsLangSupportedInRider())
                             {
-                                currentElement = new XElement("if", new XAttribute("instance", "!rdr"));
+                                currentElement = XmlHelpers.GetNotForRiderFilter();
                                 contentTd.Add(currentElement);
                             }
 

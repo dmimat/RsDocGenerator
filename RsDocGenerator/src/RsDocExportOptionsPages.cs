@@ -98,7 +98,6 @@ namespace RsDocGenerator
                 optionsPagesLib.Add(stepOpenPageChunk);
             }
             
-            ;
             optionsPagesLib.Save();
 
             return "Options Pages";

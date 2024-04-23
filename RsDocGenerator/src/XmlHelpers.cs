@@ -186,5 +186,10 @@ namespace RsDocGenerator
         {
             element.Add(new XAttribute("instance", "rs"));
         }
+
+        public static XElement GetNotForRiderFilter()
+        {
+            return new XElement("if", new XAttribute("instance", "!rdr"));
+        }
     }
 }
