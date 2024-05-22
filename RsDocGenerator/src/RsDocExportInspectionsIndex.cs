@@ -62,30 +62,31 @@ namespace RsDocGenerator
                     chapter.Add(XmlHelpers.CreateInclude("CA", "Category_" + categoryIdNormalized));
                     var summaryTable = new XElement("table", new XAttribute("id", "tbl_" + categoryIdNormalized));
                     summaryTable.Add(XmlHelpers.CreateInclude("CA", "tr_code_inspection_index_header"));
+                    var separator = ": ";
                     foreach (var inspection in category.Value)
                     {
                         var compoundName = inspection.CompoundName ?? "not compound";
                         var iChunk = XmlHelpers.CreateChunk(inspection.Id, false);
                         iChunk.Add(new XElement("title", "Code inspection: " + inspection.Text));
-                        var iChunkHeaderTable = new XElement("table", new XAttribute("style", "none"));
+                        var iChunkHeaderTable = new XElement("tldr");
                         //iChunkHeaderTable.Add(new XComment("Name: " + inspection.Text));
                         iChunkHeaderTable.Add(new XComment("Compound name: " + compoundName));
-                        iChunkHeaderTable.Add(new XElement("tr", 
+                        iChunkHeaderTable.Add(new XElement("p", 
                             XmlHelpers.CreateInclude("CA", "iChunks_category"),
-                            new XElement("td",
-                                FeatureCatalog.GetGroupTitle(category.Key))));
-                        iChunkHeaderTable.Add(new XElement("tr",
+                            separator,
+                            FeatureCatalog.GetGroupTitle(category.Key)));
+                        iChunkHeaderTable.Add(new XElement("p",
                             XmlHelpers.CreateInclude("CA", "iChunks_iId"),
-                            new XElement("td",
-                                new XElement("code", inspection.Id))));
-                        iChunkHeaderTable.Add(new XElement("tr",
+                            separator,
+                            new XElement("code", inspection.Id)));
+                        iChunkHeaderTable.Add(new XElement("p",
                             XmlHelpers.CreateInclude("CA", "iChunks_ecId"),
-                            new XElement("td",
-                                new XElement("code", inspection.EditorConfigId))));
-                        iChunkHeaderTable.Add(new XElement("tr",
+                            separator,
+                            new XElement("code", inspection.EditorConfigId)));
+                        iChunkHeaderTable.Add(new XElement("p",
                             XmlHelpers.CreateInclude("CA", "iChunks_severity"), 
-                            new XElement("td",
-                                GetSeverityLink(inspection.Severity))));
+                            separator,
+                            GetSeverityLink(inspection.Severity)));
                         var supportedLangs = "";
                         var supportedLangsRdr = "";
                         foreach (var supportedLang in inspection.Multilang)
@@ -106,18 +107,19 @@ namespace RsDocGenerator
                                 supportedLangsRdr += supportedLangPresentable;
                             }
                         }
-                        iChunkHeaderTable.Add(new XElement("tr",
+                        iChunkHeaderTable.Add(new XElement("p",
                             XmlHelpers.CreateInclude("CA", "iChunks_language"),
-                            new XElement("td", new XAttribute("instance", "!rdr"), supportedLangs),
-                            new XElement("td", new XAttribute("instance", "rdr"), supportedLangsRdr)
+                            separator,
+                            new XElement("if", new XAttribute("instance", "!rdr"), supportedLangs),
+                            new XElement("if", new XAttribute("instance", "rdr"), supportedLangsRdr)
                             ));
                         
                         if (language == "CSHARP" || language == "ASPX" || language == "ASXX" ||
                             language == "JAVA_SCRIPT" || language == "VBASIC" || language == "XAML")
-                            iChunkHeaderTable.Add(new XElement("tr",
+                            iChunkHeaderTable.Add(new XElement("p",
                                 XmlHelpers.CreateInclude("CA", "iChunks_swea"),
-                                new XElement("td",
-                                    inspection.SweaRequired ? "Yes" : "No")));
+                                separator,
+                                inspection.SweaRequired ? "Yes" : "No"));
                         iChunk.Add(iChunkHeaderTable);
                         iChunk.Add(XmlHelpers.CreateInclude("CA", "tip_disable"));
                         iChunksTopic.Add(iChunk);
