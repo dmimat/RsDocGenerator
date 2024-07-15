@@ -30,7 +30,7 @@ namespace RsDocGenerator
                              sortedActions.Count()));
             foreach (var ca in sortedActions)
             {
-                var lang = ca.Group ?? "Unknown";
+                var lang = ca.GroupName ?? "Unknown";
 
                 if (!tablesByLanguage.ContainsKey(lang))
                     tablesByLanguage.Add(lang,

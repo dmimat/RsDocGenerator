@@ -34,7 +34,7 @@ namespace RsDocGenerator
             var groups = new Dictionary<string, List<RsFeature>>();
             var groupIds =
                 highlightingManager.ConfigurableGroups.OrderBy(g => g.Title).Select(g => g.Key).ToList();
-            groupIds.AddRange(highlightingManager.StaticGroups.OrderBy(g => g.Name).Select(g => g.Key));
+            groupIds.AddRange(highlightingManager.StaticGroups.OrderBy(g => g.Title).Select(g => g.Key));
 
             foreach (var group in groupIds)
             {
@@ -57,7 +57,7 @@ namespace RsDocGenerator
             var highlightingManager = Shell.Instance.GetComponent<HighlightingSettingsManager>();
             var staticGroup = highlightingManager.StaticGroups.FirstOrDefault(x => x.Key == groupId);
             if (staticGroup != null)
-                return staticGroup.Name;
+                return staticGroup.Title;
 
             var configurableGroup = highlightingManager.ConfigurableGroups.FirstOrDefault(x => x.Key == groupId);
             if (configurableGroup != null)

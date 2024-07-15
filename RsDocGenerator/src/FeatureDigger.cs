@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using JetBrains.Application.DataContext;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.DataContext;
-using JetBrains.ReSharper.Daemon.CSharp.EditorConfig;
 using JetBrains.ReSharper.Daemon.CSharp.StyleCop;
 using JetBrains.ReSharper.Feature.Services.ContextActions;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -153,7 +152,7 @@ namespace RsDocGenerator
             var actionsCatalog = new FeatureCatalog(RsFeatureKind.ContextAction);
             foreach (var ca in _myContext.GetComponent<IContextActionTable>().AllActions)
             {
-                var lang = GeneralHelpers.GetPsiLangByPresentation(ca.Group);
+                var lang = GeneralHelpers.GetPsiLangByPresentation(ca.GroupName);
                 var feature = new RsFeature(ca.ActionKey, ca.Name, lang, null, RsFeatureKind.ContextAction);
                 actionsCatalog.AddFeature(feature, lang);
             }

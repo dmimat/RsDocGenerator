@@ -7,14 +7,11 @@ using JetBrains.Annotations;
 using JetBrains.Application.DataContext;
 using JetBrains.Application.UI.Actions;
 using JetBrains.Application.UI.ActionsRevised.Menu;
-using JetBrains.Application.UI.Extensions;
 using JetBrains.Application.UI.Options;
 using JetBrains.Application.UI.Options.OptionPages;
 using JetBrains.Application.UI.Options.OptionsDialog;
 using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions;
 using JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel;
-using JetBrains.DataFlow;
-using JetBrains.Lifetimes;
 using JetBrains.Util;
 
 namespace RsDocGenerator
@@ -112,9 +109,9 @@ namespace RsDocGenerator
 
             var dumper = new OptionsEntitiesDumper();
             var pageName = optionsPageAttribute.Name;
-            WriteMessage(page.Id, state,
+            /*WriteMessage(page.Id, state,
                 $"Page. name=\"{pageName}\". id=\"{page.Id}\". help={optionsPageAttribute.HelpKeyword ?? "missedHelpKeyword"} Options count={simpleOptionsPage.OptionEntities.Count}",
-                parent);
+                parent);*/
             state.Indent++;
             foreach (var optionEntity in simpleOptionsPage.OptionEntities)
             {
