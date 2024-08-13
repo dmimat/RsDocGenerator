@@ -19,14 +19,20 @@ namespace RsDocGenerator
         private readonly XDocument _catalogDocument;
         private readonly string _catalogFile;
         private readonly XElement _currentVersionElement;
+        private readonly XElement _newInspectionsChapter;
+        private readonly HelpTopic _newInspectionsLib;
 
         public FeatureKeeper(IDataContext context, bool isVs = false)
         {
             var rootFolder = GeneralHelpers.GetDotnetDocsRootFolder(context);
             var currentFileName = isVs ? FileNameVs : FileName;
+            var currentVersionString = GeneralHelpers.GetCurrentVersion();
 
             if (rootFolder.IsNullOrEmpty()) return;
-
+            _newInspectionsChapter = XmlHelpers.CreateChapter("New code inspections in " + currentVersionString, 
+                "new_inspections");
+            _newInspectionsLib = new HelpTopic("New_Inspection_Chunks", "New inspections", rootFolder.AddGeneratedPath());
+            
             _catalogFile = Path.Combine(rootFolder + "\\nonProject", currentFileName);
             if (File.Exists(_catalogFile))
                 try
@@ -49,8 +55,7 @@ namespace RsDocGenerator
                 _catalogDocument = new XDocument();
                 _catalogDocument.Add(new XElement(RootNodeName));
             }
-
-            var currentVersionString = GeneralHelpers.GetCurrentVersion();
+            
             _currentVersionElement = (from el in _catalogDocument.Root.Elements(VersionElementName)
                 where (string) el.Attribute("v") == currentVersionString
                 select el).FirstOrDefault();
@@ -128,8 +133,9 @@ namespace RsDocGenerator
                 if (langElement.Element(featureRootNodeName) != null)
                     continue;
                 var featuresRootElemnt = new XElement(featureRootNodeName);
-
-
+                
+                var newInspectionsList = new XElement("list");
+                
                 foreach (var feature in langImplementations)
                 {
                     if (existingLangFeatures.Contains(feature.Id)) continue;
@@ -141,6 +147,20 @@ namespace RsDocGenerator
 
                     totalLangFeaturesInVersion += 1;
                     totalFeaturesInVersion += 1;
+                    
+                    if(featureCatalog.FeatureKind == RsFeatureKind.ConfigInspection)
+                        newInspectionsList.Add(new XElement("li", 
+                            XmlHelpers.CreateHyperlink(feature.Text,
+                                CodeInspectionHelpers.TryGetStaticHref(feature.Id), null, true)));
+                }
+                
+                if (newInspectionsList.HasElements)
+                {
+                    var newInspectionLangChapter = 
+                        XmlHelpers.CreateChapter("New inspections in " + langPresentation, 
+                            "new_inspections_in_" + lang);
+                    newInspectionLangChapter.Add(newInspectionsList);
+                    _newInspectionsChapter.Add(newInspectionLangChapter); 
                 }
 
                 if (featuresRootElemnt.HasElements)
@@ -157,6 +177,12 @@ namespace RsDocGenerator
                         where (string) el.Attribute("name") == langPresentation
                         select el).FirstOrDefault() == null)
                     _currentVersionElement.Add(langElement);
+            }
+
+            if (featureCatalog.FeatureKind == RsFeatureKind.InspectionWithQuickFix)
+            {
+                _newInspectionsLib.Add(_newInspectionsChapter);
+                _newInspectionsLib.Save();
             }
 
             var statNode = _currentVersionElement.Element("statistics");
