@@ -82,7 +82,7 @@ namespace RsDocGenerator
                         iChunkHeaderTable.Add(new XElement("p",
                             XmlHelpers.CreateInclude("CA", "iChunks_ecId"),
                             separator,
-                            new XElement("code", inspection.EditorConfigId)));
+                            new XElement("code", inspection.EditorConfigId + "=[error|warning|suggestion|hint|none]")));
                         iChunkHeaderTable.Add(new XElement("p",
                             XmlHelpers.CreateInclude("CA", "iChunks_severity"), 
                             separator,
@@ -122,6 +122,10 @@ namespace RsDocGenerator
                                 inspection.SweaRequired ? "Yes" : "No"));
                         iChunk.Add(iChunkHeaderTable);
                         iChunk.Add(XmlHelpers.CreateInclude("CA", "tip_disable"));
+                        
+                        var inspectionOptions = context.GetComponents<ICodeInspectionSettingsProvider>();
+
+                        
                         iChunksTopic.Add(iChunk);
                         
                         summaryTable.Add(
