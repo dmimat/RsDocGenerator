@@ -51,7 +51,7 @@ namespace RsDocGenerator
 
         public static string NormalizeStringForAttribute(this string value)
         {
-            value = value.Replace("#", "SHARP").Replace("++", "PP");
+            value = value.Replace("#", "SHARP").Replace("++", "PP").Replace(@"/", "_");
             return Regex.Replace(value, @"[\.\s-]", "_");
         }
 

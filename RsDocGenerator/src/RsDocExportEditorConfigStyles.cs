@@ -67,7 +67,7 @@ namespace RsDocGenerator
                     //.RegisterCatalog<OptionsComponentAttribute>(partsCatalogue)
                     //.Register(lifetime)
                     //.Register(threading)
-                    //.Register(contextBoundSettingsStoreLive)
+                    .Register(contextBoundSettingsStoreLive)
                     //.Register<ValueEditorViewModelFactory>()
                     //.Register<SettingsToHide>()
                     .ChainTo(SolutionInstance.GetContainer(solution))
