@@ -150,6 +150,9 @@ namespace RsDocGenerator
                 {"CSharpWarnings::CS9216", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/lock-semantics#lock-warning"},
                 {"CSharpWarnings::CS9256", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/partial-declarations#partial-properties"},
                 {"CSharpWarnings::CS9123", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/warning-waves#cs9123---taking-address-of-local-or-parameter-in-async-method-can-create-a-gc-hole"},
+                {"CSharpWarnings::CS9258", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/partial-declarations#field-backed-properties"},
+                {"CSharpWarnings::CS9264", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/partial-declarations#field-backed-properties"},
+                {"CSharpWarnings::CS1687", "https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs1687"},
   
                 {"CSharpWarnings::CS1574,CS1584,CS1581,CS1580", "CSharpWarnings_CS1574_CS1584_CS1581_CS1580"},
                 {"CSharpWarnings::CS0108,CS0114", "CSharpWarnings_CS0108_CS0114"},
