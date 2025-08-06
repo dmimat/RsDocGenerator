@@ -261,10 +261,10 @@ namespace RsDocGenerator
             if (paramElement.HasElements)
                 paramHeader.Add(new XElement("b", "Parameters "));
 
-            if (noDescriptionFallback.ToString().ToLower().Contains("unity"))
+            /*if (noDescriptionFallback.ToString().ToLower().Contains("unity"))
             {
                 lang = "Unity";
-            }
+            }*/
 
             tables[lang].Add(new XElement("tr",
                 new XElement("td",

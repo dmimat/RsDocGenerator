@@ -13,7 +13,7 @@ using MessageBox = JetBrains.Util.MessageBox;
 
 namespace RsDocGenerator
 {
-    [Action("RsDocExportCodeInspections", "Export Code Inspections", Id = 7009)]
+    [Action("RsDocExportCodeInspections", "Export Code Inspections")]
     internal class RsDocExportCodeInspections : IExecutableAction
     {
         public bool Update(IDataContext context, ActionPresentation presentation, DelegateUpdate nextUpdate)

@@ -30,7 +30,7 @@ namespace RsDocGenerator
             RsDocExportContextActions.StartContentGeneration(context, outputFolder);
             RsDocExportFixInScope.StartContentGeneration(context, outputFolder);
             //RsDocExportThirdParty.StartContentGeneration(context, outputFolder);
-            RsDocExportEditorConfigStyles.StartContentGeneration(context, outputFolder);
+            // RsDocExportEditorConfigStyles.StartContentGeneration(context, outputFolder);
 
 
             GeneralHelpers.ShowSuccessMessage("Everything", outputFolder);

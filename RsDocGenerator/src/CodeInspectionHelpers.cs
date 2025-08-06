@@ -153,6 +153,10 @@ namespace RsDocGenerator
                 {"CSharpWarnings::CS9258", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/partial-declarations#field-backed-properties"},
                 {"CSharpWarnings::CS9264", "https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/partial-declarations#field-backed-properties"},
                 {"CSharpWarnings::CS1687", "https://learn.microsoft.com/en-us/dotnet/csharp/misc/cs1687"},
+                {"CSharpWarnings::SYSLIB1014", "https://learn.microsoft.com/en-us/dotnet/fundamentals/syslib-diagnostics/syslib1014"},
+                {"CSharpWarnings::CA1856", "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1856"},
+                {"CSharpWarnings::CA2254", "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2254"},
+                {"CSharpWarnings::CA1857", "https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca1857"},
   
                 {"CSharpWarnings::CS1574,CS1584,CS1581,CS1580", "CSharpWarnings_CS1574_CS1584_CS1581_CS1580"},
                 {"CSharpWarnings::CS0108,CS0114", "CSharpWarnings_CS0108_CS0114"},
