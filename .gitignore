@@ -4,10 +4,10 @@
 /packages.*/
 
 # Compiling result files
-/RsDocGenerator/bin/
-/RsDocGenerator/bin.*/
-/RsDocGenerator/obj/
-/RsDocGenerator/obj.*/
+/*/bin/
+/*/bin.*/
+/*/obj/
+/*/obj.*/
 
 # Visual Studion and ReSharper files
 .vs/
