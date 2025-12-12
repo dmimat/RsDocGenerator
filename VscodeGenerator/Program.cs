@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.Extensions.Configuration;
 using RsDocGenerator;
@@ -88,7 +89,7 @@ public class Program
             : "Settings";
 
         var chapter = XmlHelpers.CreateChapter(title);
-        var table = XmlHelpers.CreateTwoColumnTable("ID", "Description", "50%");
+        var table = XmlHelpers.CreateTwoColumnTable("Name", "Description", "40%");
 
         // properties: a map with setting id -> object with description, etc.
         if (cfg.TryGetProperty("properties", out var properties) && properties.ValueKind == JsonValueKind.Object)
@@ -141,9 +142,78 @@ public class Program
 
     private static void AddRow(XElement table, string id, string description)
     {
+        var displayName = ToDisplayName(id);
         var tr = new XElement("tr");
-        tr.Add(new XElement("td", id));
-        tr.Add(new XElement("td", description));
+        tr.Add(new XElement("td",
+            new XElement("control", displayName)));
+        tr.Add(new XElement("td",
+            new XElement("p", description),
+            XmlHelpers.CreateInclude("GEN", id, true)));
         table.Add(tr);
+    }
+
+    // Converts an ID in a CamelHumped form into capitalized words and
+    // removes the 'resharper.[category].' prefix.
+    // Examples:
+    //  - resharper.solutionExplorer.trackActiveItem => "Track Active Item"
+    //  - resharper.trace.server => "Server"
+    //  - resharper.completion.fullCompletionListWaitTime => "Full Completion List Wait Time"
+    private static string ToDisplayName(string id)
+    {
+        if (string.IsNullOrWhiteSpace(id))
+            return string.Empty;
+
+        const string rsPrefix = "resharper.";
+        var span = id;
+
+        // Remove 'resharper.[category].' prefix if present
+        if (span.StartsWith(rsPrefix, StringComparison.OrdinalIgnoreCase))
+        {
+            var afterPrefix = span.Substring(rsPrefix.Length);
+            var nextDot = afterPrefix.IndexOf('.');
+            if (nextDot >= 0)
+            {
+                span = afterPrefix.Substring(nextDot + 1); // strip category and following dot
+            }
+            else
+            {
+                // No category part — strip only the 'resharper.' prefix
+                span = afterPrefix;
+            }
+        }
+
+        // Replace common separators with spaces first
+        span = span.Replace('_', ' ').Replace('-', ' ');
+
+        // If still contains dots (unexpected after prefix removal), keep only the last segment
+        // because IDs we display are typically the last name segment.
+        if (span.Contains('.'))
+            span = span.Split('.').Last();
+
+        // Split CamelHumped tokens into words using regex:
+        // - Proper words like "Full", "Completion", "List"
+        // - All-caps acronyms like "XML"
+        // - Numbers like "2"
+        var matches = Regex.Matches(span, @"[A-Z]?[a-z]+|[A-Z]+(?![a-z])|\d+");
+        if (matches.Count == 0)
+            return CultureInfoInvariantTitle(span);
+
+        var words = matches.Select(m => CapitalizeInvariant(m.Value));
+        return string.Join(" ", words);
+    }
+
+    private static string CapitalizeInvariant(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
+        if (value.Length == 1) return char.ToUpperInvariant(value[0]).ToString();
+        return char.ToUpperInvariant(value[0]) + value.Substring(1).ToLowerInvariant();
+    }
+
+    private static string CultureInfoInvariantTitle(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+        var parts = value.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(CapitalizeInvariant);
+        return string.Join(" ", parts);
     }
 }
