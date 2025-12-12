@@ -9,7 +9,7 @@ namespace RsDocGenerator
         private readonly string topicId;
         private readonly string topicPath;
 
-        public HelpTopic(string id, string title, string path)
+        public HelpTopic(string id, string title, string path, bool needShell = true)
         {
             topicId = id;
             topicPath = path;
@@ -26,7 +26,7 @@ namespace RsDocGenerator
                 new XAttribute("id", id),
                 new XAttribute("title", title));
 
-            XmlHelpers.AddAutoGenComment(topicDocument.Root);
+            XmlHelpers.AddAutoGenComment(topicDocument.Root, needShell);
             topicDocument.Root.Add(XmlHelpers.CreateInclude("GEN", id + "_start", true));
         }
 

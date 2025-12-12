@@ -3,27 +3,27 @@ using JetBrains.Annotations;
 
 namespace RsDocGenerator
 {
-    internal static class XmlHelpers
+    public static class XmlHelpers
     {
-        public static XDocument CreateHmTopic(string topicId, string title)
-        {
-            var topicDocument = new XDocument(
-                new XDocumentType("topic", null, "https://resources.jetbrains.com/stardust/html-entities.dtd", null));
-            //topicDocument.Add(new XComment("suppress AttributeValueVerifier"));
-            topicDocument.Add(new XElement("topic"));
-
-            XNamespace xsiNs = "http://www.w3.org/2001/XMLSchema-instance";
-            topicDocument.Root.Add(
-                new XAttribute(xsiNs + "noNamespaceSchemaLocation",
-                    "https://resources.jetbrains.com/stardust/topic.v2.xsd"),
-                new XAttribute(XNamespace.Xmlns + "xsi", xsiNs),
-                new XAttribute("id", topicId),
-                new XAttribute("title", title));
-
-            AddAutoGenComment(topicDocument.Root);
-            topicDocument.Root.Add(CreateInclude("GEN", topicId + "_start", true));
-            return topicDocument;
-        }
+        // public static XDocument CreateHmTopic(string topicId, string title)
+        // {
+        //     var topicDocument = new XDocument(
+        //         new XDocumentType("topic", null, "https://resources.jetbrains.com/stardust/html-entities.dtd", null));
+        //     //topicDocument.Add(new XComment("suppress AttributeValueVerifier"));
+        //     topicDocument.Add(new XElement("topic"));
+        //
+        //     XNamespace xsiNs = "http://www.w3.org/2001/XMLSchema-instance";
+        //     topicDocument.Root.Add(
+        //         new XAttribute(xsiNs + "noNamespaceSchemaLocation",
+        //             "https://resources.jetbrains.com/stardust/topic.v2.xsd"),
+        //         new XAttribute(XNamespace.Xmlns + "xsi", xsiNs),
+        //         new XAttribute("id", topicId),
+        //         new XAttribute("title", title));
+        //
+        //     AddAutoGenComment(topicDocument.Root);
+        //     topicDocument.Root.Add(CreateInclude("GEN", topicId + "_start", true));
+        //     return topicDocument;
+        // }
 
         public static XElement CreateTwoColumnTable(string firstColName, string secondColName, string firstColWidth)
         {
@@ -175,12 +175,14 @@ namespace RsDocGenerator
             return codeElement;
         }
 
-        public static void AddAutoGenComment(XElement element)
+        public static void AddAutoGenComment(XElement element, bool needVersion = true)
         {
+            var commentString =
+                "This topic was generated automatically with the ReSharper Documentation Generator plugin.";
+            if (needVersion) 
+                commentString += " ReSharper version: " + GeneralHelpers.GetCurrentVersion();
             element.Add(
-                new XComment(
-                    "This topic was generated automatically with the ReSharper Documentation Generator plugin. " +
-                    "ReSharper version: " + GeneralHelpers.GetCurrentVersion()));
+                new XComment(commentString));
         }
 
         public static void AddRsOnlyAttribute(XElement element)
