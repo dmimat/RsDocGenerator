@@ -25,9 +25,9 @@ namespace RsDocGenerator
         //     return topicDocument;
         // }
 
-        public static XElement CreateTwoColumnTable(string firstColName, string secondColName, string firstColWidth)
+        public static XElement CreateTwoColumnTable(string firstColName, string secondColName, string firstColWidth, string id = null)
         {
-            return CreateTable(new[] {firstColName, secondColName}, new[] {firstColWidth});
+            return CreateTable(new[] {firstColName, secondColName}, new[] {firstColWidth}, id);
         }
 
         public static XElement CreateTable(

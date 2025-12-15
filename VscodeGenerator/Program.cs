@@ -89,7 +89,7 @@ public class Program
             : "Settings";
 
         var chapter = XmlHelpers.CreateChapter(title);
-        var table = XmlHelpers.CreateTwoColumnTable("Name", "Description", "40%");
+        var table = XmlHelpers.CreateTwoColumnTable("Name", "Description", "40%", "tbl_" + title.ToLower());
 
         // properties: a map with setting id -> object with description, etc.
         if (cfg.TryGetProperty("properties", out var properties) && properties.ValueKind == JsonValueKind.Object)
@@ -142,20 +142,28 @@ public class Program
 
     private static void AddRow(XElement table, string id, string description)
     {
-        var displayName = ToDisplayName(id);
+        var descriptionPara = new XElement("p", description);
         var tr = new XElement("tr");
         tr.Add(new XElement("td",
-            new XElement("control", displayName)));
-        tr.Add(new XElement("td",
-            new XElement("p", description),
+            VsCodeSettingsLink(id)));
+        tr.Add(new XElement("td", 
+            descriptionPara,
             XmlHelpers.CreateInclude("GEN", id, true)));
         table.Add(tr);
     }
 
+    private static XElement VsCodeSettingsLink(string id)
+    {
+        return new XElement("a", ToDisplayName(id), new XAttribute("href", "vscode://settings/" + id));
+    }
+
     // Converts an ID in a CamelHumped form into capitalized words and
-    // removes the 'resharper.[category].' prefix.
+    // keeps only the last dot-separated segment (treats everything before the last '.' as prefix).
     // Examples:
     //  - resharper.solutionExplorer.trackActiveItem => "Track Active Item"
+    //  - solutionExplorer.trackActiveItem => "Track Active Item"
+    //  - editor.trackActiveItem => "Track Active Item"
+    //  - my.new.ai.plugin.solutionExplorer.trackActiveItem => "Track Active Item"
     //  - resharper.trace.server => "Server"
     //  - resharper.completion.fullCompletionListWaitTime => "Full Completion List Wait Time"
     private static string ToDisplayName(string id)
@@ -163,30 +171,17 @@ public class Program
         if (string.IsNullOrWhiteSpace(id))
             return string.Empty;
 
-        const string rsPrefix = "resharper.";
         var span = id;
 
-        // Remove 'resharper.[category].' prefix if present
-        if (span.StartsWith(rsPrefix, StringComparison.OrdinalIgnoreCase))
-        {
-            var afterPrefix = span.Substring(rsPrefix.Length);
-            var nextDot = afterPrefix.IndexOf('.');
-            if (nextDot >= 0)
-            {
-                span = afterPrefix.Substring(nextDot + 1); // strip category and following dot
-            }
-            else
-            {
-                // No category part — strip only the 'resharper.' prefix
-                span = afterPrefix;
-            }
-        }
+        // Keep only the part after the last dot, treating all preceding parts as a prefix
+        var lastDot = span.LastIndexOf('.');
+        if (lastDot >= 0 && lastDot + 1 < span.Length)
+            span = span.Substring(lastDot + 1);
 
         // Replace common separators with spaces first
         span = span.Replace('_', ' ').Replace('-', ' ');
 
-        // If still contains dots (unexpected after prefix removal), keep only the last segment
-        // because IDs we display are typically the last name segment.
+        // If still contains dots for any reason, keep only the last segment as a safeguard
         if (span.Contains('.'))
             span = span.Split('.').Last();
 
