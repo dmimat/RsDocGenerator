@@ -89,7 +89,9 @@ public class Program
             : "Settings";
 
         var chapter = XmlHelpers.CreateChapter(title);
-        var table = XmlHelpers.CreateTwoColumnTable("Name", "Description", "40%", "tbl_" + title.ToLower());
+        var table = XmlHelpers.CreateTwoColumnTable("Name", "Description", "25%",
+            // ReSharper disable once InvokeAsExtensionMethod
+            "tbl_" + GeneralHelpers.NormalizeStringForAttribute(title.ToLower()));
 
         // properties: a map with setting id -> object with description, etc.
         if (cfg.TryGetProperty("properties", out var properties) && properties.ValueKind == JsonValueKind.Object)
@@ -142,7 +144,46 @@ public class Program
 
     private static void AddRow(XElement table, string id, string description)
     {
-        var descriptionPara = new XElement("p", description);
+        // Build description paragraph that can replace backticked settings references
+        // like `#settings.someLongString#` with a proper VS Code settings link element.
+        var descriptionPara = new XElement("p");
+
+        if (string.IsNullOrEmpty(description))
+        {
+            descriptionPara.Add(string.Empty);
+        }
+        else
+        {
+            // Pattern: backtick + #settings.some.id# + backtick
+            var regex = new Regex(@"`#(.[A-Za-z0-9_.-]+)#`");
+            var matches = regex.Matches(description);
+
+            if (matches.Count == 0)
+            {
+                // No special tokens – add as plain text ensuring valid XML
+                descriptionPara.Add(new XText(description));
+            }
+            else
+            {
+                int lastIndex = 0;
+                foreach (Match m in matches)
+                {
+                    // Add preceding text segment (if any)
+                    if (m.Index > lastIndex)
+                        descriptionPara.Add(new XText(description.Substring(lastIndex, m.Index - lastIndex)));
+
+                    var settingId = m.Groups[1].Value; // e.g., "settings.someLongString"
+                    descriptionPara.Add(VsCodeSettingsLink(settingId));
+
+                    lastIndex = m.Index + m.Length;
+                }
+
+                // Add trailing text after last match
+                if (lastIndex < description.Length)
+                    descriptionPara.Add(new XText(description.Substring(lastIndex)));
+            }
+        }
+
         var tr = new XElement("tr");
         tr.Add(new XElement("td",
             VsCodeSettingsLink(id)));

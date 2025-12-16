@@ -15,7 +15,7 @@ using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace RsDocGenerator
 {
-    internal static class GeneralHelpers
+    public static class GeneralHelpers
     {
         private static readonly Dictionary<string, string> PsiLangugages = new Dictionary<string, string>
         {
