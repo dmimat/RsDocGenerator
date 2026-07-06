@@ -11,6 +11,7 @@ public class Program
     private static string SettingsFile { get; set; } = string.Empty;
     private static string DocFolderPath { get; set; } = string.Empty;
     private static HelpTopic VscodeSettingsTopic { get; set; }
+    private static Dictionary<string, string> NlsStrings { get; set; } = new();
 
     static void Main(string[] args)
     {
@@ -33,6 +34,19 @@ public class Program
 
         DocFolderPath = config["DocFolder"] ?? throw new Exception("DocFolder not found in appsettings.json");
         
+        // Load localization strings from package.nls.json next to the settings file
+        var nlsFile = Path.Combine(Path.GetDirectoryName(SettingsFile)!, "package.nls.json");
+        if (File.Exists(nlsFile))
+        {
+            using var nlsFs = File.OpenRead(nlsFile);
+            using var nlsDoc = JsonDocument.Parse(nlsFs);
+            foreach (var prop in nlsDoc.RootElement.EnumerateObject())
+            {
+                if (prop.Value.ValueKind == JsonValueKind.String)
+                    NlsStrings[prop.Name] = prop.Value.GetString() ?? string.Empty;
+            }
+        }
+
         VscodeSettingsTopic = new HelpTopic("VsCode_Settings", "ReSharper settings in VS Code", DocFolderPath, false);
         try
         {
@@ -85,7 +99,7 @@ public class Program
     {
         // Title is used as chapter title; fallback to 'Settings'
         var title = cfg.TryGetProperty("title", out var titleEl) && titleEl.ValueKind == JsonValueKind.String
-            ? titleEl.GetString() ?? "Settings"
+            ? ResolveNls(titleEl.GetString() ?? "Settings")
             : "Settings";
 
         var chapter = XmlHelpers.CreateChapter(title);
@@ -129,15 +143,22 @@ public class Program
         VscodeSettingsTopic.Add(chapter);
     }
 
+    private static string ResolveNls(string value)
+    {
+        if (string.IsNullOrEmpty(value)) return value;
+        return Regex.Replace(value, @"%([^%]+)%", m =>
+            NlsStrings.TryGetValue(m.Groups[1].Value, out var resolved) ? resolved : m.Value);
+    }
+
     private static string ExtractDescription(JsonElement property)
     {
         // description can be string; sometimes markdownDescription is used; fallback to empty
         if (property.ValueKind == JsonValueKind.Object)
         {
             if (property.TryGetProperty("description", out var d) && d.ValueKind == JsonValueKind.String)
-                return d.GetString() ?? string.Empty;
+                return ResolveNls(d.GetString() ?? string.Empty);
             if (property.TryGetProperty("markdownDescription", out var md) && md.ValueKind == JsonValueKind.String)
-                return md.GetString() ?? string.Empty;
+                return ResolveNls(md.GetString() ?? string.Empty);
         }
         return string.Empty;
     }
