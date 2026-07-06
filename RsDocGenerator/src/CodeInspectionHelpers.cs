@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Feature.Services.Explanatory;
+using JetBrains.ReSharper.Resources.Shell;
 
 namespace RsDocGenerator
 {
@@ -239,10 +241,13 @@ namespace RsDocGenerator
 
         public static string TryGetStaticHref(string inspectionId)
         {
+            var inspectionWikiDataProvider = Shell.Instance.GetComponent<CodeInspectionWikiDataProvider>();
+
             if (ExternalInspectionLinks.ContainsKey(inspectionId))
                 return ExternalInspectionLinks[inspectionId];
             if (inspectionId.Contains("::"))
-                return "NO_LINK";
+                if (inspectionWikiDataProvider.TryGetValue(inspectionId, out var wikiUrl))
+                    return wikiUrl;
             return inspectionId;
         }
     }

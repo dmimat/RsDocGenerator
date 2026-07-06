@@ -13,6 +13,7 @@
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
     <TargetFrameworkProfile />
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -73,6 +74,13 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="JetBrains.Lifetimes">
+      <HintPath>..\..\..\Users\d\.nuget\packages\jetbrains.lifetimes\2026.1.3\lib\net472\JetBrains.Lifetimes.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JetBrains.Annotations">
+      <HintPath>..\..\..\Users\d\.nuget\packages\jetbrains.annotations\2025.2.4\lib\netstandard2.0\JetBrains.Annotations.dll</HintPath>
+    </Reference>
     <Reference Include="JetBrains.Platform.VisualStudio.SinceVs10, Version=777.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325">
       <HintPath>..\packages\JetBrains.Platform.VisualStudio.SinceVs10.213.0.20211012.94036-eap04\DotFiles\JetBrains.Platform.VisualStudio.SinceVs10.dll</HintPath>
     </Reference>
@@ -105,7 +113,7 @@
       <Version>2023.1.2</Version>
     </PackageReference>
     <PackageReference Include="JetBrains.ReSharper.SDK">
-      <Version>2025.3.0-rc01</Version>
+      <Version>2026.1.0.1</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
