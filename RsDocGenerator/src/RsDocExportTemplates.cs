@@ -266,7 +266,7 @@ namespace RsDocGenerator
                 lang = "Unity";
             }*/
 
-            tables[lang].Add(new XElement("tr",
+            var templateRow = new XElement("tr",
                 new XElement("td",
                     new XElement("code", templateId), 
                     new XAttribute("id", templateIdFull)),
@@ -277,7 +277,14 @@ namespace RsDocGenerator
                     XmlHelpers.CreateCodeBlock(template.Text, lang, false),
                     paramHeader,
                     paramElement,
-                    XmlHelpers.CreateInclude("TR", templateIdFull, true))));
+                    XmlHelpers.CreateInclude("TR", templateIdFull, true)));
+
+            if (lang == "C#" && noDescriptionFallback.ToString().ToLower().Contains("unity"))
+            {
+                templateRow.Add(new XAttribute("instance", "!rv"));
+            }
+            
+            tables[lang].Add(templateRow);
 
             var summaryItemRow = new XElement("tr",
                 new XElement("td",
